@@ -1,0 +1,147 @@
+{% extends 'base_gerencial.html' %}
+{% load static %}
+
+{% block items %}
+<title>Empleados</title>
+<link rel="stylesheet" href="{% static 'styles/empleados.css' %}">
+<link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+<script src="{% static 'javascript/empleados.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-start align-items-start g-4">
+
+        <!-- FORMULARIO A LA IZQUIERDA -->
+        <div class="col-lg-4 offset-lg-1">
+            <div class="card shadow-sm rounded p-4">
+                <h4 class="mb-4 text-primary text-center">Registrar Empleado</h4>
+                <form class="row g-4" method="POST">
+                    {% csrf_token %}
+                    <div class="col-md-6">
+                        <label class="form-label">Nombre(s)</label>
+                        <input type="text" class="form-control" required name="nombre" id="nombre">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Apellidos</label>
+                        <input type="text" class="form-control" required name="apellido" id="apellido">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Télefono</label>
+                        <input type="number" class="form-control" required name="telefono" id="telefono">
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Privilegio</label>
+                        <select class="form-select" required id="privilegio" name="privilegio">
+                            <option selected disabled>Selecciona privilegio</option>
+                            <option value="1">Gerente</option>
+                            <option value="2">Ventas</option>
+                            <option value="3">Cajero</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Sucursal</label>
+                        <select class="form-select" required id="sucursal" name="sucursal">
+                            <option selected disabled>Selecciona sucursal</option>
+                            <option value="1">Vista Hermosa</option>
+                            <option value="2">Moctezuma</option>
+                        </select>
+                    </div>
+                    <div class="col-12 text-center">
+                        <input class="btn btn-primary w-100" type="submit" />
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- VISTA DE EMPLEADOS A LA DERECHA -->
+        <div class="col-lg-6">
+            <div class="card p-3 shadow-sm">
+                <h4 class="text-primary text-center mb-3">Lista de Empleados</h4>
+                <div class="container-fluid overflow-auto" style="max-height: 500px;">
+                    <div class="row row-cols-1 row-cols-md-2 g-4">
+                        {% for empleado in empleados %}
+                        <div class="col">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title"> {{ empleado.nombre }} </h5>
+                                    <p class="card-text"> <strong>No. Empleado </strong> {{ empleado.numero_empleado }}
+                                    </p>
+                                    <p class="card-text">Sucursal:
+                                        {% if empleado.sucursal  == 1 %} Vista Hermosa {% endif %}
+                                        {% if empleado.sucursal  == 2 %} Moctezuma {% endif %}
+                                    </p>
+                                    <p class="card-text">Teléfono: {{ empleado.telefono }} </p>
+                                    <button type="button" class="btn btn-warning" id="modal" data-bs-toggle="modal"
+                                        data-bs-target="#exampleModal" data-nombre="{{ empleado.nombre }}"
+                                        data-numero="{{ empleado.numero_empleado }}"
+                                        data-telefono="{{ empleado.telefono }}"
+                                        data-sucursal="{% if empleado.sucursal == 1 %}Vista Hermosa{% elif empleado.sucursal == 2 %}Moctezuma{% endif %}"
+                                        data-contrasena = " {{ empleado.contrasena }} "
+                                        data-privilegio="{% if empleado.privilegio == 1 %} Gerencial {% elif empleado.privilegio == 2 %} Ventas {% elif empleado.privilegio == 3 %} Caja {% endif %}""
+                                    >
+                                        Ver detalles
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Botón para abrir el modal -->
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalLabel">Datos de empleado</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h3 id="modalNombre"></h3>
+                        <p id="modalNumero"></p>
+                        <p id="modalTelefono"></p>
+                        <p id="modalSucursal"></p>
+                        <p id="modalContrasena"></p>
+                        <p id="modalPrivilegio"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var exampleModal = document.getElementById("exampleModal");
+
+        exampleModal.addEventListener("show.bs.modal", function (event) {
+            var button = event.relatedTarget;  // Botón que activó el modal
+            var nombre = button.getAttribute("data-nombre");
+            var numero = button.getAttribute("data-numero");
+            var telefono = button.getAttribute("data-telefono");
+            var sucursal = button.getAttribute("data-sucursal");
+            var contrasena = button.getAttribute("data-contrasena");
+            var privilegio = button.getAttribute("data-privilegio");
+            // Asignar los valores a los elementos dentro del modal
+
+            document.getElementById("modalNombre").innerText = "Nombre: " + nombre;
+            document.getElementById("modalNumero").innerText = "No. Empleado: " + numero;
+            document.getElementById("modalTelefono").innerText = "Teléfono: " + telefono;
+            document.getElementById("modalSucursal").innerText = "Sucursal: " + sucursal;
+            document.getElementById("modalContrasena").innerText = "Contraseña: " + contrasena;
+            document.getElementById("modalPrivilegio").innerText = "Privilegio: " + privilegio;
+        });
+    });
+</script>
+{% endblock %}

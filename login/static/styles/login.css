@@ -1,0 +1,92 @@
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  height: 100vh;
+  background-color: #fef6ef;
+}
+
+/* Contenedor general */
+.login-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+}
+
+/* Lado de la imagen */
+.image-side {
+  flex: 1;
+  background-color: #dcdcdc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.image-side img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Lado del formulario */
+.form-side {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background-color: white;
+}
+
+.form-box {
+  width: 100%;
+  max-width: 400px;
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.logo img {
+  margin-bottom: 20px;
+}
+
+.form-box h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+form input {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 25px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+form button {
+  width: 100%;
+  padding: 12px;
+  background-color: #d28850;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+form button:hover {
+  background-color: #915a30;
+}
+

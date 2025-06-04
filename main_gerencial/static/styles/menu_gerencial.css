@@ -1,0 +1,81 @@
+.productos-scroll {
+    max-height: 250px; /* Establece una altura fija */
+    overflow-y: auto;  /* Activa el desplazamiento vertical */
+}
+
+/* Ajuste para que tabla ocupe todo el ancho y se vea bien */
+.productos-scroll table {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+/* Opcional: resaltar fila al pasar el mouse */
+.table-hover tbody tr:hover {
+  background-color: #d1ecf1;
+  cursor: pointer;
+}
+
+
+.container_custom {
+  width: 100%;
+  padding: 20px 40px; /* puedes ajustar padding horizontal */
+  max-width: none;
+}
+
+/* Para que graficas y productos usen toda la altura disponible en su fila */
+.graficas-container,
+.productos-container {
+  height: 400px; /* altura fija para estas dos secciones */
+}
+
+/* Contenedor de gráfica con scroll si necesario */
+.grafica-content {
+  height: 100%;
+  overflow-y: auto;
+  padding: 15px;
+}
+
+/* Productos: scroll vertical */
+.productos-scroll {
+  height: 100%;
+  overflow-y: auto;
+  padding-right: 10px;
+  display: block;
+}
+
+/* Tarjetas de producto con estilo */
+.producto-card {
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  padding: 15px;
+  background-color: #fcfaf8;
+  text-align: center;
+  margin-bottom: 15px;
+  max-width: 250px;
+  flex: 1 1 250px;
+}
+
+/* Botones grupo transición suave */
+.btn-group button {
+  transition: all 0.3s ease;
+}
+
+.btn-group button:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Tabla pedidos scroll */
+.pedidos-container {
+  max-height: 320px;
+}
+
+.table-responsive {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.table th, .table td {
+  padding: 12px;
+  text-align: center;
+}

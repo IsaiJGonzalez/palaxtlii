@@ -1,0 +1,15 @@
+.container-custom {
+     width: 95vw;
+     height: 90vh;
+     margin: auto;
+     padding: 20px;
+     background-color: #f8f9fa;
+     border-radius: 10px;
+ }
+
+ .order-date {
+     font-size: 18px;
+     font-weight: bold;
+     color: #af6c31;
+     /* Café brillante pastel */
+ }

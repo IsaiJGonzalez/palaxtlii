@@ -1,0 +1,342 @@
+{% extends 'base_gerencial.html' %}
+{% load static %}
+
+{% block items %}
+<title>Pedidos</title>
+<link rel="stylesheet" href="{% static 'styles/hpedidos.css' %}">
+<script src="{% static 'javascript/tools.js'  %}"></script>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="pt-3">
+
+        <div class="mb-3">
+            <strong>Ordenar por:</strong>
+            <a href="?orden=registro" class="btn btn-outline-primary {% if orden == 'registro' %}active{% endif %}">
+                Fecha de registro
+            </a>
+            <a href="?orden=entrega" class="btn btn-outline-success {% if orden == 'entrega' %}active{% endif %}">
+                Fecha de entrega
+            </a>
+        </div>
+        
+
+        <h3 class="pb-3" id="h3_1">Pedidos por Entregar</h3>
+        <table class="table table-striped table-bordered border-5 text-center align-middle" id="pedidos_act">
+            <thead class="customer_header">
+                <tr>
+                    <th>Folio</th>
+                    <th>Fecha Entrega</th>
+                    <th>Cliente</th>
+                    <th>Fecha Registro</th>
+                    <th>Cant.</th>
+                    <th>Productos</th>
+                    <th>Forma entrega</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="lista-pedidos-no-entregados">
+                {% for pedido in pedidos_no_entregados %}
+                <tr>
+                    <td class="text-bg-danger">{{ pedido.folio }}</td>
+                    <td class="text-bg-success" >{{ pedido.fecha_entrega|date:"j \\d\\e F \\d\\e Y" }}</td>
+                    <td>{{ pedido.nombre_cliente }}</td>
+                    <td>{{ pedido.fecha_registro|date:"j \\d\\e F \\d\\e Y" }}</td>
+                    <td class="text-end">
+                        {% for producto in pedido.productos %}
+                            <p>{{producto.cantidad}} </p>
+                        {% endfor %}
+                    </td>
+                    <td class="text-start">
+                        {% for producto in pedido.productos %}
+                            <p>{{producto.descripcion}} </p>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% if pedido.forma_entrega == 'tienda' %}
+                        Sucursal : {% if pedido.sucursal  == '1' %} Vista Hermosa {% endif %} {% if pedido.sucursal == '2' %} Moctezuma {% endif %} 
+                        {% endif %}
+                        {% if pedido.forma_entrega == 'envio' %}
+                        Envio a domicilio
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            {% if pedido.restante_pagado %}
+                                <button class="btn btn-primary mb-2" id="entregado_directo" data-folio_ed="{{pedido.folio}}"> <i class="bi bi-check-circle"></i></button>
+                            {% else %}
+                                <button class="btn btn-secondary mb-2" id="entregado_directo" disabled> <i class="bi bi-check-circle"></i></button>
+                            {% endif %}
+
+                            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#pedidoModal"
+                                data-anticipo="{{ pedido.anticipo }}" data-at-no_emp="{{pedido.at_no_emp}}"
+                                data-at-nom-emp="{{pedido.at_nom_emp}}" data-cambio="{{pedido.cambio}}"
+                                data-cel="{{pedido.cel}}" data-costo-envio="{{pedido.costo_envio}}"
+                                data-direccion="{{pedido.direccion}}" data-especificaciones="{{pedido.especificaciones}}"
+                                data-estado="{{pedido.estado}}" data-fecha-entrega="{{pedido.fecha_entrega}}"
+                                data-fecha-registro="{{pedido.fecha_registro}}" data-folio="{{pedido.folio}}"
+                                data-forma-entrega="{{pedido.forma_entrega}}" data-gran-total="{{pedido.gran_total}}"
+                                data-hora-entrega="{{pedido.hora_entrega}}" data-metodo-pago="{{pedido.metodo_pago}}"
+                                data-mix-ef="{{pedido.mix_ef}}" data-mix-tar="{{pedido.mix_tar}}"
+                                data-nombre-cliente="{{pedido.nombre_cliente}}"
+                                data-num_operacion="{{pedido.num_operacion}}" 
+                                data-recibe="{{pedido.recibe}}" data-recibido="{{pedido.recibido}}"
+                                data-referencias="{{pedido.referencias}}" data-sucursal="{{pedido.sucursal}}"
+                                data-telefono="{{pedido.telefono}}" data-total="{{pedido.total}}">
+                                <i class="bi bi-info-circle"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pt-4">
+        <h3 class="pb-3" id="h3_2">Pedidos Entregados</h3>
+        <table class="table table-striped table-bordered text-center align-middle" id="pedidos_ent">
+            <thead class="customer_header">
+                <tr>
+                    <th>Folio</th>
+                    <th>Fecha registro</th>
+                    <th>Cliente</th>
+                    <th>Fecha entrega</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="lista-pedidos-entregados">
+                {% for pedido in pedidos_entregados %}
+                <tr>
+                    <td>{{pedido.folio}}</td>
+                    <td>{{pedido.fecha_registro|date:"j \\d\\e F \\d\\e Y"}}</td>
+                    <td>{{pedido.nombre_cliente}}</td>
+                    <td>{{pedido.fecha_entrega|date:"j \\d\\e F \\d\\e Y"}}</td>
+                    <td>
+                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#pedidoModal12345">Ver
+                            Detalles</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <!-- Paginación para pedidos entregados -->
+        <div class="pagination">
+            {% if pedidos_entregados.has_previous %}
+            <a href="?page_entregados={{ pedidos_entregados.previous_page_number }}&orden={{ orden }}"
+                class="btn btn-secondary">Anterior</a>
+            {% endif %}
+            {% if pedidos_entregados.has_next %}
+            <a href="?page_entregados={{ pedidos_entregados.next_page_number }}&orden={{ orden }}"
+                class="btn btn-secondary">Siguiente</a>
+            {% endif %}
+        </div>
+        <!-- Botón "Cargar más" para pedidos entregados -->
+        <button id="cargarMasPedidosEntregados" class="btn btn-secondary">Cargar más entregados</button>
+
+    </div>
+</div>
+
+<!-- Modal para detalles del pedido de Juan Pérez -->
+<div class="modal fade" id="pedidoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold text-primary">Resumen: </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-bg-danger w-25 fw-bold pt-1 pb-1" id="folio"></p>
+                <p class="text-bg-warning fw-bold" id="cliente"></p>
+                <p class="text-bg-warning fw-bold" id="telefono"></p>
+                <hr class="table-group-divider">
+                <h6>Atendio: </h6>
+                <table class="table justify-content-center">
+                    <thead>
+                        <tr class="text-center">
+                            <th>No. Empleado</th>
+                            <th>Nombre</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="text-center">
+                            <td id="no_emp"></td>
+                            <td id="nom_emp"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <hr class="table-group-divider">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Fecha de Entrega</th>
+                            <th>Hora</th>
+                            <th>Lugar de Entrega</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td id="fecha_entrega"></td>
+                            <td id="hora_entrega"></td>
+                            <td id="lugar"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <hr class="table-group-divider">
+                <h5>Especificaciones Especiales:</h5>
+                <p id="especificaciones"></p>
+
+                <hr class="table-group-divider">
+                
+                <div class="" id="pago_realizado">
+                
+                </div>
+
+                <h6 id="total" class="text-end text-bg-success p-2"></h6>
+                <h6 id="anticipo" class="text-end text-bg-primary p-2"></h6>
+                <h5 class=" text-end text-bg-dark p-3" id="restante"></h5>
+                <div class="mb-3 col-5 d-none" id="forma_de_pago">
+                    <label class="form-label d-block">Forma de pago:</label>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="pago" id="tarjeta">
+                        <label class="form-check-label" for="tarjeta">Tarjeta</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="pago" id="efectivo">
+                        <label class="form-check-label" for="efectivo">Efectivo</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-success" id="pagado">Pagado y Entregado</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS para que los modales funcionen -->
+
+<!-- Bootstrap JS para que los modales funcionen -->
+<script>
+    let pagina_entregados = 2;
+
+    document.getElementById("cargarMasPedidosEntregados").addEventListener("click", function () {
+        const orden = new URLSearchParams(window.location.search).get("orden") || "registro";
+
+        fetch(`/pedidos?page_entregados=${pagina_entregados}&orden=${orden}&tipo=entregados`, {
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        })
+            .then(response => {
+                if (!response.ok) throw new Error("Error al cargar pedidos");
+                return response.json();
+            })
+            .then(data => {
+                const listaPedidos = document.getElementById("lista-pedidos-entregados");
+
+                if (data.pedidos.length === 0) {
+                    document.getElementById("cargarMasPedidosEntregados").disabled = true;
+                    document.getElementById("cargarMasPedidosEntregados").innerText = "No hay más pedidos";
+                    return;
+                }
+
+                data.pedidos.forEach(pedido => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                <td>${pedido.folio}</td>
+                <td>${pedido.fecha_registro}</td>
+                <td>${pedido.nombre_cliente}</td>
+                <td>${pedido.fecha_entrega}</td>
+                <td><button class="btn btn-warning">Ver Detalles</button></td>
+            `;
+                    listaPedidos.appendChild(row);
+                });
+
+                pagina_entregados++;
+            })
+            .catch(error => {
+                console.error("Error al cargar más pedidos entregados:", error);
+            });
+    });
+
+</script>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var exampleModal = document.getElementById("pedidoModal");
+
+        exampleModal.addEventListener("show.bs.modal", function (event) {
+            var button = event.relatedTarget;  // Botón que activó el modal
+            //var anticipo = button.getAttribute("data-anticipo");
+            const anticipo = button.getAttribute('data-anticipo');
+            var at_no_emp = button.getAttribute("data-at-no_emp");
+            var at_nom_emp = button.getAttribute("data-at-nom-emp");
+            var cambio = button.getAttribute("data-cambio");
+            var cel = button.getAttribute("data-cel");
+            var costo_envio = button.getAttribute("data-costo-envio");
+            var direccion = button.getAttribute("data-direccion");
+            var especificaciones = button.getAttribute("data-especificaciones");
+            var estado = button.getAttribute("data-estado");
+            var fecha_entrega = button.getAttribute("data-fecha-entrega");
+            var fecha_registro = button.getAttribute("data-fecha-registro");
+            var folio = button.getAttribute("data-folio");
+            var forma_entrega = button.getAttribute("data-forma-entrega");
+            var gran_total = button.getAttribute("data-gran-total");
+            var hora_entrega = button.getAttribute("data-hora-entrega");
+            var metodo_pago = button.getAttribute("data-metodo-pago");
+            var mix_ef = button.getAttribute("data-mix-ef");
+            var mix_tar = button.getAttribute("data-mix-tar");
+            var nombre_cliente = button.getAttribute("data-nombre-cliente");
+            var num_operacion = button.getAttribute("data-num_operacion");
+            
+            var importe = button.getAttribute("data-importe");
+            var precio_unitario = button.getAttribute("data-precio-unitario");
+            var recibe = button.getAttribute("data-recibe");
+            var recibido = button.getAttribute("data-recibido");
+            var referencias = button.getAttribute("data-referencias");
+            var sucursal = button.getAttribute("data-sucursal");
+            var telefono = button.getAttribute("data-telefono");
+            var total = button.getAttribute("data-total");
+
+            const div_pagos = document.getElementById('forma_de_pago');
+
+            // Asignar los valores a los elementos dentro del modal
+
+            document.getElementById("folio").innerText = "Folio: " + folio;
+            document.getElementById("no_emp").innerText = at_no_emp;
+            document.getElementById("nom_emp").innerText = at_nom_emp;
+
+            document.getElementById("fecha_entrega").innerText = fecha_entrega.split(" a las")[0];
+            document.getElementById("hora_entrega").innerText = hora_entrega;
+            if (forma_entrega == "envio") {
+                document.getElementById('lugar').innerText = direccion + " " + 'Recibe: ' + recibe + ', Cel: ' + cel
+            } else if (forma_entrega == 'tienda') {
+                document.getElementById('lugar').innerText = 'Sucursal ' + (parseInt(sucursal) === 1 ? "Vista Hermosa" : (parseInt(sucursal) === 2 ? "Moctezuma" : "Desconocido"));
+            }
+
+            document.getElementById('cliente').innerText = 'Cliente: ' + nombre_cliente;
+            document.getElementById('telefono').innerText = 'Teléfono: ' + telefono;
+
+            document.getElementById('total').innerText = 'Total: ' + '$' + total;
+            document.getElementById("anticipo").innerText = 'Anticipó: ' + '$' + anticipo;
+            document.getElementById('restante').innerText = 'Pago Restante: ' + '$' + gran_total;
+            document.getElementById('especificaciones').innerText = especificaciones;
+            
+            document.getElementById('pagado').setAttribute('data-folio',folio)
+            
+
+            if (gran_total != 0) {
+                div_pagos.classList.remove('d-none');
+            }
+
+
+        });
+    });
+
+</script>
+
+
+<script src="{% static 'javascript/pagado.js'  %}"></script>
+{% endblock %}

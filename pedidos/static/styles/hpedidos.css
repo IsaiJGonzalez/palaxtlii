@@ -1,0 +1,31 @@
+#pedidos_act th{
+    background-color: #3369ba !important;
+    color: white !important;
+}
+
+#pedidos_ent th {
+    background-color: #3fa74c !important;
+    color: white !important;
+}
+
+#h3_1 {
+    color: #3369ba;
+    font-weight: bold;
+}
+
+#h3_2 {
+    color: #33ba4e;
+    font-weight: bold;
+}
+
+button[disabled][data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    transform: translateY(-30px);
+}

@@ -1,0 +1,526 @@
+{% extends base_template %}
+
+{% load static %}
+
+{% block items %}
+<title>Registro de pedidos</title>
+<meta name="csrf-token" content="{{ csrf_token }}">
+<link rel="stylesheet" href="{% static 'styles/registro_pedidos.css' %}">
+{% endblock %}
+
+{% block content %}
+<form class=" p-4 border rounded-4 shadow bg-white mb-3 mt-3" style="max-width: 900px; margin: auto;" id="form-pedido">
+    <div class="text-center mb-4">
+        <h4 class="fw-bold mb-1">Palaxtli</h4>
+        <p class="mb-0">REPOSTERÍA</p>
+        <small class="text-muted"> {{locacion}} </small>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+        <div class="d-flex gap-2 flex-wrap">
+            <div>
+                <label class="form-label small mb-1">DÍA</label>
+                <input type="number" class="form-control form-control-sm" id="dia_reg" readonly style="width: 60px;">
+            </div>
+            <div>
+                <label class="form-label small mb-1">MES</label>
+                <input type="number" class="form-control form-control-sm" id="mes_reg" readonly style="width: 60px;">
+            </div>
+            <div>
+                <label class="form-label small mb-1">AÑO</label>
+                <input type="number" class="form-control form-control-sm" id="a_reg" readonly style="width: 70px;">
+            </div>
+        </div>
+        <div>
+            <label class="form-label small mb-1">FOLIO</label>
+            <input type="text" class="form-control form-control-sm fw-bold text-danger" value="{{folio}}" id="folio" readonly
+                style="width: 100px;">
+        </div>
+    </div>
+    <hr class="table-group-divider">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+        <div class="d-flex gap-2 flex-wrap">
+            <label class="form-label">Atiende: </label>
+            <input type="number" class="form-control form-control-sm" id="at_no_emp" readonly style="width: 100px;" value="{{ numero_empleado }}" > <!-- (at)iende (no). (emp)leado -->
+            <input type="text" class="form-control form-control-sm" id="at_nom_emp" readonly style="width: 300px;" value="{{nombre}}">
+        </div>
+    </div>
+    <hr class="table-group-divider">
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label class="form-label">Cliente</label>
+            <input type="text" class="form-control" id="in_cliente">
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Teléfono</label>
+            <input type="number" class="form-control" id="in_tel">
+        </div>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+        <table class="table table-bordered mb-3">
+            <thead class="table-light">
+                <tr>
+                    <th class="col-1">Cantidad</th>
+                    <th>Descripción</th>
+                    <th class="col-2">Precio Unit.</th>
+                    <th class="col-2">Importe</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-body">
+                <tr>
+                    <td><input class="form-control cantidad" type="number" value="1"></td>
+                    <td><input class="form-control descripcion" type="text"></td>
+                    <td><input class="form-control precio_unitario" type="number"></td>
+                    <td><input class="form-control importe" type="number" readonly></td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- Botón flotante de + para agregar filas -->
+        <button id="agregarFila" class="btn btn-success"
+            style="border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;">
+            +
+        </button>
+    </div>
+    <hr class="table-group-divider">
+    <div class="mb-3">
+        <label class="form-label">Especificaciones especiales</label>
+        <textarea class="form-control" rows="2"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label d-block">Entrega:</label>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="entrega" id="envio" onchange="mostrarEnvio()">
+            <label class="form-check-label" for="envio">Envío</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="entrega" id="tienda" onchange="mostrarEnvio()">
+            <label class="form-check-label" for="tienda">Tienda</label>
+        </div>
+    </div>
+
+    <!--ENVIO SELECCIONADO-->
+    <div class="d-none" id="envio_seleccionado">
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label class="form-label">Recibe</label>
+                <input type="text" class="form-control" id="recibe">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Cel.</label>
+                <input type="number" class="form-control" id="cel">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Dirección</label>
+                <input type="text" class="form-control" id="direccion_entrega">
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="mb-3 col-7">
+                <label class="form-label">Referencias</label>
+                <input type="text" class="form-control" placeholder="Entre calle...">
+            </div>
+            <div class="mb-3 col-5">
+                <label class="form-label">Costo de envio $</label>
+                <input type="number" class="form-control" placeholder="50">
+            </div>
+        </div>
+    </div>
+
+
+    <!--ENVIO SELECCIONADO-->
+
+    <!--TIENDA SELECCIONADA-->
+    <div class="d-none mb-4" id="tienda_seleccionada">
+        <select class="form-select" required>
+            <option selected disabled>Selecciona sucursal</option>
+            <option value="1">Vista Hermosa</option>
+            <option value="2">Moctezuma</option>
+        </select>
+    </div>
+    <!--TIENDA SELECCIONADA-->
+
+    <hr class="table-group-divider">
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <label class="form-label">Fecha de entrega</label>
+            <input type="date" class="form-control">
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Hora de entrega</label>
+            <input type="time" class="form-control">
+        </div>
+    </div>
+    <hr class="table-group-divider">
+
+    <div class="mb-3 col-5 d-none" id="forma_de_pago">
+        <label class="form-label d-block">Forma de pago:</label>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="pago" id="tarjeta" onchange="recuadros_pago()">
+            <label class="form-check-label" for="tarjeta">Tarjeta</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="pago" id="efectivo" onchange="recuadros_pago()">
+            <label class="form-check-label" for="efectivo">Efectivo</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="pago" id="transferencia" onchange="recuadros_pago()">
+            <label class="form-check-label" for="transferencia">Transferencia</label>
+        </div>
+        <!-- Añadir opción de Pago Mixto -->
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="pago" id="mixto" onchange="recuadros_pago()">
+            <label class="form-check-label" for="mixto">Mixto (Efectivo + Tarjeta)</label>
+        </div>
+    </div>
+
+    <div class="row mb-3 text-end">
+        <div class="col-md-4">
+            <label class="form-label fw-bold">Total</label> 
+            <input type="number" class="form-control fw-bold text-success text-end" id="total" readonly>
+        </div>
+        <div class="col-md-4">
+            <div class="form-check d-flex justify-content-end gap-2 mb-1">
+                <input class="form-check-input" type="checkbox" id="anticipoCheck" onclick="toggleAnticipo()">
+                <label class="form-check-label" for="anticipoCheck">Anticipo</label>
+            </div>
+            <input type="number" id="anticipoInput" class="form-control fw-bold text-primary text-end" disabled>
+        </div>
+        <!-- Contenedor para Efectivo -->
+        <div class="d-none col-md-4 text-end" id="div_efectivo_r">
+            <label class="form-label fw-bold">Recibido $</label>
+            <input type="number" class="form-control fw-bold text-secondary text-end" id="recibido">
+
+            <label class="form-label fw-bold mt-2">Cambio $</label>
+            <input type="number" class="form-control fw-bold text-danger text-end" readonly id="cambio">
+        </div>
+        <div class="col-md-4 text-end">
+            <label class="form-label fw-bold">Gran Total</label>
+            <input type="number" class="form-control fw-bold text-success text-end" id="granTotal_in" readonly>
+        </div>
+
+        <!-- Contenedor para Pago Mixto -->
+        <div class="d-none col-md-12 mt-2" id="div_pago_mixto">
+            <div class="row">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold text-end">Efectivo $</label>
+                    <input type="number" class="form-control fw-bold text-danger text-end" id="efectivo_mixto">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Tarjeta $</label>
+                    <input type="number" class="form-control fw-bold text-danger text-end" id="tarjeta_mixto">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">No. Operación</label>
+                    <input type="text" class="form-control fw-bold text-primary text-end" id="operacion_mixto">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Nueva fila para mostrar los métodos de pago debajo de "Gran Total" -->
+    <div class="row d-flex flex-column align-items-end">
+        <!-- Contenedor para Tarjeta / Transferencia -->
+        <div class="d-none col-md-4 text-end" id="div_tarjeta_transferencia_r">
+            <label class="form-label fw-bold">Número de operación</label>
+            <input type="number" class="form-control fw-bold text-secondary" id="id_operacion">
+        </div>
+    </div>
+    <input type="submit" class="btn btn-success w-100 mt-5" value="Registrar Pedido">
+</form>
+
+<script src="{% static 'javascript/fechas.js' %}"></script>
+<script src="{% static 'javascript/calculo.js' %}"></script>
+<script>
+
+    function mostrarEnvio() {
+        tienda = document.getElementById('tienda');
+        envio = document.getElementById('envio');
+        div_tienda = document.getElementById('tienda_seleccionada');
+        div_envio = document.getElementById('envio_seleccionado');
+
+        if (tienda.checked) {
+            div_tienda.classList.remove('d-none');
+        } else {
+            div_tienda.classList.add('d-none')
+        }
+
+        if (envio.checked) {
+            div_envio.classList.remove('d-none');
+        } else {
+            div_envio.classList.add('d-none');
+        }
+    }
+
+    function toggleAnticipo() {
+        const checkbox = document.getElementById('anticipoCheck');
+        const input = document.getElementById('anticipoInput');
+        const div_formaPago = document.getElementById('forma_de_pago');
+        let div_tr_tar = document.getElementById('div_tarjeta_transferencia_r');
+        let div_efectivo = document.getElementById('div_efectivo_r');
+        let div_mix = document.getElementById('div_pago_mixto');
+
+        if (checkbox.checked) {
+            input.disabled = false;
+            div_formaPago.classList.remove('d-none');
+        } else {
+            input.disabled = true;
+            input.value = '';
+            div_formaPago.classList.add('d-none');
+            div_tr_tar.classList.add('d-none');
+            div_efectivo.classList.add('d-none');
+            div_mix.classList.add('d-none');
+        }
+    }
+
+    function recuadros_pago() {
+        efectivo = document.getElementById('efectivo');
+        tarjeta = document.getElementById('tarjeta');
+        transferencia = document.getElementById('transferencia');
+        div_tr_tar = document.getElementById('div_tarjeta_transferencia_r')
+        div_efectivo = document.getElementById('div_efectivo_r')
+
+        if (efectivo.checked) {
+            div_efectivo.classList.remove('d-none');
+        } else {
+            div_efectivo.classList.add('d-none');
+        }
+
+        if (tarjeta.checked || transferencia.checked) {
+            div_tr_tar.classList.remove('d-none');
+        } else {
+            div_tr_tar.classList.add('d-none')
+        }
+    }
+
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const tablaBody = document.getElementById("tabla-body");
+        const botonAgregar = document.getElementById("agregarFila");
+
+        // Función para calcular el importe de cada fila
+        function valorImporte(event) {
+            const fila = event.target.closest("tr"); // Encuentra la fila actual
+            const cantidad = parseFloat(fila.querySelector(".cantidad").value) || 0;
+            const precioUnit = parseFloat(fila.querySelector(".precio_unitario").value) || 0;
+            const importe = fila.querySelector(".importe");
+
+            const totalImporte = cantidad * precioUnit;
+            importe.value = totalImporte.toFixed(2); // Redondea a 2 decimales
+        }
+
+        // Delegación de eventos: escucha cambios en cantidad y precio dentro de la tabla
+        tablaBody.addEventListener("input", function (event) {
+            if (event.target.classList.contains("cantidad") || event.target.classList.contains("precio_unitario")) {
+                valorImporte(event);
+            }
+        });
+
+        // Agregar nueva fila y asegurarse de que pueda calcular su importe correctamente
+        if (botonAgregar) {
+            botonAgregar.addEventListener("click", function (event) {
+                event.preventDefault(); // Evita la recarga de la página
+
+                const nuevaFila = document.createElement("tr");
+                nuevaFila.innerHTML = `
+                <td><input class="form-control cantidad" type="number" value="1"></td>
+                <td><input class="form-control descripcion" type="text"></td>
+                <td><input class="form-control precio_unitario" type="number"></td>
+                <td><input class="form-control importe" type="number" readonly></td>
+            `;
+                tablaBody.appendChild(nuevaFila);
+            });
+        } else {
+            console.error("El botón agregarFila no se encontró en el DOM.");
+        }
+    });
+
+</script>
+<script>
+// Función para actualizar el total general
+function calcularTotal() {
+    const filas = document.querySelectorAll('#tabla-body tr');
+    let total = 0;
+
+    // Recorre cada fila para calcular el subtotal
+    filas.forEach(fila => {
+        const importe = parseFloat(fila.querySelector('.importe')?.value) || 0;
+        total += importe;
+    });
+
+    // Suma costo de envío si aplica
+    const envioChecked = document.getElementById('envio')?.checked;
+    if (envioChecked) {
+        const costoEnvio = parseFloat(document.querySelector('#envio_seleccionado input[placeholder="50"]')?.value) || 0;
+        total += costoEnvio;
+    }
+
+    // Asigna al input de Total
+    const totalInput = document.querySelector('input.form-control.text-success');
+    totalInput.value = total.toFixed(2);
+
+    calcularGranTotal();
+}
+
+// Función para calcular gran total considerando anticipo o pagos
+function calcularGranTotal() {
+    const total = parseFloat(document.querySelector('input.form-control.text-success')?.value) || 0;
+    const anticipoCheck = document.getElementById('anticipoCheck').checked;
+    const anticipo = anticipoCheck ? parseFloat(document.getElementById('anticipoInput')?.value) || 0 : 0;
+    const granTotal_in = document.getElementById('granTotal_in');
+    const cambio = document.getElementById('cambio');
+    const recibido = parseFloat(document.getElementById('recibido')?.value) || 0;
+    const efectivo_mixto = parseFloat(document.getElementById('efectivo_mixto')?.value) || 0;
+    const tarjeta_mixto = document.getElementById('tarjeta_mixto');
+
+
+    let granTotal = total - anticipo;
+
+    const formaPago = document.querySelector('input[name="pago"]:checked')?.id;
+
+    // Si es efectivo, calcular cambio correctamente
+    if (formaPago === 'efectivo') {
+        const cambioCl = recibido - anticipo;
+        cambio.value = cambioCl >= 0 ? cambioCl.toFixed(2) : '0.00';
+    }
+
+    if(formaPago === 'mixto'){
+        const tar = anticipo - efectivo_mixto; 
+        tarjeta_mixto.value = tar >= 0 ? tar.toFixed(2) : '0.00';
+    }
+
+
+
+    // Asignar a Gran Total
+    granTotal_in.value = granTotal.toFixed(2);
+}
+
+// Mostrar y ocultar campos según forma de pago
+function recuadros_pago() {
+    const efectivo = document.getElementById('efectivo');
+    const tarjeta = document.getElementById('tarjeta');
+    const transferencia = document.getElementById('transferencia');
+    const mixto = document.getElementById('mixto');
+
+    const div_tr_tar = document.getElementById('div_tarjeta_transferencia_r');
+    const div_efectivo = document.getElementById('div_efectivo_r');
+    const div_mixto = document.getElementById('div_pago_mixto');
+
+    // Limpieza
+    div_tr_tar.classList.add('d-none');
+    div_efectivo.classList.add('d-none');
+    div_mixto.classList.add('d-none');
+
+    // Mostrar según la opción seleccionada
+    if (efectivo.checked) div_efectivo.classList.remove('d-none');
+    if (tarjeta.checked || transferencia.checked) div_tr_tar.classList.remove('d-none');
+    if (mixto.checked) div_mixto.classList.remove('d-none');
+}
+
+// Detectar cambios para recalcular todo
+document.addEventListener("input", function () {
+    calcularTotal();
+});
+
+// Inicializar valores
+document.addEventListener("DOMContentLoaded", function () {
+    calcularTotal();
+});
+</script>
+<script>
+document.getElementById("form-pedido").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    // Recolectar productos de la tabla
+    const productos = [];
+    document.querySelectorAll("#tabla-body tr").forEach(row => {
+        const cantidad = parseInt(row.querySelector(".cantidad")?.value || 0);
+        const descripcion = row.querySelector(".descripcion")?.value || "";
+        const precio_unitario = parseFloat(row.querySelector(".precio_unitario")?.value || 0);
+        const importe = parseFloat(row.querySelector(".importe")?.value || 0);
+
+        if (descripcion && cantidad > 0) {
+            productos.push({ cantidad, descripcion, precio_unitario, importe });
+        }
+    });
+
+    const envio_seleccionado = document.getElementById("envio").checked;
+    const tienda_seleccionada = document.getElementById('tienda').checked;
+    const anticipoCheck = document.getElementById('anticipoCheck').checked;
+    const tarjeta_seleccionada = document.getElementById('tarjeta').checked;
+    const efectivo_seleccionado = document.getElementById('efectivo').checked;
+    const transferencia_seleccionada = document.getElementById('transferencia').checked;
+    const mixto_seleccionado = document.getElementById('mixto').checked;
+    // Armar datos del pedido   
+    const data = {
+        folio: document.getElementById('folio').value,
+        fecha_registro: `${document.getElementById("a_reg").value}-${document.getElementById("mes_reg").value}-${document.getElementById("dia_reg").value}`,
+        nombre_cliente: document.getElementById('in_cliente').value,
+        telefono: document.getElementById('in_tel').value,
+        productos: productos,
+        especificaciones: document.querySelector("textarea").value,
+        
+        forma_entrega: document.getElementById("envio").checked ? "envio" : "tienda",
+
+        metodo_pago: document.querySelector("input[name='pago']:checked")?.id || "",
+
+        total: parseFloat(document.getElementById('total').value || 0),
+        gran_total: parseFloat(document.getElementById("granTotal_in").value || 0),
+        fecha_entrega: document.querySelector("input[type='date']").value,
+        hora_entrega: document.querySelector("input[type='time']").value,
+        
+        anticipo: anticipoCheck ? document.getElementById('anticipoInput').value || 0:0,
+        
+        recibe: envio_seleccionado ? document.getElementById('recibe')?.value || "" : "",
+        cel: envio_seleccionado ? document.getElementById('cel')?.value || "":"",
+        direccion: envio_seleccionado ?  document.getElementById('direccion_entrega')?.value || "":"",
+        referencias: envio_seleccionado ?  document.querySelector("#envio_seleccionado input[placeholder='Entre calle...']")?.value || "":"",
+        costo_envio: envio_seleccionado ?  parseFloat(document.querySelector("#envio_seleccionado input[placeholder='50']")?.value || 0):0,
+        
+        recibido: efectivo_seleccionado ? parseFloat(document.getElementById("recibido")?.value || 0):0,
+        cambio: efectivo_seleccionado ? parseFloat(document.getElementById("cambio")?.value || 0):0,
+
+        num_operacion : tarjeta_seleccionada 
+        ? document.getElementById("id_operacion")?.value 
+        || (mixto_seleccionado ? document.getElementById('operacion_mixto')?.value : 0) 
+        : 0,
+        
+        sucursal: tienda_seleccionada ? document.querySelector("#tienda_seleccionada select")?.value || "":"",
+        
+        mix_ef:mixto_seleccionado ? document.getElementById('efectivo_mixto')?.value : 0,
+        mix_tar:mixto_seleccionado ? document.getElementById('tarjeta_mixto')?.value :0,
+
+        at_no_emp:document.getElementById('at_no_emp').value,
+        at_nom_emp:document.getElementById('at_nom_emp').value,
+    };
+
+    // Enviar con fetch
+    fetch("{% url 'guardar_pedido' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(response => {
+        if (response.success) {
+            alert("Pedido registrado con éxito");
+            location.reload();
+        } else {
+            alert("Error al registrar el pedido: " + response.error);
+        }
+    })
+    .catch(error => {
+        alert("Error inesperado: " + error);
+    });
+});
+</script>
+
+
+
+{% endblock %}

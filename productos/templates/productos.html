@@ -1,0 +1,237 @@
+{% extends 'base_gerencial.html' %}
+{% load static %}
+
+{% block items %}
+<title>Productos</title>
+<link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-start align-items-start g-4">
+
+        <!-- FORMULARIO A LA IZQUIERDA -->
+        <div class="col-lg-4 offset-lg-1">
+            <div class="card shadow-sm rounded p-4">
+                <h4 class="mb-4 text-primary text-center">Registrar Productos</h4>
+                <form class="row g-4" method="POST" id="form_productos">
+                    {% csrf_token %}
+                    <div class="col-md-6">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-control" required name="nombre" id="nombre">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Existencias</label>
+                        <input type="number" class="form-control" name="existencias" id="existencias" placeholder="10">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Precio $</label>
+                        <input type="number" class="form-control" required name="precio" id="precio" placeholder="200">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Categoría</label>
+                        <select class="form-select" required id="categoria" name="categoria">
+                            <option selected disabled>Selecciona una categoría</option>
+                            {% for cat in cats %}
+                            <option value="{{cat.nombre}}"> {{cat.nombre}} </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Sucursal</label>
+                        <select class="form-select" required id="sucursal" name="sucursal">
+                            <option selected disabled>Selecciona sucursal</option>
+                            <option value="1">Vista Hermosa</option>
+                            <option value="2">Moctezuma</option>
+                            <option value="3">Ambas</option>
+                        </select>
+                    </div>
+                    <div class="row mt-4 align-items-center">
+                        <label class="col-auto">¿El producto tiene receta?</label>
+                        <input class="col-auto" type="checkbox" id="tiene_receta" onchange="mostrarReceta()">
+                    </div>
+                    <div id="receta_form" style="display:none;">
+                        <label>Ingredientes y cantidades:</label>
+                        <div id="ingredientes_list" class="mb-3"></div>
+                        <button class="btn btn-success" type="button" onclick="agregarIngrediente()">Añadir
+                            Ingrediente</button>
+                    </div>
+
+                    <!-- CAMBIO: reemplazamos input hidden por textarea para depuración -->
+                    <textarea name="ingredientes_json" id="ingredientes_json" hidden></textarea>
+
+                    <div class="col-12 text-center">
+                        <input class="btn btn-primary w-100" type="submit" value="Guardar Producto" />
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- LISTA DE PRODUCTOS -->
+        <div class="col-lg-6">
+            <div class="card p-3 shadow-sm">
+                <h4 class="text-primary text-center mb-3">Lista de Productos</h4>
+
+                <div class="btn-group mb-3" role="group">
+                    <button type="button" class="btn btn-outline-primary"
+                        onclick="cambiarProductos('vista_hermosa')">Vista Hermosa</button>
+                    <button type="button" class="btn btn-outline-primary"
+                        onclick="cambiarProductos('moctezuma')">Moctezuma</button>
+                </div>
+
+
+                <!-- Productos de Vista Hermosa -->
+                <div class="" id="vhp">
+                    {% for cat in cats %}
+                    <h3 class="mb-2 mt-4" style="color: blue;"> - {{ cat.nombre }} </h3>
+                    <div class="w-50" style="max-height: 500px;">
+                        <div class="row row-cols-1 row-cols-md-2 g-4">
+                            {% for producto in prvh %}
+                            {% if producto.categoria == cat.nombre %}
+                            <div class="col">
+                                <div class="card shadow-sm h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ producto.nombre }}</h5>
+                                        <p class="card-text"><strong>Precio:</strong> {{ producto.precio }}</p>
+                                        <p class="card-text">Sucursal: Vista Hermosa</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Productos de Moctezuma -->
+                <div class="d-none" id="mcp">
+                    {% for cat in cats %}
+                    <h3 class="mb-2 mt-4" style="color: blue;"> - {{ cat.nombre }} </h3>
+                    <div class="w-50" style="max-height: 500px;">
+                        <div class="row row-cols-1 row-cols-md-2 g-4">
+                            {% for producto in prmc %}
+                            {% if producto.categoria == cat.nombre %}
+                            <div class="col">
+                                <div class="card shadow-sm h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ producto.nombre }}</h5>
+                                        <p class="card-text"><strong>Precio:</strong> {{ producto.precio }}</p>
+                                        <p class="card-text">Sucursal: Moctezuma</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function cambiarProductos(sucursal) {
+        let div_vh = document.getElementById('vhp');
+        let div_mcp = document.getElementById('mcp');
+
+        if (sucursal === 'moctezuma') {
+            div_mcp.classList.remove('d-none');
+            div_vh.classList.add('d-none');
+        } else if (sucursal === 'vista_hermosa') {
+            div_vh.classList.remove('d-none');
+            div_mcp.classList.add('d-none');
+        }
+    }
+
+    function mostrarReceta() {
+        var recetaForm = document.getElementById("receta_form");
+        recetaForm.style.display = document.getElementById("tiene_receta").checked
+            ? "block"
+            : "none";
+    }
+
+    function agregarIngrediente() {
+        const div = document.createElement("div");
+        div.classList.add("border", "p-2", "rounded", "mb-2");
+        div.innerHTML = `
+    <div class="mb-2">
+      <input class="form-control mb-1" type="text" name="ingrediente[]" placeholder="Ingrediente: leche" required>
+      <input class="form-control mb-1" type="number" name="cantidad[]" placeholder="Cantidad: 250" required>
+      <select class="form-select mb-1" name="unidad[]" required>
+        <option value="">Unidad</option>
+        <option value="ml">ml</option>
+        <option value="g">g</option>
+        <option value="Kg">Kg</option>
+        <option value="L">L</option>
+        <option value="cda">cda</option>
+        <option value="pz">pz</option>
+      </select>
+      <button class="btn btn-sm btn-danger" type="button" onclick="this.parentNode.parentNode.remove()">❌ Eliminar</button>
+    </div>
+  `;
+        document.getElementById("ingredientes_list").appendChild(div);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        console.log("DOM completamente cargado");
+
+        const form = document.getElementById("form_productos");
+        if (!form) {
+            console.warn("Formulario no encontrado");
+            return;
+        }
+
+        form.addEventListener("submit", function (event) {
+            console.log("Interceptando submit");
+
+            // VALIDACIÓN de campos obligatorios antes de continuar
+            const categoria = document.getElementById("categoria").value;
+            const sucursal = document.getElementById("sucursal").value;
+
+            if (
+                !categoria ||
+                !sucursal ||
+                categoria === "Selecciona una categoría" ||
+                sucursal === "Selecciona sucursal"
+            ) {
+                event.preventDefault();
+                alert("Categoría o Sucursal NO SELECCIONADA.");
+                return;
+            }
+
+            // PROCESAR INGREDIENTES
+            let ingredientes = [];
+            document.querySelectorAll("#ingredientes_list > div").forEach((div) => {
+                const ingrediente = div
+                    .querySelector('input[name="ingrediente[]"]')
+                    .value.trim();
+                const cantidad = div
+                    .querySelector('input[name="cantidad[]"]')
+                    .value.trim();
+                const unidad = div.querySelector('select[name="unidad[]"]').value.trim();
+
+                if (ingrediente && cantidad && unidad) {
+                    ingredientes.push({
+                        nombre: ingrediente,
+                        cantidad: cantidad,
+                        unidad: unidad,
+                    });
+                }
+            });
+
+            // ACTUALIZAR CAMPO JSON
+            const ingredientesInput = document.getElementById("ingredientes_json");
+            ingredientesInput.value = JSON.stringify(ingredientes);
+
+            console.log("Ingredientes generados:", ingredientesInput.value);
+
+            // No prevenir submit para que el formulario se envíe
+        });
+    });
+
+
+</script>
+{% endblock %}
