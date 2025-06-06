@@ -115,8 +115,36 @@ def registrar_pedido(folio, #
     return nuevo_pedido.key
 
 
-def registrar_venta():
-    return
+def registrar_venta_vh(
+    ubicacion,
+    fecha_venta,
+    no_venta,
+    at_nom_emp,
+    at_no_emp,
+    productos,
+    total,
+    metodo_pago,
+    recibido=None,
+    cambio=None,
+    no_operacion=None):
+
+    venta_data = {
+        'ubicacion':ubicacion,
+        'fecha_venta':fecha_venta,
+        'no_venta':no_venta,
+        'at_nom_emp':at_nom_emp,
+        'at_no_emp':at_no_emp,
+        'productos':productos,
+        'total':total,
+        'metodo_pago':metodo_pago,
+        'recibido':recibido,
+        'cambio':cambio,
+        'no_operacion':no_operacion
+    }
+    venta_data = {i: j for i, j in venta_data.items() if j is not None}
+    ref = db.reference('/vistahermosa/ventas')
+    ref.push(venta_data)
+    return 'Venta registrada'
 
 def agregar_codigos(codigo):
     ref = db.reference('/codigos')
@@ -151,6 +179,15 @@ def ref_folio_vh():
 
 def obtener_pedidos():
     ref = db.reference('/pedidos').get()
+    return (ref)
+
+def obtener_seriabilidad_vh():
+    ref = db.reference('/seriabilidad/vistahermosa/venta').get()
+    return (ref)
+
+
+def ref_seriabilidad_vh():
+    ref = db.reference('/seriabilidad/vistahermosa/venta')
     return (ref)
 
 # *** Funciones moctezuma
@@ -195,6 +232,14 @@ def ref_folio_mc():
     ref = db.reference('/folio/moctezuma/folio')
     return (ref)
 
+
+def obtener_seriabilidad_mc():
+    ref = db.reference('/seriabilidad/moctezuma/venta').get()
+    return (ref)
+
+def ref_seriabilidad_mc():
+    ref = db.reference('/seriabilidad/moctezuma/venta')
+    return (ref)
 
 
 #ACTUALIZACION DE ATRIBUTOS

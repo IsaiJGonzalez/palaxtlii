@@ -19,16 +19,21 @@ def punto_venta(request):
         
         direccion_sucursal = fr_db.child('vistahermosa').child('locacion').get()#<------
         
-        numero_venta = fr_db.child('seriabilidad').child('vistahermosa').child('venta').get() or 1#<------
-        
+        numero_venta = fs.obtener_seriabilidad_vh()#<------
+        n_venta_m = numero_venta + 1
+        fs.ref_seriabilidad_vh().set(n_venta_m)
+
+
         productos = list(fs.obtener_productos_vh().values()) if fs.obtener_productos_vh() else []
         
     
     elif(direccion_empleado == 2):
         direccion_sucursal = fr_db.child('moctezuma').child('locacion').get()#<------
     
-        numero_venta = fr_db.child('seriabilidad').child('moctezuma').child('venta').get() or 1#<------
-    
+        numero_venta = fs.obtener_seriabilidad_mc()#<------
+        n_venta_m = numero_venta + 1
+        fs.ref_seriabilidad_mc().set(n_venta_m)
+
         productos = list(fs.obtener_productos_moctezuma().values()) if fs.obtener_productos_moctezuma() else []
         
     

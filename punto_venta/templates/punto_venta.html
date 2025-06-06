@@ -2,220 +2,175 @@
 {% load static %}
 
 {% block items %}
-<title>Punto de Venta</title>
+<title>Punto de Venta - Palaxtli</title>
 <link rel="stylesheet" href="{% static 'styles/punto_venta.css' %}">
-<!-- CSS de Select2 -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet">
-
-<!-- JS de Select2 y jQuery (necesario para su funcionamiento) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-
+<script src="{% static 'javascript/anadir_producto.js' %}"></script>
+<script src="{% static 'javascript/acciones_tabla.js' %}" ></script>
 
 {% endblock %}
 
 {% block content %}
-<div class="container my-4">
-    <div class="shadow p-4 bg-white rounded" style="min-height: 85vh;">
-        <!-- Encabezado de sucursal y venta -->
+<div class="container py-4">
+    <div class="bg-white p-4 card-style">
         <div class="text-center mb-4">
-            <h3 class="mb-3">Palaxtli</h3>
-            <h5 class="fw-light mb-5">{{ direccion_sucursal }}</h5>
+            <h3 class="fw-bold text-primary mb-0">Palaxtli</h3>
+            <h5 class="fw-light text-muted">Repostería</h5>
+            <p class="text-secondary mb-0">{{ direccion_sucursal }}</p>
         </div>
-        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-            <div class="d-flex gap-2 flex-wrap">
-                <div>
-                    <label class="form-label small mb-1 text-primary"><strong>Fecha:</strong></label>
-                    <input type="date" class="form-control form-control-sm" id="fecha_registro" value="{{today_date}}"
-                        readonly style="width: 120px;">
+
+        <hr>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <label class="form-label small text-primary fw-semibold">Fecha</label>
+                <input type="date" class="form-control form-control-sm  w-25" id="fecha_registro"
+                    value="{{ today_date }}" readonly>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <label class="form-label small text-primary fw-semibold">No. Venta</label>
+                <input type="text" class="form-control form-control-sm fw-bold text-danger d-inline-block w-25"
+                    value="{{ numero_venta }}" id="numero_venta" readonly>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label">Atiende:</label>
+            <div class="row g-0">
+                <div class="col-auto">
+                    <input type="number" class="form-control form-control-sm w-50" id="at_nom_emp" value="{{ no_emp }}"
+                        readonly>
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control form-control-sm w-25" id="at_no_emp" value="{{ empleado }}"
+                        readonly>
                 </div>
             </div>
-            <div>
-                <label class="form-label small mb-1 text-primary"><strong>No. Venta</strong></label>
-                <input type="text" class="form-control form-control-sm fw-bold text-danger" value="{{numero_venta}}"
-                    id="numero_venta" readonly style="width: 100px;">
-            </div>
         </div>
 
-        <hr class="my-4">
+        <hr>
 
-        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-            <div class="d-flex gap-2 flex-wrap">
-                <label class="form-label">Atiende: </label>
-                <input type="number" class="form-control form-control-sm" id="at_nom_emp" readonly style="width: 100px;"
-                    value="{{no_emp}}">
-                <input type="text" class="form-control form-control-sm" id="at_no_emp" readonly style="width: 300px;"
-                    value="{{empleado}}"> <!-- (at)iende (no). (emp)leado -->
-            </div>
-        </div>
-
-        <hr class="my-4">
-
-        <!-- Formulario de producto -->
-        <h5 class="mb-3">Selección de Producto</h5>
-        <form class="row g-3 mb-4 align-items-end">
-            <div class="col-md-5">
-                <label class="form-label">Producto</label>
-                <select class="form-select" id="producto-select">
+        <h5 class="text-primary mb-3">Selección de Producto</h5>
+        <form class="row justify-content-center align-items-end g-3 mb-4" id="venta_form">
+            <div class="col-md-4">
+                <label class="form-label"> <i class="bi bi-bag-heart-fill"></i> Producto</label>
+                <select class="form-select " name="producto_id" id="producto-select">
                     <option selected disabled>Seleccione un producto</option>
                     {% for producto in productos %}
-                    <option value="{{producto.id}}" data-precio="{{producto.precio}}">{{producto.nombre}}</option>
+                    <option value="{{ producto.id }}" data-precio="{{ producto.precio }}">{{ producto.nombre }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <script>
-                $(document).ready(function () {
-                    $('#producto-select').select2({
-                        placeholder: "Buscar producto...",
-                        allowClear: true
-                    });
-                });
-            </script>
             <div class="col-md-2">
-                <label class="form-label">Cantidad</label>
-                <input type="number" class="form-control" min="1" id="cantidad">
+                <label class="form-label"> <i class="bi bi-stack"></i> Cantidad</label>
+                <input type="number" class="form-control" min="1" name="cantidad" id="cantidad">
             </div>
             <div class="col-md-2">
-                <label class="form-label">Precio Unitario</label>
-                <input type="number" class="form-control" id="precio-unitario">
+                <label class="form-label"> <i class="bi bi-currency-exchange"></i> Precio Unitario</label>
+                <input type="number" class="form-control" name="precio-unitario" id="precio-unitario" readonly>
             </div>
-            <div class="col-md-3">
-                <button type="button" class="btn btn-primary w-100">Añadir</button>
+            <div class="col-md-2">
+                <label class="form-label"> <i class="bi bi-wallet-fill"></i> Total</label>
+                <input type="number" class="form-control" name="total-tab" id="total-tab" readonly>
+            </div>
+            <div class="col-md-1 d-flex justify-content-center">
+                <button type="button" class="btn btn-outline-primary px-3" id="btnAnadir">
+                    <i class="bi bi-arrow-down-circle fs-5"></i>
+                </button>
             </div>
         </form>
 
-        <hr class="my-4">
 
-        <!-- Tabla de resumen -->
-        <h5 class="text-center mb-3">Resumen de la Venta</h5>
+        <hr>
+
+        <h5 class="text-center text-success mb-3">Resumen de la Venta</h5>
         <div class="table-responsive mb-4">
-            <table class="table table-bordered text-center align-middle">
-                <thead class="table-success">
+            <table class="table table-bordered table-hover" id="resumenTabla">
+                <thead class="table-success text-center">
                     <tr>
                         <th>Producto</th>
                         <th>Cantidad</th>
-                        <th>Precio Unitario</th>
-                        <th>Subtotal</th>
+                        <th>Precio Unitario <i class="bi bi-currency-dollar"></i></th>
+                        <th>Subtotal <i class="bi bi-currency-dollar"></i></th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <!-- Filas dinámicas -->
+                <tbody class="text-center">
+                    <!-- Aquí van las filas dinámicas -->
                     <tr>
-                        <td>Ejemplo Producto</td>
-                        <td>2</td>
-                        <td>$50.00</td>
-                        <td>$100.00</td>
-                        <td>
-                            <button class="btn btn-sm btn-warning">Editar</button>
-                            <button class="btn btn-sm btn-danger">Eliminar</button>
-                        </td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <!-- Franja negra con total -->
-        <div class="bg-dark text-white text-end py-3 mb-4">
-            <h3 class="m-2">TOTAL: $<span id="total">0.00</span></h3>
+        <div class="bg-dark text-white py-3 px-4 rounded mb-4 text-end">
+            <h4 class="m-0">TOTAL: $<span id="total">0.00</span></h4>
         </div>
 
         <div class="row mb-4">
-            <!-- MÉTODO DE PAGO A LA IZQUIERDA -->
             <div class="col-md-6">
                 <h5 class="mb-3">Método de Pago</h5>
-                <div class="mb-3">
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="metodo_pago" id="metodo_efectivo"
-                            value="efectivo">
-                        <label class="form-check-label" for="metodo_efectivo">Efectivo</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="metodo_pago" id="metodo_tarjeta"
-                            value="tarjeta">
-                        <label class="form-check-label" for="metodo_tarjeta">Tarjeta</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="metodo_pago" id="metodo_transferencia"
-                            value="transferencia">
-                        <label class="form-check-label" for="metodo_transferencia">Transferencia</label>
-                    </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="metodo_pago" id="metodo_efectivo"
+                        value="efectivo">
+                    <label class="form-check-label" for="metodo_efectivo"> <i class="bi bi-cash-coin"></i> Efectivo</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="metodo_pago" id="metodo_tarjeta" value="tarjeta">
+                    <label class="form-check-label" for="metodo_tarjeta"> <i class="bi bi-credit-card"></i> Tarjeta</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="metodo_pago" id="metodo_transferencia"
+                        value="transferencia">
+                    <label class="form-check-label" for="metodo_transferencia"> <i class="bi bi-send-dash"></i> Transferencia</label>
                 </div>
             </div>
 
-            <!-- RECIBIDO Y CAMBIO APILADOS A LA DERECHA -->
-            <div class="col-md-6 d-flex justify-content-end">
-
-                <div id="efectivo-fields" class="column-gap-2" style="display: none;">
-                    <div>
-                        <label class="form-label" for="recibido">Recibido</label>
-                        <input type="number" id="recibido" class="form-control">
+            <div class="col-md-6">
+                <div class="row g-3 justify-content-end">
+                    <div id="efectivo-fields" class="col-md-5 d-none">
+                        <label class="form-label text-end">Recibido</label>
+                        <input type="number" id="recibido" class="form-control text-end">
+                        <label class="form-label mt-2 text-end">Cambio</label>
+                        <input type="text" id="cambio" class="form-control text-end"  readonly>
                     </div>
-                    <div>
-                        <label class="form-label" for="cambio">Cambio</label>
-                        <input type="text" id="cambio" class="form-control" readonly>
+                    <div id="operacion-fields" class="col-md-5 d-none">
+                        <label class="form-label">Número de Operación</label>
+                        <input type="text" id="operacion" class="form-control">
                     </div>
-                </div>
-
-                <!-- Número de operación -->
-                <div id="operacion-fields" class="mb-3" style="display: none;">
-                    <label class="form-label" for="operacion">Número de Operación</label>
-                    <input type="text" id="operacion" class="form-control">
-
                 </div>
             </div>
         </div>
 
-        <!-- Botón final -->
         <div class="text-end">
-            <button type="submit" class="btn btn-success btn-lg">Registrar Compra</button>
+            <button type="submit" class="btn btn-success btn-lg px-5">Registrar Compra</button>
         </div>
     </div>
 </div>
 
-<script>
-    const efectivo = document.getElementById('metodo_efectivo');
-    const tarjeta = document.getElementById('metodo_tarjeta');
-    const transferencia = document.getElementById('metodo_transferencia');
-
-    efectivo.addEventListener('change', () => {
-        document.getElementById('efectivo-fields').style.display = 'flex';
-        document.getElementById('operacion-fields').style.display = 'none';
-    });
-
-    tarjeta.addEventListener('change', () => {
-        document.getElementById('efectivo-fields').style.display = 'none';
-        document.getElementById('operacion-fields').style.display = 'block';
-    });
-
-    transferencia.addEventListener('change', () => {
-        document.getElementById('efectivo-fields').style.display = 'none';
-        document.getElementById('operacion-fields').style.display = 'block';
-    });
-</script>
-
+<!-- Scripts -->
 <script>
     $(document).ready(function () {
-        // Inicializar Select2
         $('#producto-select').select2({
             placeholder: "Buscar producto...",
             allowClear: true
         });
 
-        // Asignar listener después de inicialización
         $('#producto-select').on('select2:select', function (e) {
             const selectedOption = e.params.data.element;
             const precio = selectedOption.getAttribute("data-precio");
+            $('#precio-unitario').val(precio || '');
+        });
+    });
 
-            console.log("Cambio detectado en select");
-            console.log("Opción seleccionada:", e.params.data.id);
-            console.log("Precio obtenido:", precio);
-
-            // Asignar el precio
-            document.getElementById("precio-unitario").value = precio || "";
+    const metodoRadios = document.querySelectorAll('input[name="metodo_pago"]');
+    metodoRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+            document.getElementById('efectivo-fields').classList.toggle('d-none', radio.value !== 'efectivo');
+            document.getElementById('operacion-fields').classList.toggle('d-none', radio.value === 'efectivo');
         });
     });
 </script>
-
-
 {% endblock %}
