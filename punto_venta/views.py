@@ -3,6 +3,9 @@ from django.utils.timezone import now
 import pytz
 from firebase_config import fr_db
 import firebase_service as fs
+from django.http import JsonResponse
+from datetime import date
+import json
 
 # Create your views here.
 def punto_venta(request):
@@ -62,3 +65,71 @@ def punto_venta(request):
     }
 
     return render(request,'punto_venta.html',context)
+
+
+
+
+def registrar_venta(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+    try:
+        
+        usuario = request.session.get('usuario', {})
+        direccion_empleado = request.session.get('usuario',{}).get('sucursal',0)
+        nombre_emp = usuario.get('nombre', 'Desconocido')
+        no_emp = usuario.get('numero_empleado', 0)
+        print(direccion_empleado)
+        
+        fecha = date.today().isoformat()
+        resumen_data = json.loads(request.POST.get('resumen_data', '[]'))
+        total = sum(float(p['subtotal']) for p in resumen_data)
+
+        
+        metodo_pago = request.POST.get('metodo_pago')
+        recibido = request.POST.get('recibido')
+        cambio = request.POST.get('cambio')
+        operacion = request.POST.get('numero_operacion')
+
+        if direccion_empleado == 1:
+            no_venta = fs.obtener_seriabilidad_vh()
+            direccion_sucursal = fr_db.child('vistahermosa').child('locacion').get()
+
+            fs.registrar_venta_vh(
+                ubicacion=direccion_sucursal,
+                fecha_venta=fecha,
+                no_venta=no_venta,
+                at_nom_emp=nombre_emp,
+                at_no_emp=no_emp,
+                productos=resumen_data,
+                total=total,
+                metodo_pago=metodo_pago,
+                recibido=recibido,
+                cambio=cambio,
+                no_operacion=operacion
+            )
+
+        elif direccion_empleado == 2:
+            no_venta = fs.obtener_seriabilidad_mc()
+            direccion_sucursal = fr_db.child('moctezuma').child('locacion').get()#<------
+
+            fs.registrar_venta_mc(
+                ubicacion=direccion_sucursal,
+                fecha_venta=fecha,
+                no_venta=no_venta,
+                at_nom_emp=nombre_emp,
+                at_no_emp=no_emp,
+                productos=resumen_data,
+                total=total,
+                metodo_pago=metodo_pago,
+                recibido=recibido,
+                cambio=cambio,
+                no_operacion=operacion
+            )
+        else:
+            return JsonResponse({'error': 'Empleado sin sucursal válida'}, status=400)
+
+        return redirect('punto_venta')
+
+    except Exception as e:
+        print("Error al registrar venta:", e)
+        return JsonResponse({'error': 'Ocurrió un error al registrar la venta'}, status=500)

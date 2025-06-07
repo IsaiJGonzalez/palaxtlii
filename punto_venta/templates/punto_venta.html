@@ -8,7 +8,6 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 <script src="{% static 'javascript/anadir_producto.js' %}"></script>
-<script src="{% static 'javascript/acciones_tabla.js' %}" ></script>
 
 {% endblock %}
 
@@ -53,7 +52,8 @@
         <hr>
 
         <h5 class="text-primary mb-3">Selección de Producto</h5>
-        <form class="row justify-content-center align-items-end g-3 mb-4" id="venta_form">
+        <form class="row justify-content-center align-items-end g-3 mb-4" id="venta_form" method="post" action="{% url 'registrar_venta' %}">
+            {% csrf_token %}
             <div class="col-md-4">
                 <label class="form-label"> <i class="bi bi-bag-heart-fill"></i> Producto</label>
                 <select class="form-select " name="producto_id" id="producto-select">
@@ -80,73 +80,76 @@
                     <i class="bi bi-arrow-down-circle fs-5"></i>
                 </button>
             </div>
+
+
+            <hr>
+
+            <h5 class="text-center text-success mb-3">Resumen de la Venta</h5>
+            <div class="table-responsive mb-4">
+                <table class="table table-bordered" id="resumenTabla">
+                    <thead class="table-success text-center">
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario <i class="bi bi-currency-dollar"></i></th>
+                            <th>Subtotal <i class="bi bi-currency-dollar"></i></th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-center">
+                        <!-- Aquí van las filas dinámicas -->
+
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="bg-dark text-white py-3 px-4 rounded mb-4 text-end">
+                <h4 class="m-0">TOTAL: $<span id="total">0.00</span></h4>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5 class="mb-3">Método de Pago</h5>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="metodo_pago" id="metodo_efectivo"
+                            value="efectivo">
+                        <label class="form-check-label" for="metodo_efectivo"> <i class="bi bi-cash-coin"></i>
+                            Efectivo</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="metodo_pago" id="metodo_tarjeta"
+                            value="tarjeta">
+                        <label class="form-check-label" for="metodo_tarjeta"> <i class="bi bi-credit-card"></i>
+                            Tarjeta</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="metodo_pago" id="metodo_transferencia"
+                            value="transferencia">
+                        <label class="form-check-label" for="metodo_transferencia"> <i class="bi bi-send-dash"></i>
+                            Transferencia</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="row g-3 justify-content-end">
+                        <div id="efectivo-fields" class="col-md-5 d-none">
+                            <label class="form-label text-end">Recibido</label>
+                            <input type="number" id="recibido" class="form-control text-end">
+                            <label class="form-label mt-2 text-end">Cambio</label>
+                            <input type="text" id="cambio" class="form-control text-end" readonly>
+                        </div>
+                        <div id="operacion-fields" class="col-md-5 d-none">
+                            <label class="form-label">Número de Operación</label>
+                            <input type="text" id="operacion" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-end">
+                <button type="submit" class="btn btn-success btn-lg px-5" id="registrarCompra">Registrar Compra</button>
+            </div>
         </form>
-
-
-        <hr>
-
-        <h5 class="text-center text-success mb-3">Resumen de la Venta</h5>
-        <div class="table-responsive mb-4">
-            <table class="table table-bordered table-hover" id="resumenTabla">
-                <thead class="table-success text-center">
-                    <tr>
-                        <th>Producto</th>
-                        <th>Cantidad</th>
-                        <th>Precio Unitario <i class="bi bi-currency-dollar"></i></th>
-                        <th>Subtotal <i class="bi bi-currency-dollar"></i></th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody class="text-center">
-                    <!-- Aquí van las filas dinámicas -->
-                    <tr>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="bg-dark text-white py-3 px-4 rounded mb-4 text-end">
-            <h4 class="m-0">TOTAL: $<span id="total">0.00</span></h4>
-        </div>
-
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <h5 class="mb-3">Método de Pago</h5>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="metodo_pago" id="metodo_efectivo"
-                        value="efectivo">
-                    <label class="form-check-label" for="metodo_efectivo"> <i class="bi bi-cash-coin"></i> Efectivo</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="metodo_pago" id="metodo_tarjeta" value="tarjeta">
-                    <label class="form-check-label" for="metodo_tarjeta"> <i class="bi bi-credit-card"></i> Tarjeta</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="metodo_pago" id="metodo_transferencia"
-                        value="transferencia">
-                    <label class="form-check-label" for="metodo_transferencia"> <i class="bi bi-send-dash"></i> Transferencia</label>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="row g-3 justify-content-end">
-                    <div id="efectivo-fields" class="col-md-5 d-none">
-                        <label class="form-label text-end">Recibido</label>
-                        <input type="number" id="recibido" class="form-control text-end">
-                        <label class="form-label mt-2 text-end">Cambio</label>
-                        <input type="text" id="cambio" class="form-control text-end"  readonly>
-                    </div>
-                    <div id="operacion-fields" class="col-md-5 d-none">
-                        <label class="form-label">Número de Operación</label>
-                        <input type="text" id="operacion" class="form-control">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="text-end">
-            <button type="submit" class="btn btn-success btn-lg px-5">Registrar Compra</button>
-        </div>
     </div>
 </div>
 
@@ -173,4 +176,6 @@
         });
     });
 </script>
+
+<script src="{% static 'javascript/registrar_venta.js' %}"></script>
 {% endblock %}

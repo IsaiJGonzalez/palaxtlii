@@ -211,6 +211,39 @@ def agregar_productos_moctezuma(nombre,existencias,precio,categoria,ingredientes
     print("Producto(s) añadido correctamente")
 
 
+def registrar_venta_mc(
+    ubicacion,
+    fecha_venta,
+    no_venta,
+    at_nom_emp,
+    at_no_emp,
+    productos,
+    total,
+    metodo_pago,
+    recibido=None,
+    cambio=None,
+    no_operacion=None):
+
+    venta_data = {
+        'ubicacion':ubicacion,
+        'fecha_venta':fecha_venta,
+        'no_venta':no_venta,
+        'at_nom_emp':at_nom_emp,
+        'at_no_emp':at_no_emp,
+        'productos':productos,
+        'total':total,
+        'metodo_pago':metodo_pago,
+        'recibido':recibido,
+        'cambio':cambio,
+        'no_operacion':no_operacion
+    }
+    venta_data = {i: j for i, j in venta_data.items() if j is not None}
+    ref = db.reference('/moctezuma/ventas')
+    ref.push(venta_data)
+    return 'Venta registrada'
+
+
+
 #Funciones get
 def obtener_productos_moctezuma():
     ref = db.reference("/moctezuma/productos").get()

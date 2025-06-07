@@ -35,8 +35,8 @@ document.addEventListener("DOMContentLoaded", function() {
         const total_tab = parseFloat(formData.get('total-tab')) || 0;
 
         // Tabla de productos
-        const table = document.getElementById('resumenTabla');
-        const newRow = table.insertRow();
+        const tbody = document.querySelector('#resumenTabla tbody');
+        const newRow = tbody.insertRow();
         newRow.innerHTML = `
             <td data-id='${productoId}' >${productoNombre}</td>
             <td>${cantidad}</td>
@@ -54,11 +54,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
         //AÑADIENDO ACCIONES A LOS BOTONES DE EDITAR Y ELIMINAR
-        newRow.querySelector('.editarBtn').addEventListener('click',function(){
+        newRow.querySelector('.editarBtn').addEventListener('click',function(event){
+            event.preventDefault();
             editarFila(newRow);
         })
 
-        newRow.querySelector(".btn-elim").addEventListener("click", function() {
+        newRow.querySelector(".btn-elim").addEventListener("click", function(event) {
+            event.preventDefault();
             eliminarFila(newRow);
         });
 
@@ -98,8 +100,6 @@ function editarFila(row){
     const prec_uni= parseInt(precio_unitarioCell.textContent);
 
     const subtotal = parseInt(subtotalCell.textContent);
-
-    console.log(productoId, producto, cantidad, prec_uni, subtotal);
 
     //tengo que restarle los cosos ajsajs
 
