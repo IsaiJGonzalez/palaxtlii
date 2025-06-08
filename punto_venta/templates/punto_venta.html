@@ -59,7 +59,7 @@
                 <select class="form-select " name="producto_id" id="producto-select">
                     <option selected disabled>Seleccione un producto</option>
                     {% for producto in productos %}
-                    <option value="{{ producto.id }}" data-precio="{{ producto.precio }}">{{ producto.nombre }}</option>
+                    <option value="{{ producto.id }}" data-precio="{{ producto.precio }}" data-cant="{{producto.existencias}}">{{ producto.nombre }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -164,7 +164,10 @@
         $('#producto-select').on('select2:select', function (e) {
             const selectedOption = e.params.data.element;
             const precio = selectedOption.getAttribute("data-precio");
+            const cantidad = selectedOption.getAttribute("data-cant");
+            console.log(cantidad + 'cantidad')
             $('#precio-unitario').val(precio || '');
+            $('#cantidad').attr('placeholder', 'max: ' + (cantidad || ''));
         });
     });
 

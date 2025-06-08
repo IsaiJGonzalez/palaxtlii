@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import firebase_service as fs
 from datetime import datetime, date
+import ticket_utils as tk
 
 
 
@@ -45,6 +46,7 @@ def registro_pedidos(request):
 def guardar_pedido(request):
     if request.method == "POST":
         try:
+            locacion_empleado = request.session.get('usuario',{}).get('sucursal',0)
             data = json.loads(request.body)
             gran_total = data.get('gran_total')
 
@@ -84,7 +86,7 @@ def guardar_pedido(request):
                 estado=0,
                 restante_pagado=restante_pagado
             )
-
+            tk.imprimir_ticket(data,locacion_empleado)
             return JsonResponse({
                 "success": True
             })
