@@ -22,7 +22,7 @@ def pedidos(request):
 
     # --- Obtener y procesar datos desde Firebase ---
     pedidos = fs.obtener_pedidos()
-    pedidos_valores = list(pedidos.values())
+    pedidos_valores = list(pedidos.values()) if pedidos else []
 
     for p in pedidos_valores:
         p['fecha_registro'] = convertir_fecha(p.get('fecha_registro', '1900-01-01'))

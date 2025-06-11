@@ -6,6 +6,10 @@ from django.views.decorators.csrf import csrf_exempt
 import firebase_service as fs
 from datetime import datetime, date
 import ticket_utils as tk
+import subprocess
+import os
+from django.conf import settings
+
 
 
 
@@ -86,7 +90,13 @@ def guardar_pedido(request):
                 estado=0,
                 restante_pagado=restante_pagado
             )
-            tk.imprimir_ticket(data,locacion_empleado)
+            try:
+                script_path = os.path.join(settings.BASE_DIR,"ticket_utils.py")
+                subprocess.Popen([
+                    "python", script_path, json.dumps(data), str(locacion_empleado)
+                ])
+            except Exception as e:
+                print("❌ Error al lanzar impresión externa:", e)
             return JsonResponse({
                 "success": True
             })
