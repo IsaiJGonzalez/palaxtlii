@@ -21,9 +21,9 @@ function registrarCompra() {
         const cells = row.getElementsByTagName("td");
         const rowData = {
             productoId: cells[0].getAttribute("data-id"),
-            cantidad: cells[1].innerText,
-            precio_unitario: cells[2].innerText,
-            subtotal: cells[3].innerText,
+            cantidad: parseInt(cells[1].innerText,10),
+            precio_unitario: parseFloat(cells[2].innerText),
+            subtotal: parseFloat(cells[3].innerText),
         };
         resumenData.push(rowData);
     }
@@ -44,13 +44,15 @@ function registrarCompra() {
 
     // 🧾 Método de pago y valores asociados
     const metodoPago = document.querySelector('input[name="metodo_pago"]:checked').value;
-    const recibidoValue = metodoPago === "efectivo" ? document.getElementById("recibido").value : "";
-    const cambioValue = metodoPago === "efectivo" ? document.getElementById("cambio").value : "";
+    const recibidoValue = metodoPago === "efectivo" ? document.getElementById("recibido").value : 0;
+    const recibido = recibidoValue ? parseFloat(recibidoValue) : 0.00;
+    const cambioValue = metodoPago === "efectivo" ? document.getElementById("cambio").value : 0;
+    const cambio = cambioValue ? parseFloat(cambioValue) : 0.00;
     const operacionValue = metodoPago !== "efectivo" ? document.getElementById("operacion").value : "";
 
     agregarCampoOculto(form, "metodo_pago", metodoPago);
-    agregarCampoOculto(form, "recibido", recibidoValue);
-    agregarCampoOculto(form, "cambio", cambioValue);
+    agregarCampoOculto(form, "recibido", recibido);
+    agregarCampoOculto(form, "cambio", cambio);
     agregarCampoOculto(form, "numero_operacion", operacionValue);
 
     // ✅ Envía el formulario

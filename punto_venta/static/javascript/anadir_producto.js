@@ -156,8 +156,8 @@ document.addEventListener("DOMContentLoaded", function() {
             const cambio = recibido - total;
             cambioOutput.value = cambio.toFixed(2); // Muestra el cambio con dos decimales
         } else {
-            cambioOutput.value = '0.00'; // Si otro método está seleccionado, el cambio es 0
-            recibidoInput.value = '0.00';
+            cambioOutput.value = 0.00; // Si otro método está seleccionado, el cambio es 0
+            recibidoInput.value = 0.00;
         }
     }
 

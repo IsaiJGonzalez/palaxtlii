@@ -186,6 +186,13 @@ def obtener_seriabilidad_vh():
     return (ref)
 
 
+def obtener_producto_vh(id):
+    doc_ref = db.reference(f'/vistahermosa/productos/{id}')
+    producto = doc_ref.get()
+    nombre = producto.get('nombre')
+    return nombre
+
+
 def ref_seriabilidad_vh():
     ref = db.reference('/seriabilidad/vistahermosa/venta')
     return (ref)
@@ -269,6 +276,14 @@ def ref_folio_mc():
 def obtener_seriabilidad_mc():
     ref = db.reference('/seriabilidad/moctezuma/venta').get()
     return (ref)
+
+
+def obtener_producto_mc(id):
+    doc_ref = db.reference(f'/moctezuma/productos/{id}')
+    producto = doc_ref.get()
+    nombre = producto.get('nombre')
+    return nombre
+
 
 def ref_seriabilidad_mc():
     ref = db.reference('/seriabilidad/moctezuma/venta')

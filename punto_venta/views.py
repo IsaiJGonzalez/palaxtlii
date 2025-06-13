@@ -6,6 +6,7 @@ import firebase_service as fs
 from django.http import JsonResponse
 from datetime import date
 import json
+import ticket_venta as tv
 
 # Create your views here.
 def punto_venta(request):
@@ -78,7 +79,6 @@ def registrar_venta(request):
         direccion_empleado = request.session.get('usuario',{}).get('sucursal',0)
         nombre_emp = usuario.get('nombre', 'Desconocido')
         no_emp = usuario.get('numero_empleado', 0)
-        print(direccion_empleado)
         
         fecha = date.today().isoformat()
         resumen_data = json.loads(request.POST.get('resumen_data', '[]'))
@@ -86,8 +86,8 @@ def registrar_venta(request):
 
         
         metodo_pago = request.POST.get('metodo_pago')
-        recibido = request.POST.get('recibido')
-        cambio = request.POST.get('cambio')
+        recibido = int(request.POST.get('recibido'))
+        cambio = int(request.POST.get('cambio'))
         operacion = request.POST.get('numero_operacion')
 
         if direccion_empleado == 1:
@@ -107,6 +107,23 @@ def registrar_venta(request):
                 cambio=cambio,
                 no_operacion=operacion
             )
+            resumen = {
+                "ubicacion": direccion_sucursal,
+                "fecha_venta": fecha,
+                "no_venta": no_venta,
+                "at_nom_emp": nombre_emp,
+                "at_no_emp": no_emp,
+                "productos": resumen_data,
+                "total": total,
+                "metodo_pago": metodo_pago,
+                "recibido": recibido,
+                "cambio": cambio,
+                "no_operacion": operacion,
+                'loc_emp':direccion_empleado
+            }
+            tv.imprimir_venta(resumen=resumen)
+
+        
 
         elif direccion_empleado == 2:
             no_venta = fs.obtener_seriabilidad_mc()
@@ -125,6 +142,23 @@ def registrar_venta(request):
                 cambio=cambio,
                 no_operacion=operacion
             )
+
+            resumen = {
+                "ubicacion": direccion_sucursal,
+                "fecha_venta": fecha,
+                "no_venta": no_venta,
+                "at_nom_emp": nombre_emp,
+                "at_no_emp": no_emp,
+                "productos": resumen_data,
+                "total": total,
+                "metodo_pago": metodo_pago,
+                "recibido": recibido,
+                "cambio": cambio,
+                "no_operacion": operacion,
+                'loc_emp':direccion_empleado
+            }
+            tv.imprimir_venta(resumen=resumen)
+            
         else:
             return JsonResponse({'error': 'Empleado sin sucursal válida'}, status=400)
 
