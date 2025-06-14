@@ -74,7 +74,6 @@ def registrar_venta(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Método no permitido'}, status=405)
     try:
-        
         usuario = request.session.get('usuario', {})
         direccion_empleado = request.session.get('usuario',{}).get('sucursal',0)
         nombre_emp = usuario.get('nombre', 'Desconocido')
@@ -84,7 +83,6 @@ def registrar_venta(request):
         resumen_data = json.loads(request.POST.get('resumen_data', '[]'))
         total = sum(float(p['subtotal']) for p in resumen_data)
 
-        
         metodo_pago = request.POST.get('metodo_pago')
         recibido = int(request.POST.get('recibido'))
         cambio = int(request.POST.get('cambio'))
@@ -93,6 +91,11 @@ def registrar_venta(request):
         if direccion_empleado == 1:
             no_venta = fs.obtener_seriabilidad_vh()
             direccion_sucursal = fr_db.child('vistahermosa').child('locacion').get()
+
+            for producto in resumen_data:
+                producto_id = producto.get('productoId')
+                cantidad = producto.get('cantidad')
+                fs.restar_producto_vh(producto_id,cantidad)
 
             fs.registrar_venta_vh(
                 ubicacion=direccion_sucursal,
@@ -121,13 +124,16 @@ def registrar_venta(request):
                 "no_operacion": operacion,
                 'loc_emp':direccion_empleado
             }
-            tv.imprimir_venta(resumen=resumen)
-
-        
+            #tv.imprimir_venta(resumen=resumen) <------------------------------------------------
 
         elif direccion_empleado == 2:
             no_venta = fs.obtener_seriabilidad_mc()
             direccion_sucursal = fr_db.child('moctezuma').child('locacion').get()#<------
+            
+            for producto in resumen_data:
+                producto_id = producto.get('productoId')
+                cantidad = producto.get('cantidad')
+                fs.restar_producto_mc(producto_id,cantidad)
 
             fs.registrar_venta_mc(
                 ubicacion=direccion_sucursal,
@@ -157,7 +163,7 @@ def registrar_venta(request):
                 "no_operacion": operacion,
                 'loc_emp':direccion_empleado
             }
-            tv.imprimir_venta(resumen=resumen)
+            #tv.imprimir_venta(resumen=resumen) <---------------------------------------------------
             
         else:
             return JsonResponse({'error': 'Empleado sin sucursal válida'}, status=400)

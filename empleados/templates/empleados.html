@@ -81,7 +81,8 @@
                                         data-sucursal="{% if empleado.sucursal == 1 %}Vista Hermosa{% elif empleado.sucursal == 2 %}Moctezuma{% endif %}"
                                         data-contrasena = " {{ empleado.contrasena }} "
                                         data-privilegio="{% if empleado.privilegio == 1 %} Gerencial {% elif empleado.privilegio == 2 %} Ventas {% elif empleado.privilegio == 3 %} Caja {% endif %}""
-                                    >
+                                        data-caja="{{empleado.caja_activa}}"
+                                        >
                                         Ver detalles
                                     </button>
                                 </div>
@@ -112,6 +113,7 @@
                         <p id="modalSucursal"></p>
                         <p id="modalContrasena"></p>
                         <p id="modalPrivilegio"></p>
+                        <p id="modalCaja"></p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -126,13 +128,15 @@
         var exampleModal = document.getElementById("exampleModal");
 
         exampleModal.addEventListener("show.bs.modal", function (event) {
-            var button = event.relatedTarget;  // Botón que activó el modal
-            var nombre = button.getAttribute("data-nombre");
-            var numero = button.getAttribute("data-numero");
-            var telefono = button.getAttribute("data-telefono");
-            var sucursal = button.getAttribute("data-sucursal");
-            var contrasena = button.getAttribute("data-contrasena");
-            var privilegio = button.getAttribute("data-privilegio");
+            let button = event.relatedTarget;  // Botón que activó el modal
+            let nombre = button.getAttribute("data-nombre");
+            let numero = button.getAttribute("data-numero");
+            let telefono = button.getAttribute("data-telefono");
+            let sucursal = button.getAttribute("data-sucursal");
+            let contrasena = button.getAttribute("data-contrasena");
+            let privilegio = button.getAttribute("data-privilegio");
+            let caja = button.getAttribute('data-caja');
+            let caja_activa = caja === 'true' ? 'Activa' : 'Inactiva';
             // Asignar los valores a los elementos dentro del modal
 
             document.getElementById("modalNombre").innerText = "Nombre: " + nombre;
@@ -141,6 +145,7 @@
             document.getElementById("modalSucursal").innerText = "Sucursal: " + sucursal;
             document.getElementById("modalContrasena").innerText = "Contraseña: " + contrasena;
             document.getElementById("modalPrivilegio").innerText = "Privilegio: " + privilegio;
+            document.getElementById('modalCaja').innerText = 'Caja: ' + caja_activa;
         });
     });
 </script>

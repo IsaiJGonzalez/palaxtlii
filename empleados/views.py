@@ -21,7 +21,8 @@ def empleados(request):
         numero_empleado = random.randint(10**4, 10**6 - 1)
         contrasena = numero_empleado
         ch_psw = False
+        caja_activa = False
         empleado_ref = fr_db.child('empleados').child(str(numero_empleado))
-        empleado_ref.set({'numero_empleado': numero_empleado,'contrasena':contrasena ,'nombre' : nombre + ' ' + apellido, 'telefono' : telefono, 'sucursal': int(sucursal), 'privilegio': int(privilegio), 'ch_psw':ch_psw})
+        empleado_ref.set({'numero_empleado': numero_empleado,'contrasena':contrasena ,'nombre' : nombre + ' ' + apellido, 'telefono' : telefono, 'sucursal': int(sucursal), 'privilegio': int(privilegio), 'ch_psw':ch_psw,'caja_activa':caja_activa})
         return redirect('empleados')
     return render(request,'empleados.html', {'empleados':empleados_lista})

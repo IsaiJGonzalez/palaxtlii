@@ -4,6 +4,10 @@ import os
 from django.conf import settings
 from datetime import datetime
 import json
+import locale
+
+locale.setlocale(locale.LC_TIME, "es_ES.UTF-8")
+
 
 def imprimir_ticket(data,loc):
     try:
@@ -33,7 +37,12 @@ def imprimir_ticket(data,loc):
         p.text(f"Folio: {data.get('folio', '')}\n")
         p.text(f"Cliente: {data.get('nombre_cliente', '')}\n")
         p.text(f"Teléfono: {data.get('telefono', '')}\n")
-        p.text(f"Fecha de Entrega: {data.get('fecha_entrega', '')} {data.get('hora_entrega', '')}\n")
+
+        fecha_str = data.get('fecha_entrega')
+        fecha_ob = datetime.strptime(fecha_str, "%Y-%m-%d")
+        fecha_en = fecha_ob.strftime("%d de %B de %Y")
+
+        p.text(f"Fecha de Entrega: {fecha_en} a las {data.get('hora_entrega', '')} hrs. \n")
         p.text('Forma de Entrega: ')
 
         forma_entrega = data.get('forma_entrega')
@@ -154,7 +163,7 @@ def imprimir_ticket(data,loc):
         p.text(f"Folio: {data.get('folio', '')}\n")
         p.text(f"Cliente: {data.get('nombre_cliente', '')}\n")
         p.text(f"Teléfono: {data.get('telefono', '')}\n")
-        p.text(f"Fecha de Entrega: {data.get('fecha_entrega', '')} {data.get('hora_entrega', '')}\n")
+        p.text(f"Fecha de Entrega: {fecha_en} a las {data.get('hora_entrega', '')} hrs. \n")
         p.text('Forma de Entrega: ')
 
         forma_entrega = data.get('forma_entrega')

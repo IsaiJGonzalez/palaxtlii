@@ -197,6 +197,17 @@ def ref_seriabilidad_vh():
     ref = db.reference('/seriabilidad/vistahermosa/venta')
     return (ref)
 
+
+def restar_producto_vh(id,cantidad):
+    try:
+        ref = db.reference(f'vistahermosa/productos/{id}')
+        existencias = db.reference(f'vistahermosa/productos/{id}/existencias').get()
+        ex_act = existencias - cantidad
+        ref.update({'existencias':ex_act})
+    except Exception as e:
+        print('Error: ',e)
+
+
 # *** Funciones moctezuma
 
 #Funciones add
@@ -288,6 +299,15 @@ def obtener_producto_mc(id):
 def ref_seriabilidad_mc():
     ref = db.reference('/seriabilidad/moctezuma/venta')
     return (ref)
+
+def restar_producto_mc(id,cantidad):
+    try:
+        ref = db.reference(f'moctezuma/productos/{id}')
+        existencias = db.reference(f'moctezuma/productos/{id}/existencias').get()
+        ex_act = existencias - cantidad
+        ref.update({'existencias':ex_act})
+    except Exception as e:
+        print('Error: ',e)
 
 
 #ACTUALIZACION DE ATRIBUTOS
