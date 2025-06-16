@@ -1,0 +1,80 @@
+{% extends base %}
+{% load static %}
+
+{% block items %}
+<title>Apertura Caja</title>
+<link rel="stylesheet" href="{% static 'styles/a_caja.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Apertura de Caja</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="encabezado">
+            <div class="usuario-fecha">
+                <div>
+                    <label for="id_empleado">Empleado:</label>
+                    <input type="number" class="form-control" id="id_empleado" name="id_empleado"
+                        placeholder="Número de empleado" value="{{no_empleado}}" readonly>
+                </div>
+                <div>
+                    <label for="id_fecha_asignacion">Fecha de Asignación:</label>
+                    <input type="datetime-local" class="form-control" id="id_fecha_asignacion" name="fecha_asignacion">
+                </div>
+            </div>
+        </div>
+
+        <div class="billetes-monedas mt-3">
+            <div>
+                <label for="id_mil">Billetes 1000:</label>
+                <input type="number" class="form-control" id="id_mil" name="billetes_1000" min="0" value="0"> 
+            </div>
+            <div>
+                <label for="id_quinientos">Billetes 500:</label>
+                <input type="number" class="form-control" id="id_quinientos" name="billetes_500" min="0" value="0">
+            </div>
+            <div>
+                <label for="id_doscientos">Billetes 200:</label>
+                <input type="number" class="form-control" id="id_doscientos" name="billetes_200" min="0" value="0">
+            </div>
+            <div>
+                <label for="id_cien">Billetes 100:</label>
+                <input type="number" class="form-control" id="id_cien" name="billetes_100" min="0" value="0">
+            </div>
+            <div>
+                <label for="id_cincuenta">Billetes 50:</label>
+                <input type="number" class="form-control" id="id_cincuenta" name="billetes_50" min="0" value="0">
+            </div>
+            <div>
+                <label for="id_veinte">Billetes 20:</label>
+                <input type="number" class="form-control" id="id_veinte" name="billetes_20" min="0" value="0">
+            </div>
+            <div>
+                <label for="id_monedas">Monedas:</label>
+                <input type="number" class="form-control" id="id_monedas" name="monedas" step="0.01" min="0"
+                    value="0.00">
+            </div>
+            <div>
+                <label for="fondo_caja">Fondo de Caja:</label>
+                <input type="number" class="form-control" id="fondo_caja" name="fondo_caja" step="0.01" min="0"
+                    value="0.00" readonly>
+            </div>
+        </div>
+        <div class="form-bottom mt-4">
+            <input type="submit" class="btn btn-primary" value="Registrar Caja">
+        </div>
+    </form>
+
+    {% if form.errors %}
+    <div class="alert alert-danger mt-3">
+        {% for field in form %}
+        {% if field.errors %}
+        <strong>{{ field.label|title }}</strong>: {{ field.errors.as_text|striptags }}
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+<script src="{% static 'javascript/a_caja.js' %}"></script>
+{% endblock %}

@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from firebase_config import fr_db
 import json
 from django.http import JsonResponse
@@ -17,6 +17,10 @@ from core.decorators import gerente_required, ventas_required, cajero_required, 
 def registro_pedidos(request):
     privilegio = request.session.get("usuario", {}).get("privilegio", 0)  # Si no hay privilegio, asigna 0
     locacion_empleado = request.session.get('usuario',{}).get('sucursal',0)
+    caja_activa = request.session.get('usuario',{}).get('caja_activa',False)
+    if not caja_activa :
+        return redirect('apertura_caja')
+
     data_emp = {
         "nombre": request.session.get('usuario', {}).get('nombre', ''),
         "numero_empleado": request.session.get('usuario', {}).get('numero_empleado', 0)

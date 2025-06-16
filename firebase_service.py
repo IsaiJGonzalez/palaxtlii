@@ -144,7 +144,8 @@ def registrar_venta_vh(
         'no_operacion':no_operacion
     }
     venta_data = {i: j for i, j in venta_data.items() if j is not None}
-    ref = db.reference('/vistahermosa/ventas')
+    fecha_str = fecha_venta if isinstance(fecha_venta, str) else fecha_venta.strftime('%Y-%m-%d')
+    ref = db.reference(f'/vistahermosa/ventas/{fecha_str}')
     ref.push(venta_data)
     return 'Venta registrada'
 
@@ -280,7 +281,9 @@ def registrar_venta_mc(
         'no_operacion':no_operacion
     }
     venta_data = {i: j for i, j in venta_data.items() if j is not None}
-    ref = db.reference('/moctezuma/ventas')
+    fecha_str = fecha_venta if isinstance(fecha_venta, str) else fecha_venta.strftime('%Y-%m-%d')
+
+    ref = db.reference(f'/moctezuma/ventas/{fecha_str}')
     ref.push(venta_data)
     return 'Venta registrada'
 
@@ -380,3 +383,71 @@ def obtener_codigos():
         return (ref)
     except Exception as e:
         print('Error al obtener codigos: ', e)
+
+
+
+#CAJASSSSSSS
+def apertura_caja_vh(
+    no_emp, fecha_asignacion, b1000, b500, b200, b100, b50, b20, monedas, fondo_caja, estado
+):
+    try:
+        ref = db.reference('vistahermosa/apertura_caja')
+        n_ref = ref.push()
+        n_uid = n_ref.key
+
+        apertura_caja = {
+            'id':n_uid,
+            'no_emp':no_emp,
+            'fecha_asignacion' : fecha_asignacion,
+            '1000' : b1000,
+            '500' : b500,
+            '200' : b200,
+            '100' : b100,
+            '50' : b50,
+            '20' : b20,
+            'monedas' : monedas,
+            'fondo_caja':fondo_caja,
+            'estado' : estado
+        }
+        n_ref.set(apertura_caja)
+        print('Caja abierta correctamente')
+    except Exception as e:
+        print('Error al abrir caja: ', e)
+
+
+
+def apertura_caja_mc(
+    no_emp, fecha_asignacion, b1000, b500, b200, b100, b50, b20, monedas, fondo_caja, estado
+):
+    try:
+        ref = db.reference('moctezuma/apertura_caja')
+        n_ref = ref.push()
+        n_uid = n_ref.key
+
+        apertura_caja = {
+            'id':n_uid,
+            'no_emp':no_emp,
+            'fecha_asignacion' : fecha_asignacion,
+            '1000' : b1000,
+            '500' : b500,
+            '200' : b200,
+            '100' : b100,
+            '50' : b50,
+            '20' : b20,
+            'monedas' : monedas,
+            'fondo_caja':fondo_caja,
+            'estado' : estado
+        }
+        n_ref.set(apertura_caja)
+        print('Caja abierta correctamente')
+    except Exception as e:
+        print('Error al abrir caja: ', e)
+
+
+def activar_caja_emp(id):
+    ref = db.reference(f'empleados/{id}')
+    ref.update({'caja_activa':True})
+
+def desactivar_caja_emp(id):
+    ref = db.reference(f'empleados/{id}')
+    ref.update({'caja_activa':False})
