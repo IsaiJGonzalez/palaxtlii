@@ -59,7 +59,9 @@
                 <select class="form-select " name="producto_id" id="producto-select">
                     <option selected disabled>Seleccione un producto</option>
                     {% for producto in productos %}
-                    <option value="{{ producto.id }}" data-precio="{{ producto.precio }}" data-cant="{{producto.existencias}}">{{ producto.nombre }}</option>
+                        {% if producto.estado %}
+                            <option value="{{ producto.id }}" data-precio="{{ producto.precio }}" data-cant="{{producto.existencias}}">{{ producto.nombre }}</option>
+                        {% endif %}
                     {% endfor %}
                 </select>
             </div>

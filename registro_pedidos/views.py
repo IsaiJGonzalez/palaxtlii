@@ -9,10 +9,11 @@ import ticket_utils as tk
 import subprocess
 import os
 from django.conf import settings
+from core.decorators import gerente_required, ventas_required, cajero_required, login_required
 
 
 
-
+@login_required
 def registro_pedidos(request):
     privilegio = request.session.get("usuario", {}).get("privilegio", 0)  # Si no hay privilegio, asigna 0
     locacion_empleado = request.session.get('usuario',{}).get('sucursal',0)
@@ -46,7 +47,8 @@ def registro_pedidos(request):
     return render(request, "registro_pedidos.html", {"base_template": base_template, 'locacion':locacion_sucursal,'folio':folio_mostrado,'loc_em':locacion_empleado,**data_emp})
 
 
-@csrf_exempt
+#@csrf_exempt
+@login_required
 def guardar_pedido(request):
     if request.method == "POST":
         try:
@@ -90,6 +92,7 @@ def guardar_pedido(request):
                 estado=0,
                 restante_pagado=restante_pagado
             )
+
             try:
                 script_path = os.path.join(settings.BASE_DIR,"ticket_utils.py")
                 subprocess.Popen([

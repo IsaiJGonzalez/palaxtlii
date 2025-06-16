@@ -10,14 +10,16 @@ document.getElementById('pagado').addEventListener('click', function() {
     enviarFolio(folio, 'Pedido actualizado correctamente.');
 });
 
-// Nueva lógica para el botón "entregado_directo"
-document.getElementById('entregado_directo').addEventListener('click', function() {
-    const folio = this.getAttribute('data-folio_ed'); // Obtiene el folio asignado
-    
-    if (confirm('¿Desea marcar como entregado?')) { // Confirma la acción antes de ejecutar
-        enviarFolio(folio, 'Pedido marcado como entregado.');
-    }
+
+document.querySelectorAll('.entregado_directo').forEach(boton => {
+    boton.addEventListener('click', function() {
+        const folio = this.getAttribute('data-folio_ed');
+        if (confirm('¿Desea marcar como entregado?')) {
+            enviarFolio(folio, 'Pedido marcado como entregado.');
+        }
+    });
 });
+
 
 // Función reutilizable para enviar el folio al backend
 function enviarFolio(folio, mensajeExito) {

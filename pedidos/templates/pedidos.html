@@ -1,4 +1,4 @@
-{% extends 'base_gerencial.html' %}
+{% extends base %}
 {% load static %}
 
 {% block items %}
@@ -29,8 +29,7 @@
                     <th>Fecha Entrega</th>
                     <th>Cliente</th>
                     <th>Fecha Registro</th>
-                    <th>Cant.</th>
-                    <th>Productos</th>
+                    <th>Cantidad/Productos</th>
                     <th>Forma entrega</th>
                     <th>Acciones</th>
                 </tr>
@@ -42,14 +41,9 @@
                     <td class="text-bg-success" >{{ pedido.fecha_entrega|date:"j \\d\\e F \\d\\e Y" }}</td>
                     <td>{{ pedido.nombre_cliente }}</td>
                     <td>{{ pedido.fecha_registro|date:"j \\d\\e F \\d\\e Y" }}</td>
-                    <td class="text-end">
-                        {% for producto in pedido.productos %}
-                            <p>{{producto.cantidad}} </p>
-                        {% endfor %}
-                    </td>
                     <td class="text-start">
                         {% for producto in pedido.productos %}
-                            <p>{{producto.descripcion}} </p>
+                            <li> {{producto.cantidad}} - {{producto.descripcion}} </li>
                         {% endfor %}
                     </td>
                     <td>
@@ -64,9 +58,9 @@
                     <td>
                         <div style="display: flex; flex-direction: column; gap: 8px;">
                             {% if pedido.restante_pagado %}
-                                <button class="btn btn-primary mb-2" id="entregado_directo" data-folio_ed="{{pedido.folio}}"> <i class="bi bi-check-circle"></i></button>
+                                <button class="btn btn-primary mb-2  entregado_directo" data-folio_ed="{{pedido.folio}}"> <i class="bi bi-check-circle"></i></button>
                             {% else %}
-                                <button class="btn btn-secondary mb-2" id="entregado_directo" disabled> <i class="bi bi-check-circle"></i></button>
+                                <button class="btn btn-secondary mb-2 entregado_directo" disabled> <i class="bi bi-check-circle"></i></button>
                             {% endif %}
 
                             <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#pedidoModal"
@@ -100,9 +94,9 @@
             <thead class="customer_header">
                 <tr>
                     <th>Folio</th>
-                    <th>Fecha registro</th>
-                    <th>Cliente</th>
                     <th>Fecha entrega</th>
+                    <th>Cliente</th>
+                    <th>Fecha registro</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -110,9 +104,9 @@
                 {% for pedido in pedidos_entregados %}
                 <tr>
                     <td>{{pedido.folio}}</td>
-                    <td>{{pedido.fecha_registro|date:"j \\d\\e F \\d\\e Y"}}</td>
-                    <td>{{pedido.nombre_cliente}}</td>
                     <td>{{pedido.fecha_entrega|date:"j \\d\\e F \\d\\e Y"}}</td>
+                    <td>{{pedido.nombre_cliente}}</td>
+                    <td>{{pedido.fecha_registro|date:"j \\d\\e F \\d\\e Y"}}</td>
                     <td>
                         <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#pedidoModal12345">Ver
                             Detalles</button>

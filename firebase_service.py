@@ -3,11 +3,10 @@ import firebase_config
 # *** Funciones Vista Hermosa
 
 #Funciones add 
-def agregar_productos_vh(nombre,existencias,precio,categoria,ingredientes):
+def agregar_productos_vh(nombre,existencias,precio,categoria,ingredientes,estado,punto_reorden,sucursal):
     ref = db.reference("/vistahermosa/productos")
     n_ref = ref.push()
     n_uid = n_ref.key
-
 
     nuevo_producto = {
         'id': n_uid,
@@ -16,6 +15,9 @@ def agregar_productos_vh(nombre,existencias,precio,categoria,ingredientes):
         "precio" : precio,
         'categoria': categoria,
         'ingredientes':ingredientes,
+        'estado':estado,
+        'punto_reorden':punto_reorden,
+        'sucursal':sucursal
     }
     n_ref.set(nuevo_producto)
     print("Producto(s) añadido correctamente")
@@ -147,8 +149,11 @@ def registrar_venta_vh(
     return 'Venta registrada'
 
 def agregar_codigos(codigo):
-    ref = db.reference('/codigos')
-    ref.push(codigo)
+    ref = db.reference('/codigos/')
+    codigo_nuevo = {
+        'codigo' : codigo
+    }
+    ref.push(codigo_nuevo)
     print('listo')
 
 #Funciones get
@@ -208,10 +213,26 @@ def restar_producto_vh(id,cantidad):
         print('Error: ',e)
 
 
+def editar_producto_vh(id,nombre,existencias,precio,categoria,estado,punto_reorden):
+    try:
+        ref = db.reference(f'vistahermosa/productos/{id}')
+        ref.update({
+            'categoria':categoria,
+            'estado':estado,
+            'existencias':existencias,
+            'nombre' : nombre,
+            'precio' : precio,
+            'punto_reorden' : punto_reorden,
+            
+        })
+        print('Producto editado correctamente')
+    except Exception as e:
+        print('Error al editar p: ',e)
+
 # *** Funciones moctezuma
 
 #Funciones add
-def agregar_productos_moctezuma(nombre,existencias,precio,categoria,ingredientes):
+def agregar_productos_moctezuma(nombre,existencias,precio,categoria,ingredientes,estado,punto_reorden,sucursal):
     ref = db.reference("/moctezuma/productos")
     n_ref = ref.push()
     n_uid = n_ref.key
@@ -224,6 +245,9 @@ def agregar_productos_moctezuma(nombre,existencias,precio,categoria,ingredientes
         "precio" : precio,
         'categoria': categoria,
         'ingredientes':ingredientes,
+        'estado':estado,
+        'punto_reorden':punto_reorden,
+        'sucursal':sucursal
     }
     n_ref.set(nuevo_producto)
     print("Producto(s) añadido correctamente")
@@ -322,3 +346,37 @@ def act_pedido_estado(folio):
         db.reference(f'/pedidos/{key}').update({'estado': 1})  # Actualiza cada pedido encontrado
 
     return 'Estado actualizado'
+
+
+def editar_producto_mc(id,nombre,existencias,precio,categoria,estado,punto_reorden):
+    try:
+        ref = db.reference(f'moctezuma/productos/{id}')
+        ref.update({
+            'categoria':categoria,
+            'estado':estado,
+            'existencias':existencias,
+            'nombre' : nombre,
+            'precio' : precio,
+            'punto_reorden' : punto_reorden,
+            
+        })
+        print('Producto editado correctamente')
+    except Exception as e:
+        print('Error al editar p: ',e)
+
+
+def obtener_categorias():
+    try:
+
+        ref = db.reference('categorias/').get()
+        return(ref)
+    except Exception as e:
+        print('Error al obtener Categoriass: ', e)
+
+
+def obtener_codigos():
+    try:
+        ref = db.reference('codigos/').get()
+        return (ref)
+    except Exception as e:
+        print('Error al obtener codigos: ', e)

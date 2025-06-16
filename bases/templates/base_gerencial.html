@@ -32,21 +32,21 @@
                         <a class="nav-link" href="{% url 'menu_gerencial' %}">Inicio</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'registro_pedidos' %}">Registrar Pedido</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'pedidos' %}">Pedidos</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'punto_venta' %}">Punto de Venta</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'registro_pedidos' %}">Registrar Pedido</a>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
-                            Configuracion
+                            Configuración
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#">Códigos</a></li>
+                            <li><a class="dropdown-item" href="{% url 'codigos' %}">Códigos / Categorías</a></li>
                             <li>
                                 <a class="dropdown-item" href="{% url 'empleados' %}">Empleados</a>
                             </li>

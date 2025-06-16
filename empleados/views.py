@@ -2,8 +2,10 @@ from django.shortcuts import render, redirect
 from firebase_admin import db
 from firebase_config import fr_db
 import random
+from core.decorators import gerente_required
 
-# Create your views here.
+
+@gerente_required
 def empleados(request):
 
     empleados_exist = fr_db.child('empleados').get() 

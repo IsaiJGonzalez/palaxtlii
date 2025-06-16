@@ -7,10 +7,12 @@ from django.http import JsonResponse
 from datetime import date
 import json
 import ticket_venta as tv
+from core.decorators import gerente_required, ventas_required, cajero_required, login_required
+
 
 # Create your views here.
+@login_required
 def punto_venta(request):
-    
     #Datos de empleado y dirección sucursal
     direccion_empleado = request.session.get('usuario',{}).get('sucursal',0)
     privilegio = request.session.get('usuario',{}).get('privilegio',0)
@@ -69,7 +71,7 @@ def punto_venta(request):
 
 
 
-
+@login_required
 def registrar_venta(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Método no permitido'}, status=405)
@@ -124,7 +126,7 @@ def registrar_venta(request):
                 "no_operacion": operacion,
                 'loc_emp':direccion_empleado
             }
-            #tv.imprimir_venta(resumen=resumen) <------------------------------------------------
+            tv.imprimir_venta(resumen=resumen) 
 
         elif direccion_empleado == 2:
             no_venta = fs.obtener_seriabilidad_mc()
@@ -163,7 +165,7 @@ def registrar_venta(request):
                 "no_operacion": operacion,
                 'loc_emp':direccion_empleado
             }
-            #tv.imprimir_venta(resumen=resumen) <---------------------------------------------------
+            tv.imprimir_venta(resumen=resumen)
             
         else:
             return JsonResponse({'error': 'Empleado sin sucursal válida'}, status=400)

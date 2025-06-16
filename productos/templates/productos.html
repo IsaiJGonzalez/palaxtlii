@@ -13,7 +13,7 @@
         <!-- FORMULARIO A LA IZQUIERDA -->
         <div class="col-lg-4 offset-lg-1">
             <div class="card shadow-sm rounded p-4">
-                <h4 class="mb-4 text-primary text-center">Registrar Productos</h4>
+                <h4 class="mb-5 text-primary text-center">Registrar Productos</h4>
                 <form class="row g-4" method="POST" id="form_productos">
                     {% csrf_token %}
                     <div class="col-md-6">
@@ -37,7 +37,16 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="col-12">
+                    <div class="col-md-6">
+                        <label class="form-label">Existencias mínimas</label>
+                        <input type="number" class="form-control" required name="punto_reorden" id="punto_reorden"
+                            placeholder="3">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Estado del producto</label>
+                        <input class="form-check" type="checkbox" name="estado" id="estado" checked>
+                    </div>
+                    <div class="col-12 mb-2">
                         <label class="form-label">Sucursal</label>
                         <select class="form-select" required id="sucursal" name="sucursal">
                             <option selected disabled>Selecciona sucursal</option>
@@ -46,7 +55,8 @@
                             <option value="3">Ambas</option>
                         </select>
                     </div>
-                    <div class="row mt-4 align-items-center">
+
+                    <div class="row mt-4 align-items-center d-none">
                         <label class="col-auto">¿El producto tiene receta?</label>
                         <input class="col-auto" type="checkbox" id="tiene_receta" onchange="mostrarReceta()">
                     </div>
@@ -61,7 +71,16 @@
                     <textarea name="ingredientes_json" id="ingredientes_json" hidden></textarea>
 
                     <div class="col-12 text-center">
-                        <input class="btn btn-primary w-100" type="submit" value="Guardar Producto" />
+                        <input class="btn btn-primary w-100" type="submit" value="Guardar Producto" id="submit" />
+                    </div>
+                    <div class="col-md-6 text-center">
+                        <button class="btn btn-danger w-100 d-none" id="editarBtn">Guardar Edición</button>
+                    </div>
+                    <div class="d-none">
+                        <input type="text" value="" name="idP" id="idP">
+                    </div>
+                    <div class="col-md-6 text-center">
+                        <button class="btn btn-secondary w-100 d-none" id="cancelarBtn" onclick="cancelarEdicion(event)">Cancelar</button>
                     </div>
                 </form>
             </div>
@@ -81,57 +100,125 @@
 
 
                 <!-- Productos de Vista Hermosa -->
-                <div class="" id="vhp">
+                <div id="vhp" class="overflow-auto" style="max-height: 450px;">
                     {% for cat in cats %}
                     <h3 class="mb-2 mt-4" style="color: blue;"> - {{ cat.nombre }} </h3>
-                    <div class="w-50" style="max-height: 500px;">
-                        <div class="row row-cols-1 row-cols-md-2 g-4">
-                            {% for producto in prvh %}
-                            {% if producto.categoria == cat.nombre %}
-                            <div class="col">
-                                <div class="card shadow-sm h-100">
-                                    <div class="card-body">
-                                        <h5 class="card-title">{{ producto.nombre }}</h5>
-                                        <p class="card-text"><strong>Precio:</strong> {{ producto.precio }}</p>
-                                        <p class="card-text">Sucursal: Vista Hermosa</p>
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-1">
+                        {% for producto in prvh %}
+                        {% if producto.categoria == cat.nombre %}
+                        <div class="col">
+                            <div class="card shadow-sm h-100  {%if producto.estado == False %} bg-secondary {% elif producto.existencias < producto.punto_reorden %} bg-danger-subtle {% elif producto.existencias == producto.punto_reorden %} bg-warning-subtle {% elif producto.existencias > producto.punto_reorden %} bg-success-subtle {% endif %}">
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title">{{ producto.nombre }}</h5>
+                                    <p class="card-text"><strong>Precio:</strong> {{ producto.precio }}</p>
+                                    <p class="card-text bg-black fw-bold" style="color: azure;">Sucursal: Vista Hermosa</p>
+
+                                    <!-- Botones -->
+                                    <div class="mt-auto d-flex justify-content-between">
+                                        <button class="btn btn-sm btn-primary" title="Ver detalles"
+                                            id="modal"
+                                            data-bs-toggle="modal" data-bs-target="#productoModal"
+                                            data-id-producto="{{producto.id}}" data-categoria="{{producto.categoria}}"
+                                            data-estado="{{producto.estado}}"
+                                            data-existencias="{{producto.existencias}}"
+                                            data-nombre="{{producto.nombre}}" data-precio="{{producto.precio}}"
+                                            data-reorden="{{producto.punto_reorden}}">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-warning" title="Editar" 
+                                        
+                                        onclick="editarProducto('{{producto.id}}','{{producto.categoria}}','{{producto.estado}}',
+                                            '{{producto.existencias}}', '{{producto.nombre}}','{{producto.precio}}','{{producto.punto_reorden}}','{{producto.sucursal}}'
+                                        )"
+                                        
+                                        >
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-                            {% endif %}
-                            {% endfor %}
                         </div>
+                        {% endif %}
+                        {% endfor %}
                     </div>
                     {% endfor %}
                 </div>
 
                 <!-- Productos de Moctezuma -->
-                <div class="d-none" id="mcp">
+                <div class="d-none overflow-auto" id="mcp" style="max-height: 450px;">
                     {% for cat in cats %}
                     <h3 class="mb-2 mt-4" style="color: blue;"> - {{ cat.nombre }} </h3>
-                    <div class="w-50" style="max-height: 500px;">
-                        <div class="row row-cols-1 row-cols-md-2 g-4">
-                            {% for producto in prmc %}
-                            {% if producto.categoria == cat.nombre %}
-                            <div class="col">
-                                <div class="card shadow-sm h-100">
-                                    <div class="card-body">
-                                        <h5 class="card-title">{{ producto.nombre }}</h5>
-                                        <p class="card-text"><strong>Precio:</strong> {{ producto.precio }}</p>
-                                        <p class="card-text">Sucursal: Moctezuma</p>
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-1">
+                        {% for producto in prmc %}
+                        {% if producto.categoria == cat.nombre %}
+                        <div class="col">
+                            <div class="card shadow-sm h-100 {%if producto.estado == False %} bg-secondary {% elif producto.existencias < producto.punto_reorden %} bg-danger-subtle {% elif producto.existencias == producto.punto_reorden %} bg-warning-subtle {% elif producto.existencias > producto.punto_reorden %} bg-success-subtle {% endif %}">
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title">{{ producto.nombre }}</h5>
+                                    <p class="card-text"><strong>Precio:</strong> {{ producto.precio }}</p>
+                                    <p class="card-text bg-black fw-bold" style="color: azure;">Sucursal: Moctezuma</p>
+
+                                    <!-- Botones -->
+                                    <div class="mt-auto d-flex justify-content-between">
+                                        <button class="btn btn-sm btn-primary" title="Ver detalles"
+                                            id="modal"
+                                            data-bs-toggle="modal" data-bs-target="#productoModal"
+                                            data-id-producto="{{producto.id}}" data-categoria="{{producto.categoria}}"
+                                            data-estado="{{producto.estado}}"
+                                            data-existencias="{{producto.existencias}}"
+                                            data-nombre="{{producto.nombre}}" data-precio="{{producto.precio}}"
+                                            data-reorden="{{producto.punto_reorden}}">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+
+                                        <button class="btn btn-sm btn-warning" title="Editar" id="editar_p"
+                                            onclick="editarProducto('{{producto.id}}','{{producto.categoria}}','{{producto.estado}}',
+                                                '{{producto.existencias}}', '{{producto.nombre}}','{{producto.precio}}','{{producto.punto_reorden}}','{{producto.sucursal}}'
+                                            )"
+                                        >
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-                            {% endif %}
-                            {% endfor %}
                         </div>
+                        {% endif %}
+                        {% endfor %}
                     </div>
                     {% endfor %}
                 </div>
-
             </div>
         </div>
     </div>
 </div>
+
+<!--MODAL-->
+
+<div class="modal fade" id="productoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Datos de los productos: </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <h3 id="modalNombre"></h3>
+                <p id="modalCategoria"></p>
+                <p id="modalPrecio"></p>
+                <p id="modalReorden"></p>
+                <p id="modalExistencias"></p>
+                <p id="modalEstado"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{% static 'javascript/modal.js' %}"></script>
+<script src="{% static 'javascript/editar_producto.js' %}"></script>
 <script>
     function cambiarProductos(sucursal) {
         let div_vh = document.getElementById('vhp');

@@ -233,6 +233,8 @@
 
 <script src="{% static 'javascript/fechas.js' %}"></script>
 <script src="{% static 'javascript/calculo.js' %}"></script>
+
+<!--ANTICIPOS, PAGOS Y AGREGAR FILA EN TABLA PEDIDOS-->
 <script>
 
     function mostrarEnvio() {
@@ -339,6 +341,9 @@
     });
 
 </script>
+<!----------------------------------------------------->
+
+<!--CALCULAR TOTALES-->
 <script>
 // Función para actualizar el total general
 function calcularTotal() {
@@ -430,6 +435,8 @@ document.addEventListener("DOMContentLoaded", function () {
     calcularTotal();
 });
 </script>
+<!----------------------------------------------------->
+
 <script>
 document.getElementById("form-pedido").addEventListener("submit", function(event) {
     event.preventDefault();

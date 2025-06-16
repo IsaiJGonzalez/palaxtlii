@@ -5,6 +5,8 @@ from django.core.paginator import Paginator
 from datetime import datetime, timedelta
 from django.http import JsonResponse
 import json
+from core.decorators import gerente_required, ventas_required, cajero_required, gerente_ventas_required
+
 
 def convertir_fecha(fecha_str):
     if isinstance(fecha_str, datetime):
@@ -14,11 +16,23 @@ def convertir_fecha(fecha_str):
     except (ValueError, TypeError):
         return None
 
+
+@gerente_ventas_required
 def pedidos(request):
     # --- Parámetros base ---
     fecha_limite = datetime.now() - timedelta(weeks=5)
     orden = request.GET.get('orden', 'entrega')
     tipo = request.GET.get('tipo')  # Para diferenciar si se piden entregados vía fetch
+    
+    #<-Obtener la plantilla correspondiente al nivel del usuario
+    privilegio = request.session.get('usuario',{}).get('privilegio',0)
+    if privilegio == 1 :
+        base = 'base_gerencial.html'
+    elif privilegio == 2:
+        base = 'base_ventas.html'
+    elif privilegio == 3:
+        base = 'base_cajero.html'
+    #<----
 
     # --- Obtener y procesar datos desde Firebase ---
     pedidos = fs.obtener_pedidos()
@@ -72,8 +86,11 @@ def pedidos(request):
             'pedidos_no_entregados': pedidos_no_entregados,
             'pedidos_entregados': pedidos_entregados_pag,
             'orden': orden,
+            'base':base
         },
     )
+
+
 
 def act_pedido_estado(request):
     if request.method == 'POST':

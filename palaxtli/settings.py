@@ -48,6 +48,10 @@ INSTALLED_APPS = [
     'punto_venta',
     'pedidos',
     'productos',
+    'core',
+    'codigos',
+    'apertura_caja',
+    'corte_caja',
 ]
 
 MIDDLEWARE = [
@@ -58,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'core.middlewares.VerificarSesionMiddleware',
 ]
 
 ROOT_URLCONF = 'palaxtli.urls'

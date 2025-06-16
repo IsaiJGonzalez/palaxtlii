@@ -2,8 +2,12 @@ from django.shortcuts import render
 from firebase_config import fr_db
 import firebase_service as fs
 from datetime import datetime
+import json
+from django.http import JsonResponse
+from core.decorators import gerente_required, ventas_required, cajero_required, login_required
 
-# Create your views here.
+
+@gerente_required
 def main_gerencial(request):
     nombre_empleado = request.session.get("usuario",{}).get('nombre', 'Usuario')
     sucursal_empleado = request.session.get('usuario',{}).get('sucursal','0')
@@ -36,3 +40,17 @@ def main_gerencial(request):
         
 
     return render(request, 'menu_gerencial.html', {'nombre_empleado': nombre_empleado,'prvh':productos_vh,'prmc':productos_mc,'pedidos':pedidos_hoy})
+
+
+
+def actualizar_pedido_estado(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            folio = data.get('folio')
+            
+            resultado = fs.act_pedido_estado(folio)  # Ejecuta la función
+            return JsonResponse({'mensaje': resultado})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)  # Envía error como JSON
+    return JsonResponse({'error': 'Método no permitido'}, status=405)

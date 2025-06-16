@@ -27,5 +27,6 @@ urlpatterns = [
     path('registro_pedidos/',include('registro_pedidos.urls')),
     path('pedidos/',include('pedidos.urls')),
     path('punto_venta/',include('punto_venta.urls')),
-    path('productos/',include('productos.urls'))
+    path('productos/',include('productos.urls')),
+    path('codigos/',include('codigos.urls'))
 ]
