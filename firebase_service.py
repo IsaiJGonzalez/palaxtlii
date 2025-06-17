@@ -387,6 +387,7 @@ def obtener_codigos():
 
 
 #CAJASSSSSSS
+
 def apertura_caja_vh(
     no_emp, fecha_asignacion, b1000, b500, b200, b100, b50, b20, monedas, fondo_caja, estado
 ):
@@ -424,6 +425,9 @@ def apertura_caja_mc(
         n_ref = ref.push()
         n_uid = n_ref.key
 
+        #ruta del empleado
+        e_ref = db.reference(f'empleados/{no_emp}')
+
         apertura_caja = {
             'id':n_uid,
             'no_emp':no_emp,
@@ -439,15 +443,126 @@ def apertura_caja_mc(
             'estado' : estado
         }
         n_ref.set(apertura_caja)
+        
+        #añadir la id de la caja activa
+        e_ref.update({'id_caja':n_uid})
+
         print('Caja abierta correctamente')
     except Exception as e:
         print('Error al abrir caja: ', e)
+
+
+
+
 
 
 def activar_caja_emp(id):
     ref = db.reference(f'empleados/{id}')
     ref.update({'caja_activa':True})
 
+def consultar_caja_activa(id):
+    ref = db.reference(f'empleados/{id}').get()
+    return ref.get('caja_activa')
+
+def consultar_id_caja_emp(id):
+    ref = db.reference(f'empleados/{id}').get()
+    return ref.get('id_caja')
+
 def desactivar_caja_emp(id):
     ref = db.reference(f'empleados/{id}')
     ref.update({'caja_activa':False})
+
+
+def corte_caja_vh(no_emp, apertura_id):
+    try:
+        ref = db.reference('vistahermosa/corte_caja')
+        n_ref = ref.push()
+        corte_id = n_ref.key
+
+        # Ruta del empleado
+        e_ref = db.reference(f'empleados/{no_emp}')
+
+        corte_caja = {
+            'id': corte_id,
+            'apertura_id': apertura_id,
+            'no_emp': no_emp,
+            'fecha_corte': None,  # Se llenará cuando se cierre
+            'estado': True,
+
+            'ventas': {
+                'efectivo': 0.0,
+                'tarjeta': 0.0,
+                'transferencia': 0.0
+            },
+
+            'pedidos' : {
+                'efectivo': 0.0,
+                'tarjeta': 0.0,
+                'transferencia': 0.0
+            },
+
+            'retiros': 0.0,
+            'monedas': 0.0,
+            'billetes': {},
+            'total_en_caja': 0.0,
+            'esperado_en_caja': 0.0,
+            'diferencia': 0.0,
+        }
+
+        n_ref.set(corte_caja)
+
+        # Actualizar referencia en el empleado
+        e_ref.update({'id_corte': corte_id})
+
+        print('Corte de caja inicial creado correctamente.')
+    except Exception as e:
+        print('Error al crear corte de caja: ', e)
+
+
+def corte_caja_mc(no_emp, apertura_id):
+    try:
+        ref = db.reference('moctezuma/corte_caja')
+        n_ref = ref.push()
+        corte_id = n_ref.key
+
+        # Ruta del empleado
+        e_ref = db.reference(f'empleados/{no_emp}')
+
+        corte_caja = {
+            'id': corte_id,
+            'apertura_id': apertura_id,
+            'no_emp': no_emp,
+            'fecha_corte': None,  # Se llenará cuando se cierre
+            'estado': True,
+
+            'ventas': {
+                'efectivo': 0.0,
+                'tarjeta': 0.0,
+                'transferencia': 0.0
+            },
+
+            'pedidos' : {
+                'efectivo': 0.0,
+                'tarjeta': 0.0,
+                'transferencia': 0.0
+            },
+
+            'retiros': 0.0,
+            'monedas': 0.0,
+            'billetes': {},
+            'total_en_caja': 0.0,
+            'esperado_en_caja': 0.0,
+            'diferencia': 0.0,
+        }
+
+        n_ref.set(corte_caja)
+
+        # Actualizar referencia en el empleado
+        e_ref.update({'id_corte': corte_id})
+
+        print('Corte de caja inicial creado correctamente.')
+    except Exception as e:
+        print('Error al crear corte de caja: ', e)
+
+
+

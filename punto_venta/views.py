@@ -18,10 +18,11 @@ def punto_venta(request):
     privilegio = request.session.get('usuario',{}).get('privilegio',0)
     nombre_emp = request.session.get('usuario',{}).get('nombre','Desconocido')
     no_emp = request.session.get('usuario',{}).get('numero_empleado',0)
-    caja_activa = request.session.get('usuario',{}).get('caja_activa',False)
-    if not caja_activa :
+    caja_activa = fs.consultar_caja_activa(no_emp)
+    print(caja_activa)
+    if not caja_activa:
         return redirect('apertura_caja')
-
+    
     #Locación y productos de acuerdo al empleado 
     if(direccion_empleado == 1):
         

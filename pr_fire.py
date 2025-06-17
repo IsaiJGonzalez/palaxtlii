@@ -5,5 +5,5 @@ import firebase_config
 
 
 #sv.activar_caja_emp(39708)
-
-sv.desactivar_caja_emp(39708)
+print(
+sv.consultar_caja_activa(39708))

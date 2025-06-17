@@ -15,9 +15,11 @@ from core.decorators import gerente_required, ventas_required, cajero_required, 
 
 @login_required
 def registro_pedidos(request):
+    no_emp = request.session.get('usuario',{}).get('numero_empleado',0)
     privilegio = request.session.get("usuario", {}).get("privilegio", 0)  # Si no hay privilegio, asigna 0
     locacion_empleado = request.session.get('usuario',{}).get('sucursal',0)
-    caja_activa = request.session.get('usuario',{}).get('caja_activa',False)
+    caja_activa = fs.consultar_caja_activa(no_emp)
+
     if not caja_activa :
         return redirect('apertura_caja')
 

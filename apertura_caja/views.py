@@ -7,6 +7,9 @@ def apertura_caja(request):
     privilegio = request.session.get('usuario',{}).get('privilegio',0)
     no_empleado = request.session.get('usuario',{}).get('numero_empleado',0)
     sucursal = request.session.get('usuario',{}).get('sucursal',0)
+    caja_a = fs.consultar_caja_activa(no_empleado)
+    if caja_a:
+        return redirect('corte_caja')
 
     if privilegio == 1:
         base = 'base_gerencial.html'
@@ -42,6 +45,9 @@ def apertura_caja(request):
                 estado=True
             )
             fs.activar_caja_emp(no_empleado)
+            apertura_id = fs.consultar_id_caja_emp(no_emp)
+            fs.corte_caja_vh(no_emp,apertura_id)
+
         elif sucursal == 2:
             fs.apertura_caja_mc(
                 no_emp=no_emp,
@@ -57,6 +63,8 @@ def apertura_caja(request):
                 estado=True
             )
             fs.activar_caja_emp(no_empleado)
+            apertura_id = fs.consultar_id_caja_emp(no_emp)
+            fs.corte_caja_mc(no_emp,apertura_id)
         else:
             return redirect('login')
         return redirect('apertura_caja')
