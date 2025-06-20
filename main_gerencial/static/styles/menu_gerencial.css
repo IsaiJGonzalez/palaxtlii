@@ -9,13 +9,6 @@
   margin-bottom: 0;
 }
 
-/* Opcional: resaltar fila al pasar el mouse */
-.table-hover tbody tr:hover {
-  background-color: #d1ecf1;
-  cursor: pointer;
-}
-
-
 .container_custom {
   width: 100%;
   padding: 20px 40px; /* puedes ajustar padding horizontal */

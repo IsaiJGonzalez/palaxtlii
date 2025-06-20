@@ -37,7 +37,7 @@
 
                     <div id="vhp" class="productos-scroll flex-grow-1 overflow-auto">
                         <h5 class="text-primary mb-3">Vista Hermosa</h5>
-                        <table class="table table-striped table-hover">
+                        <table class="table">
                             <thead class="table-primary">
                                 <tr>
                                     <th>Cantidad</th>
@@ -48,7 +48,7 @@
                             </thead>
                             <tbody>
                                 {% for producto in prvh %}
-                                <tr>
+                                <tr class="{% if not producto.estado %} table-info {% elif producto.existencias > producto.punto_reorden %} table-success {% elif producto.existencias == producto.punto_reorden %} table-warning {% elif producto.existencias < producto.punto_reorden %} table-danger {% endif %}">
                                     <td>{{producto.existencias}}</td>
                                     <td>{{ producto.nombre }}</td>
                                     <td>{{ producto.categoria }}</td>
@@ -65,7 +65,7 @@
 
                     <div id="mcp" class="productos-scroll flex-grow-1 overflow-auto d-none">
                         <h5 class="text-primary mb-3">Moctezuma</h5>
-                        <table class="table table-striped table-hover">
+                        <table class="table">
                             <thead class="table-primary">
                                 <tr>
                                     <th>Cantidad</th>
@@ -76,7 +76,7 @@
                             </thead>
                             <tbody>
                                 {% for producto in prmc %}
-                                <tr>
+                                <tr class="{% if not producto.estado %} table-info {% elif producto.existencias > producto.punto_reorden %} table-success {% elif producto.existencias == producto.punto_reorden %} table-warning {% elif producto.existencias < producto.punto_reorden %} table-danger {% endif %}">
                                     <td>{{producto.existencias}}</td>
                                     <td>{{ producto.nombre }}</td>
                                     <td>{{ producto.categoria }}</td>

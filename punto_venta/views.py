@@ -79,11 +79,16 @@ def registrar_venta(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Método no permitido'}, status=405)
     try:
+
+        #Variables globales para la función
         usuario = request.session.get('usuario', {})
         direccion_empleado = request.session.get('usuario',{}).get('sucursal',0)
         nombre_emp = usuario.get('nombre', 'Desconocido')
         no_emp = usuario.get('numero_empleado', 0)
-        
+        id_corte = fs.consultar_id_corte_caja_emp(no_emp)
+
+
+        #<---
         fecha = date.today().isoformat()
         resumen_data = json.loads(request.POST.get('resumen_data', '[]'))
         total = sum(float(p['subtotal']) for p in resumen_data)
@@ -129,6 +134,8 @@ def registrar_venta(request):
                 "no_operacion": operacion,
                 'loc_emp':direccion_empleado
             }
+
+            fs.registrar_en_corte_vh(id_corte,'venta',metodo_pago,total)
             tv.imprimir_venta(resumen=resumen) 
 
         elif direccion_empleado == 2:
@@ -168,6 +175,8 @@ def registrar_venta(request):
                 "no_operacion": operacion,
                 'loc_emp':direccion_empleado
             }
+
+            fs.registrar_en_corte_mc(id_corte,'venta',metodo_pago,total)
             tv.imprimir_venta(resumen=resumen)
             
         else:

@@ -11,3 +11,14 @@
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
     });
+
+
+//CAMBIO DE CONTRASEÑA;
+
+document.addEventListener('DOMContentLoaded',function(){
+
+    id_empleado = idEmpleado(id);
+
+
+    
+})

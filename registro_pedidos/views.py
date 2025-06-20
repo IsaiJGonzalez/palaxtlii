@@ -59,8 +59,14 @@ def guardar_pedido(request):
     if request.method == "POST":
         try:
             locacion_empleado = request.session.get('usuario',{}).get('sucursal',0)
+            no_emp = request.session.get('usuario',{}).get('numero_empleado',0)
             data = json.loads(request.body)
             gran_total = data.get('gran_total')
+            id_corte = fs.consultar_id_corte_caja_emp(no_emp)
+            anticipo = data.get('anticipo')
+            metodo_pago = data.get('metodo_pago')
+            
+
 
             if gran_total == 0 :
                 restante_pagado = True
@@ -99,6 +105,12 @@ def guardar_pedido(request):
                 restante_pagado=restante_pagado
             )
 
+            if locacion_empleado == 1 and anticipo:
+                a = int(anticipo)
+                fs.registrar_en_corte_vh(id_corte,'pedido',metodo_pago,a)
+            elif locacion_empleado == 2 and anticipo:
+                a = int(anticipo)
+                fs.registrar_en_corte_mc(id_corte,'pedido',metodo_pago,a)
             try:
                 script_path = os.path.join(settings.BASE_DIR,"ticket_utils.py")
                 subprocess.Popen([

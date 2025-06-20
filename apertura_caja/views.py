@@ -46,7 +46,7 @@ def apertura_caja(request):
             )
             fs.activar_caja_emp(no_empleado)
             apertura_id = fs.consultar_id_caja_emp(no_emp)
-            fs.corte_caja_vh(no_emp,apertura_id)
+            fs.corte_caja_vh(no_emp,apertura_id,fondo)
 
         elif sucursal == 2:
             fs.apertura_caja_mc(
@@ -64,7 +64,7 @@ def apertura_caja(request):
             )
             fs.activar_caja_emp(no_empleado)
             apertura_id = fs.consultar_id_caja_emp(no_emp)
-            fs.corte_caja_mc(no_emp,apertura_id)
+            fs.corte_caja_mc(no_emp,apertura_id,fondo)
         else:
             return redirect('login')
         return redirect('apertura_caja')

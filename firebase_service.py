@@ -396,6 +396,9 @@ def apertura_caja_vh(
         n_ref = ref.push()
         n_uid = n_ref.key
 
+        #ruta del empleado
+        e_ref = db.reference(f'empleados/{no_emp}')
+
         apertura_caja = {
             'id':n_uid,
             'no_emp':no_emp,
@@ -411,6 +414,9 @@ def apertura_caja_vh(
             'estado' : estado
         }
         n_ref.set(apertura_caja)
+
+        #añadir la id de la caja activa
+        e_ref.update({'id_caja':n_uid})
         print('Caja abierta correctamente')
     except Exception as e:
         print('Error al abrir caja: ', e)
@@ -468,12 +474,16 @@ def consultar_id_caja_emp(id):
     ref = db.reference(f'empleados/{id}').get()
     return ref.get('id_caja')
 
+def consultar_id_corte_caja_emp(id):
+    ref = db.reference(f'empleados/{id}').get()
+    return ref.get('id_corte')
+
 def desactivar_caja_emp(id):
     ref = db.reference(f'empleados/{id}')
     ref.update({'caja_activa':False})
 
 
-def corte_caja_vh(no_emp, apertura_id):
+def corte_caja_vh(no_emp, apertura_id, fondo):
     try:
         ref = db.reference('vistahermosa/corte_caja')
         n_ref = ref.push()
@@ -505,7 +515,7 @@ def corte_caja_vh(no_emp, apertura_id):
             'monedas': 0.0,
             'billetes': {},
             'total_en_caja': 0.0,
-            'esperado_en_caja': 0.0,
+            'esperado_en_caja': fondo,
             'diferencia': 0.0,
         }
 
@@ -519,7 +529,7 @@ def corte_caja_vh(no_emp, apertura_id):
         print('Error al crear corte de caja: ', e)
 
 
-def corte_caja_mc(no_emp, apertura_id):
+def corte_caja_mc(no_emp, apertura_id,fondo):
     try:
         ref = db.reference('moctezuma/corte_caja')
         n_ref = ref.push()
@@ -551,7 +561,7 @@ def corte_caja_mc(no_emp, apertura_id):
             'monedas': 0.0,
             'billetes': {},
             'total_en_caja': 0.0,
-            'esperado_en_caja': 0.0,
+            'esperado_en_caja': fondo,
             'diferencia': 0.0,
         }
 
@@ -565,4 +575,53 @@ def corte_caja_mc(no_emp, apertura_id):
         print('Error al crear corte de caja: ', e)
 
 
+#función para registrar ventas y pedidos en corte
+def registrar_en_corte_mc(corte_id,tipo,metodo_pago,ingreso):
+    ref = db.reference(f'moctezuma/corte_caja/{corte_id}')
+    if (tipo == 'pedido'):
+        path = f'pedidos/{metodo_pago}'
+        val_actual = ref.child(path).get()
+        suma = val_actual + ingreso if val_actual else ingreso
+        ref.child(path).set(suma)
+        if (metodo_pago == 'efectivo'):
+            val_e_act = ref.child('esperado_en_caja').get()
+            suma_e = val_e_act + ingreso if val_e_act else ingreso
+            ref.child('esperado_en_caja').set(suma_e)
+        print('Ingreso del pedido registrado')
+    elif (tipo == 'venta'):
+        path = f'ventas/{metodo_pago}'
+        val_actual = ref.child(path).get()
+        suma = val_actual + ingreso if val_actual else ingreso
+        ref.child(path).set(suma)
+        if (metodo_pago == 'efectivo'):
+            val_e_act = ref.child('esperado_en_caja').get()
+            suma_e = val_e_act + ingreso if val_e_act else ingreso
+            ref.child('esperado_en_caja').set(suma_e)
+        print('Ingreso de la venta registrada')
 
+    return
+
+def registrar_en_corte_vh(corte_id,tipo,metodo_pago,ingreso):
+    ref = db.reference(f'vistahermosa/corte_caja/{corte_id}')
+    if (tipo == 'pedido'):
+        path = f'pedidos/{metodo_pago}'
+        val_actual = ref.child(path).get()
+        suma = val_actual + ingreso if val_actual else ingreso
+        ref.child(path).set(suma)
+        if (metodo_pago == 'efectivo'):
+            val_e_act = ref.child('esperado_en_caja').get()
+            suma_e = val_e_act + ingreso if val_e_act else ingreso
+            ref.child('esperado_en_caja').set(suma_e)
+        print('Ingreso del pedido registrado')
+    elif (tipo == 'venta'):
+        path = f'ventas/{metodo_pago}'
+        val_actual = ref.child(path).get()
+        suma = val_actual + ingreso if val_actual else ingreso
+        ref.child(path).set(suma)
+        if (metodo_pago == 'efectivo'):
+            val_e_act = ref.child('esperado_en_caja').get()
+            suma_e = val_e_act + ingreso if val_e_act else ingreso
+            ref.child('esperado_en_caja').set(suma_e)
+        print('Ingreso de la venta registrada')
+        
+    return
