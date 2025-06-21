@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'codigos',
     'apertura_caja',
     'corte_caja',
+    'retiros',
 ]
 
 MIDDLEWARE = [

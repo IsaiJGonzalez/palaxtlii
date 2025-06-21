@@ -30,5 +30,6 @@ urlpatterns = [
     path('productos/',include('productos.urls')),
     path('codigos/',include('codigos.urls')),
     path('apertura_caja/',include('apertura_caja.urls')),
-    path('corte_caja/',include('corte_caja.urls'))
+    path('corte_caja/',include('corte_caja.urls')),
+    path('retiros/',include('retiros.urls')),
 ]

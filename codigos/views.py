@@ -15,7 +15,7 @@ def codigos(request):
 
 
     if request.method == 'POST':
-        codigo = request.POST.get('codigo')
+        codigo = int(request.POST.get('codigo'))
         fs.agregar_codigos(codigo)
         return redirect('codigos')
     

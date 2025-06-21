@@ -1,0 +1,102 @@
+{% extends base %}
+{% load static %}
+
+{% block items %}
+<title>Retiros</title>
+{% endblock %}
+
+{% block content %}
+
+<div class="container pt-lg-5">
+    <!-- FORMULARIO -->
+    <div class="col-lg-6 mx-auto">
+        <div class="card shadow-sm rounded p-4">
+            <h4 class="mb-5 text-primary text-center">Retiro de efectivo</h4>
+            <form class="row g-4" method="POST" id="form_productos">
+                {% csrf_token %}
+                <div class="col-md-6">
+                    <label class="form-label">ID caja: </label>
+                    <input type="text" class="form-control" name="" id="" value="{{ id_apertura }}" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Empleado: </label>
+                    <input type="number" class="form-control" name="" id="" value="{{no_emp}}" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Retira: </label>
+                    <input type="number" class="form-control" required name="retira" id="retira"
+                        placeholder="No. Empleado">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Fecha y hora: </label>
+                    <input type="datetime-local" class="form-control" required name="fecha" id="fecha">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Monto a retirar: </label>
+                    <input type="number" class="form-control" required name="monto_retiro" id="monto_retiro"
+                        placeholder="$">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Motivo: </label>
+                    <input class="form-control" type="text" name="motivo" id="motivo">
+                </div>
+                <!-- Botón para abrir el modal -->
+                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalRetiro" id="btnRetirar">
+                    <strong>Retirar</strong>
+                </button>
+                <!-- Modal -->
+                <div class="modal fade" id="modalRetiro" tabindex="-1" aria-labelledby="modalRetiroLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalRetiroLabel">Confirmar retiro</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Cerrar"></button>
+                            </div>
+                            <div class="modal-body">
+                                <label class="form-label">Ingresa código de confirmación</label>
+                                <input type="password" class="form-control border-3" id="confirmacion" name="confirmacion"
+                                    placeholder="0123" required>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-danger">Confirmar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Script -->
+<script>
+    document.getElementById("btnRetirar").addEventListener("click", function (event) {
+        event.preventDefault();
+        /*
+        const retiro = parseFloat(document.getElementById('monto_retiro').value);
+        const enCaja = parseFloat(document.getElementById('monto_caja').value);
+
+        if (retiro > enCaja) {
+            alert('El monto retirado no puede exceder al monto en caja');
+            return;
+        }
+        */
+    });
+</script>
+
+<script>
+    document.querySelector('.modal form')?.addEventListener('submit', function (e) {
+        const codigo = document.getElementById('confirmacion').value;
+
+        if (!codigo) {
+            e.preventDefault();
+            alert('Por favor ingresa el código de confirmación.');
+            return;
+        }
+    });
+</script>
+
+{% endblock %}

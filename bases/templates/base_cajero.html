@@ -26,10 +26,10 @@
                         <a class="nav-link" href="{% url 'menu_cajero' %}">Inicio</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'registro_pedidos' %}">Registrar Pedido</a>
+                        <a class="nav-link" href="{% url 'punto_venta' %}">Punto de Venta</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'punto_venta' %}">Punto de Venta</a>
+                        <a class="nav-link" href="{% url 'registro_pedidos' %}">Registrar Pedido</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
@@ -37,6 +37,16 @@
                             Configuración
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'apertura_caja' %}">Apertura Caja</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'corte_caja' %}">Corte Caja</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'retiros' %}">Retirar Efectivo</a>
+                            </li>
+                            <li>
                                 <hr class="dropdown-divider">
                             </li>
                             <li>

@@ -482,6 +482,71 @@ def desactivar_caja_emp(id):
     ref = db.reference(f'empleados/{id}')
     ref.update({'caja_activa':False})
 
+def consultar_monto_en_caja(id_corte,sucursal):
+    if sucursal == 1 :
+        ref = db.reference(f'vistahermosa/corte_caja/{id_corte}/esperado_en_caja').get()
+        return ref
+    elif sucursal == 2: 
+        ref = db.reference(f'moctezuma/corte_caja/{id_corte}/esperado_en_caja').get()
+        return ref
+
+def consultar_confirmacion(codigo):
+    codigos = db.reference('codigos/').get()
+    for _, valor in codigos.items():
+        if valor.get('codigo') == codigo:
+            return True
+    return False
+
+def verificar_exis_empleado(no_emp):
+    ref = db.reference(f'empleados/{no_emp}').get()
+    return ref is not None
+
+
+def registrar_retiro(sucursal, data):
+    nuevo_retiro = {
+        'apertura_id': data.get('apertura_id'),
+        'corte_id': data.get('corte_id'),
+        'numero_empleado': data.get('numero_empleado'),
+        'retira': data.get('retira'),
+        'fecha': data.get('fecha'),
+        'monto': data.get('monto'),
+        'motivo': data.get('motivo')
+    }
+
+    id_corte = data.get('corte_id')
+    monto = data.get('monto')
+
+    if sucursal == 1:
+        ref = db.reference('vistahermosa/retiros')
+        ref_corte = db.reference(f'vistahermosa/corte_caja/{id_corte}')
+        datos_corte = ref_corte.get()
+        #valores esperados en corte
+        valor_esperado_act = datos_corte.get('esperado_en_caja')
+        nuevo_valor_esperado = valor_esperado_act - monto
+        ref_corte.update({'esperado_en_caja': nuevo_valor_esperado})
+        
+        #valores de retiros en corte
+        valor_retiro_act = datos_corte.get('retiros')
+        nuevo_valor_retiro = valor_retiro_act + monto
+        ref_corte.update({'retiros' : nuevo_valor_retiro})
+
+    elif sucursal == 2:
+        ref = db.reference('moctezuma/retiros')
+        ref_corte = db.reference(f'moctezuma/corte_caja/{id_corte}')
+        datos_corte = ref_corte.get()
+        #valores esperados en corte
+        valor_esperado_act = datos_corte.get('esperado_en_caja')
+        nuevo_valor_esperado = valor_esperado_act - monto
+        ref_corte.update({'esperado_en_caja': nuevo_valor_esperado})
+
+        #valores de retiros en corte
+        valor_retiro_act = datos_corte.get('retiros')
+        nuevo_valor_retiro = valor_retiro_act + monto
+        ref_corte.update({'retiros' : nuevo_valor_retiro})
+        
+    else:
+        return
+    ref.push(nuevo_retiro)
 
 def corte_caja_vh(no_emp, apertura_id, fondo):
     try:

@@ -22,4 +22,16 @@ def corte_caja(request):
         'base':base,
         'id_caja':id_caja
     }
+
+    if request.method == 'POST':
+        billetes  = {
+            '1000' : request.POST.get('billetes_1000'),
+            '500' : request.POST.get('billetes_500'),
+            '200' : request.POST.get('billetes_200'),
+            '100' : request.POST.get('billetes_100'),
+            '50' : request.POST.get('billetes_50'),
+            '20' : request.POST.get('billetes_20')
+        }
+        monedas = request.POST.get('monedas')
+
     return render(request,'corte_caja.html',context)
