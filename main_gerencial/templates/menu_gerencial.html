@@ -99,6 +99,7 @@
         <div class="col-12 pedidos-container mt-4">
             <div class="card shadow rounded-3 h-100 d-flex flex-column">
                 <div class="card-body d-flex flex-column">
+                    <p class="text-center" style="font-size: small;"> {{loc}}</p>
                     <h4 class="card-title text-center mb-3">
                         Entregas del Día
                         <span class="ms-2" data-bs-toggle="tooltip" data-bs-placement="top"
@@ -227,11 +228,11 @@
                 <div class="mb-3 col-5 d-none" id="forma_de_pago">
                     <label class="form-label d-block">Forma de pago:</label>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="pago" id="tarjeta">
+                        <input class="form-check-input" type="radio" name="pago" id="tarjeta" value="tarjeta">
                         <label class="form-check-label" for="tarjeta">Tarjeta</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="pago" id="efectivo">
+                        <input class="form-check-input" type="radio" name="pago" id="efectivo" value="efectivo">
                         <label class="form-check-label" for="efectivo">Efectivo</label>
                     </div>
                 </div>

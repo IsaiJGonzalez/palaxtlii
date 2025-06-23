@@ -5,4 +5,4 @@ import firebase_config
 
 
 #sv.activar_caja_emp(39708)
-print(sv.verificar_exis_empleado(39709))
+print(sv.consultar_corte(2,'-OSwAFGpzIORJ29bNMYd'))

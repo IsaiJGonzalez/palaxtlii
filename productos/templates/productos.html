@@ -107,7 +107,7 @@
                         {% for producto in prvh %}
                         {% if producto.categoria == cat.nombre %}
                         <div class="col">
-                            <div class="card shadow-sm h-100  {%if producto.estado == False %} bg-secondary {% elif producto.existencias < producto.punto_reorden %} bg-danger-subtle {% elif producto.existencias == producto.punto_reorden %} bg-warning-subtle {% elif producto.existencias > producto.punto_reorden %} bg-success-subtle {% endif %}">
+                            <div class="card shadow-sm h-100 {%if producto.estado == False %} bg-info-subtle {% elif producto.existencias < producto.punto_reorden %} bg-danger-subtle {% elif producto.existencias == producto.punto_reorden %} bg-warning-subtle {% elif producto.existencias > producto.punto_reorden %} bg-success-subtle {% endif %}">
                                 <div class="card-body d-flex flex-column">
                                     <h5 class="card-title">{{ producto.nombre }}</h5>
                                     <p class="card-text"><strong>Precio:</strong> {{ producto.precio }}</p>
@@ -152,7 +152,7 @@
                         {% for producto in prmc %}
                         {% if producto.categoria == cat.nombre %}
                         <div class="col">
-                            <div class="card shadow-sm h-100 {%if producto.estado == False %} bg-secondary {% elif producto.existencias < producto.punto_reorden %} bg-danger-subtle {% elif producto.existencias == producto.punto_reorden %} bg-warning-subtle {% elif producto.existencias > producto.punto_reorden %} bg-success-subtle {% endif %}">
+                            <div class="card shadow-sm h-100 {%if producto.estado == False %} bg-info-subtle {% elif producto.existencias < producto.punto_reorden %} bg-danger-subtle {% elif producto.existencias == producto.punto_reorden %} bg-warning-subtle {% elif producto.existencias > producto.punto_reorden %} bg-success-subtle {% endif %}">
                                 <div class="card-body d-flex flex-column">
                                     <h5 class="card-title">{{ producto.nombre }}</h5>
                                     <p class="card-text"><strong>Precio:</strong> {{ producto.precio }}</p>

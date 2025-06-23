@@ -154,22 +154,22 @@
     </div>
     <hr class="table-group-divider">
 
-    <div class="mb-3 col-5 d-none" id="forma_de_pago">
+    <div class="mb-3 col-6 d-none" id="forma_de_pago">
         <label class="form-label d-block">Forma de pago:</label>
         <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" name="pago" id="tarjeta" onchange="recuadros_pago()">
-            <label class="form-check-label" for="tarjeta">Tarjeta</label>
+            <label class="form-check-label" for="tarjeta"> <i class="bi bi-credit-card"></i> Tarjeta</label>
         </div>
         <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" name="pago" id="efectivo" onchange="recuadros_pago()">
-            <label class="form-check-label" for="efectivo">Efectivo</label>
+            <label class="form-check-label" for="efectivo"> <i class="bi bi-cash"></i> Efectivo</label>
         </div>
         <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" name="pago" id="transferencia" onchange="recuadros_pago()">
-            <label class="form-check-label" for="transferencia">Transferencia</label>
+            <label class="form-check-label" for="transferencia"> <i class="bi bi-send"></i> Transferencia</label>
         </div>
         <!-- Añadir opción de Pago Mixto -->
-        <div class="form-check form-check-inline">
+        <div class="form-check form-check-inline d-none">
             <input class="form-check-input" type="radio" name="pago" id="mixto" onchange="recuadros_pago()">
             <label class="form-check-label" for="mixto">Mixto (Efectivo + Tarjeta)</label>
         </div>

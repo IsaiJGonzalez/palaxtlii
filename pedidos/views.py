@@ -93,10 +93,30 @@ def pedidos(request):
 
 
 def act_pedido_estado(request):
+    #valores globales
+    no_emp = request.session.get('usuario',{}).get('numero_empleado',0)
+    caja_activa = fs.consultar_caja_activa(no_emp)
+    if not caja_activa:
+        return JsonResponse({'Error': 'Caja inactiva'}, status=500)
+    corte_id = fs.consultar_id_corte_caja_emp(no_emp)
     if request.method == 'POST':
         try:
+            #obteniendo valores globales para la función
+            sucursal_emp = request.session.get('usuario',{}).get('sucursal',0)
+
+            #obteniendo la data del json
             data = json.loads(request.body)
+            #folio del pedido
             folio = data.get('folio')
+            
+            #pago seleccionado en caso de haber restante
+            pago_seleccionado = data.get('pagoSeleccionado')
+            if pago_seleccionado : 
+                restante = fs.consultar_restante_pedido(folio)
+                if sucursal_emp == 1:
+                    fs.registrar_en_corte_vh(corte_id,'pedido',pago_seleccionado,restante)
+                elif sucursal_emp == 2:
+                    fs.registrar_en_corte_mc(corte_id,'pedido',pago_seleccionado,restante)
             
             resultado = fs.act_pedido_estado(folio)  # Ejecuta la función
             return JsonResponse({'mensaje': resultado})

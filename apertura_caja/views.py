@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 import firebase_service as fs
+import ticket_apertura_caja as tk
 
 # Create your views here.
 def apertura_caja(request):
     privilegio = request.session.get('usuario',{}).get('privilegio',0)
     no_empleado = request.session.get('usuario',{}).get('numero_empleado',0)
+    nom_emp = request.session.get('usuario',{}).get('nombre','user')
     sucursal = request.session.get('usuario',{}).get('sucursal',0)
     caja_a = fs.consultar_caja_activa(no_empleado)
     if caja_a:
@@ -30,6 +32,14 @@ def apertura_caja(request):
         monedas = float(request.POST.get('monedas') or 0)
         fondo = float(request.POST.get('fondo_caja') or 0)
 
+        data = {
+            'fecha' : fecha,
+            'no_emp' : no_emp,
+            'nombre' : nom_emp,
+            'fondo' : fondo,
+            'sucursal' :sucursal
+        }
+
         if sucursal == 1:
             fs.apertura_caja_vh(
                 no_emp=no_emp,
@@ -47,6 +57,7 @@ def apertura_caja(request):
             fs.activar_caja_emp(no_empleado)
             apertura_id = fs.consultar_id_caja_emp(no_emp)
             fs.corte_caja_vh(no_emp,apertura_id,fondo)
+            tk.imprimir_apertura(data)
 
         elif sucursal == 2:
             fs.apertura_caja_mc(
@@ -65,6 +76,9 @@ def apertura_caja(request):
             fs.activar_caja_emp(no_empleado)
             apertura_id = fs.consultar_id_caja_emp(no_emp)
             fs.corte_caja_mc(no_emp,apertura_id,fondo)
+            tk.imprimir_apertura(data)
+
+
         else:
             return redirect('login')
         return redirect('apertura_caja')

@@ -84,21 +84,25 @@ def imprimir_venta(resumen):
         no_operacion = resumen.get('no_operacion','')
 
         p.set(bold=False)
-        p.text(f'Método de Pago: {metodo_p}\n')
+        p.text(f'Método de Pago: {metodo_p}\n\n')
         p.text(f"{'Total:':<20}${total:>8.2f}\n")
         if metodo_p == 'efectivo':
             p.text(f"{'Recibido:':<20}${recibido:>8.2f}\n")
-            p.text(f"{'Cambio:':<20}${cambio:>8.2f}\n")
+            p.text(f"{'Cambio:':<20}${cambio:>8.2f}\n\n")
         elif metodo_p == 'tarjeta' or metodo_p == 'transferencia':
-            p.set(f'Número de Operación: {no_operacion}')
+            p.set(f'Número de Operación: {no_operacion}\n\n')
         
 
         #Mensaje final
         p.set(align='center')
         p.text("¡Gracias por su preferencia!\n\n")
-        p.text('Reserva tu pastel perfecto\n')
+        p.text('***Reserva tu pastel perfecto***\n\n')
         p.text("Whatsapp: 427 159 0622\n")
 
+        p.text('\n')
+        # --- FECHA Y HORA DE IMPRESIÓN ---
+        fecha_hora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        p.text(f"\nFecha de impresión: {fecha_hora}\n")
 
         p.cut()
 
@@ -173,13 +177,18 @@ def imprimir_venta(resumen):
         no_operacion = resumen.get('no_operacion','')
 
         p.set(bold=False)
-        p.text(f'Método de Pago: {metodo_p}\n')
+        p.text(f'Método de Pago: {metodo_p}\n\n')
         p.text(f"{'Total:':<20}${total:>8.2f}\n")
         if metodo_p == 'efectivo':
             p.text(f"{'Recibido:':<20}${recibido:>8.2f}\n")
-            p.text(f"{'Cambio:':<20}${cambio:>8.2f}\n")
+            p.text(f"{'Cambio:':<20}${cambio:>8.2f}\n\n")
         elif metodo_p == 'tarjeta' or metodo_p == 'transferencia':
-            p.set(f'Número de Operación: {no_operacion}')
+            p.set(f'Número de Operación: {no_operacion}\n\n')
+
+        p.text('\n')
+        # --- FECHA Y HORA DE IMPRESIÓN ---
+        fecha_hora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        p.text(f"\nFecha de impresión: {fecha_hora}\n")
 
         p.cut()
         p.close()

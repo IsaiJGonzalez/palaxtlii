@@ -340,7 +340,7 @@ def restar_producto_mc(id,cantidad):
 #ACTUALIZACION DE ATRIBUTOS
 
 def act_pedido_estado(folio):
-    print('1')
+
     ref = db.reference('/pedidos/')
     
     pedidos = ref.order_by_child('folio').equal_to(folio).get()
@@ -482,6 +482,22 @@ def desactivar_caja_emp(id):
     ref = db.reference(f'empleados/{id}')
     ref.update({'caja_activa':False})
 
+def limpiar_cajas_empleado(id):
+    ref = db.reference(f'empleados/{id}')
+    ref.update({
+        'id_caja':'',
+        'id_corte' : ''
+    })
+
+
+def desactivar_apertura_caja(id,sucursal):
+    if sucursal == 1:
+        ref = db.reference(f'vistahermosa/apertura_caja/{id}')
+        ref.update({'estado' : False})
+    elif sucursal == 2:
+        ref = db.reference(f'moctezuma/apertura_caja/{id}')
+        ref.update({'estado' : False})
+
 def consultar_monto_en_caja(id_corte,sucursal):
     if sucursal == 1 :
         ref = db.reference(f'vistahermosa/corte_caja/{id_corte}/esperado_en_caja').get()
@@ -490,6 +506,14 @@ def consultar_monto_en_caja(id_corte,sucursal):
         ref = db.reference(f'moctezuma/corte_caja/{id_corte}/esperado_en_caja').get()
         return ref
 
+def consultar_restante_pedido(folio):
+    ref = db.reference('pedidos/')
+    pedidos = ref.order_by_child('folio').equal_to(folio).get()
+
+    for key, pedido in pedidos.items():
+        return pedido.get('gran_total')
+    return None
+
 def consultar_confirmacion(codigo):
     codigos = db.reference('codigos/').get()
     for _, valor in codigos.items():
@@ -497,9 +521,23 @@ def consultar_confirmacion(codigo):
             return True
     return False
 
+def consultar_sucursal(sucursal):
+    ruta = 'vistahermosa' if sucursal == 1 else 'moctezuma' if sucursal == 2 else None
+    ref = db.reference(f'{ruta}/locacion').get()
+    return ref
+
+def consultar_corte(suc,corte_id):
+    sucursal = 'vistahermosa' if suc == 1 else 'moctezuma' if suc == 2 else None
+    ref = db.reference(f'{sucursal}/corte_caja/{corte_id}').get()
+    return ref
+
 def verificar_exis_empleado(no_emp):
     ref = db.reference(f'empleados/{no_emp}').get()
     return ref is not None
+
+def cambiar_locacion_empleado(no_emp, locacion):
+    ref = db.reference(f'empleados/{no_emp}')
+    ref.update({'sucursal':locacion})
 
 
 def registrar_retiro(sucursal, data):
@@ -548,6 +586,8 @@ def registrar_retiro(sucursal, data):
         return
     ref.push(nuevo_retiro)
 
+
+#FUNCIONES QUE ABREN EL CORTE DE CAJA PARA EL EMPLEADO
 def corte_caja_vh(no_emp, apertura_id, fondo):
     try:
         ref = db.reference('vistahermosa/corte_caja')
@@ -640,7 +680,7 @@ def corte_caja_mc(no_emp, apertura_id,fondo):
         print('Error al crear corte de caja: ', e)
 
 
-#función para registrar ventas y pedidos en corte
+#función para registrar ventas y pedidos en corte 
 def registrar_en_corte_mc(corte_id,tipo,metodo_pago,ingreso):
     ref = db.reference(f'moctezuma/corte_caja/{corte_id}')
     if (tipo == 'pedido'):
@@ -690,3 +730,28 @@ def registrar_en_corte_vh(corte_id,tipo,metodo_pago,ingreso):
         print('Ingreso de la venta registrada')
         
     return
+
+
+##CERRAR CAJAS
+
+def cerrar_cajas(sucursal,no_emp,apertura_id,corte_id,fecha_corte,billetes,monedas,total_en_caja):
+    ruta = 'vistahermosa' if sucursal == 1 else 'moctezuma' if sucursal == 2 else None
+    if ruta:
+        ref_corte = db.reference(f'{ruta}/corte_caja/{corte_id}')
+        esperado_en_caja = consultar_monto_en_caja(corte_id, sucursal)
+        diferencia = esperado_en_caja - total_en_caja
+
+        ref_corte.update({
+            'diferencia': diferencia,
+            'estado': False,
+            'fecha_corte': fecha_corte,
+            'billetes': billetes,
+            'monedas': monedas,
+            'total_en_caja': total_en_caja
+        })
+        desactivar_apertura_caja(apertura_id, sucursal)
+        desactivar_caja_emp(no_emp)
+        limpiar_cajas_empleado(no_emp)
+    else:
+        print('Error al cerrar cajas')
+

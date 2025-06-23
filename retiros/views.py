@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect 
 from django.http import JsonResponse
 import firebase_service as fs
-
+import ticket_retiros as tk
 
 # Create your views here.
 
@@ -17,7 +17,7 @@ def retiros(request):
     #monto_en_caja = fs.consultar_monto_en_caja(id_corte,sucursal_emp)
 
     if not caja_activa: #retorna a la apertura si no hay caja para hacer un retiro
-        return redirect('apertura')
+        return redirect('apertura_caja')
     
     #variables globales para la función
     privilegio = request.session.get('usuario',{}).get('privilegio',0)
@@ -59,6 +59,9 @@ def retiros(request):
             'motivo' : request.POST.get('motivo')
         }
         fs.registrar_retiro(sucursal_emp,data)
+        tk.imprimir_retiros(sucursal_emp,data)
+
+
         print('Retiro registrado')
         return redirect('retiros')
 

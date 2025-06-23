@@ -42,7 +42,8 @@ def imprimir_ticket(data,loc):
         fecha_ob = datetime.strptime(fecha_str, "%Y-%m-%d")
         fecha_en = fecha_ob.strftime("%d de %B de %Y")
 
-        p.text(f"Fecha de Entrega: {fecha_en} a las {data.get('hora_entrega', '')} hrs. \n")
+        p.text(f"Fecha de Entrega: {fecha_en}\n")
+        p.text(f"Hora de Entrega: {data.get('hora_entrega','')} hrs.")
         p.text('Forma de Entrega: ')
 
         forma_entrega = data.get('forma_entrega')
@@ -89,7 +90,7 @@ def imprimir_ticket(data,loc):
 
 
         p.text("-" * 48 + "\n")
-        p.set(align='left', bold=True, width=1, height=1)
+        p.set(align='left', bold=False, width=1, height=1)
         p.text('Especificaciones: \n')
         especificaciones = data.get('especificaciones')
         p.text(especificaciones)
@@ -115,7 +116,7 @@ def imprimir_ticket(data,loc):
             p.text(f"{'Recibido:':<20}${data.get('recibido', 0):>8.2f}\n")
             p.text(f"{'Cambio:':<20}${data.get('cambio', 0):>8.2f}\n")
         elif (metodo=='tarjeta' or metodo=='transferencia'):
-            p.text('Tarjeta Crédito/Débito/Transferencia')
+            p.text('Pago con: Tarjeta / Transferencia\n')
         p.text(f"{'Total Restante:':<20}${data.get('gran_total',0):>8.2f}\n")
         p.text("-" * 48 + "\n")
 
@@ -163,7 +164,8 @@ def imprimir_ticket(data,loc):
         p.text(f"Folio: {data.get('folio', '')}\n")
         p.text(f"Cliente: {data.get('nombre_cliente', '')}\n")
         p.text(f"Teléfono: {data.get('telefono', '')}\n")
-        p.text(f"Fecha de Entrega: {fecha_en} a las {data.get('hora_entrega', '')} hrs. \n")
+        p.text(f"Fecha de Entrega: {fecha_en}\n")
+        p.text(f"Hora de Entrega: {data.get('hora_entrega','')} hrs.")
         p.text('Forma de Entrega: ')
 
         forma_entrega = data.get('forma_entrega')
@@ -235,7 +237,7 @@ def imprimir_ticket(data,loc):
             p.text(f"{'Recibido:':<20}${data.get('recibido', 0):>8.2f}\n")
             p.text(f"{'Cambio:':<20}${data.get('cambio', 0):>8.2f}\n")
         elif (metodo=='tarjeta' or metodo=='transferencia'):
-            p.text('Tarjeta Crédito/Débito/Transferencia')
+            p.text('Pago con: Tarjeta / Transferencia\n')
         p.text(f"{'Total Restante:':<20}${data.get('gran_total',0):>8.2f}\n")
         p.text("-" * 48 + "\n")
         
@@ -248,7 +250,7 @@ def imprimir_ticket(data,loc):
         p.text(no_emp )
         p.text(' - ') 
         p.text(nom_emp)
-
+        p.text('\n')
         # --- FECHA Y HORA DE IMPRESIÓN ---
         fecha_hora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         p.text(f"\nFecha de impresión: {fecha_hora}\n")

@@ -106,14 +106,16 @@ document.addEventListener("DOMContentLoaded", function () {
 //PAGADO
 document.getElementById('pagado').addEventListener('click', function() {
     const folio = this.getAttribute('data-folio'); // Obtiene el folio asignado
-    const pagoSeleccionado = document.querySelector('input[name="pago"]:checked'); // Verifica si hay pago seleccionado
+    const pagoInput = document.querySelector('input[name="pago"]:checked'); // Verifica si hay pago seleccionado
 
-    if (!pagoSeleccionado) {
+    if (!pagoInput) {
         alert('Por favor, selecciona una forma de pago antes de continuar.');
         return;
     }
 
-    enviarFolio(folio, 'Pedido actualizado correctamente.');
+    const pagoSeleccionado = pagoInput.value;
+
+    enviarFolio(folio,pagoSeleccionado,'Pedido actualizado correctamente.');
 });
 
 
@@ -128,14 +130,14 @@ document.querySelectorAll('.entregado_directo').forEach(boton => {
 
 
 // Función reutilizable para enviar el folio al backend
-function enviarFolio(folio, mensajeExito) {
+function enviarFolio(folio,pagoSeleccionado,mensajeExito) {
     fetch('/pedidos/act_pedido_estado/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRFToken': getCSRFToken()
         },
-        body: JSON.stringify({ folio })
+        body: JSON.stringify({ folio,pagoSeleccionado })
     })
     .then(response => response.text())
     .then(data => {

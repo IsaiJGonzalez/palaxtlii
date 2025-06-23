@@ -10,7 +10,8 @@ from core.decorators import gerente_required, ventas_required, cajero_required, 
 @gerente_required
 def main_gerencial(request):
     nombre_empleado = request.session.get("usuario",{}).get('nombre', 'Usuario')
-    sucursal_empleado = request.session.get('usuario',{}).get('sucursal','0')
+    sucursal_empleado = request.session.get('usuario',{}).get('sucursal', 0)
+    loc = fs.consultar_sucursal(sucursal_empleado)
     productos_vh = list(fs.obtener_productos_vh().values()) if fs.obtener_productos_vh() else []
     productos_mc = list(fs.obtener_productos_moctezuma().values()) if fs.obtener_productos_moctezuma() else []
 
@@ -39,7 +40,7 @@ def main_gerencial(request):
                 pedidos_hoy.append(pedido)
         
 
-    return render(request, 'menu_gerencial.html', {'nombre_empleado': nombre_empleado,'prvh':productos_vh,'prmc':productos_mc,'pedidos':pedidos_hoy})
+    return render(request, 'menu_gerencial.html', {'nombre_empleado': nombre_empleado,'prvh':productos_vh,'prmc':productos_mc,'pedidos':pedidos_hoy,'loc':loc})
 
 
 
