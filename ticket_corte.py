@@ -77,7 +77,7 @@ def imprimir_corte(data, nombre_emp, suc):
         p.text('_' * 25 + '\n')
         p.text('Firma\n\n')
 
-        p.text('Este documento es evidencia del fondo entregado.\n')
+        p.text('Este documento es evidencia del corte de caja correspondiente a la fecha y empleada/o indicados. \n')
         p.text('Reporte inconsistencias de inmediato.\n')
         p.text('\n')
         p.cut()

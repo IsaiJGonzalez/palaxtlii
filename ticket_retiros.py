@@ -50,7 +50,7 @@ def imprimir_retiros(suc,data):
         p.text('Firma')
         p.text('\n\n')
         p.set(align='center', bold=False)
-        p.text('Este documento es evidencia del fondo entregado. Reporte inconsistencias de inmediato.\n')
+        p.text('Este documento es evidencia del retiro de efectivo realizado. Reporte inconsistencias de inmediato.\n')
         p.cut()
 
         ##REPETICIÓN
