@@ -55,23 +55,33 @@
                 </form>
             </div>
 
-            <div class="card shadow-sm rounded p-4 d-none" id="did-chpsw">
-                <h5 class="text-center text-danger">Cambio de Constraseña</h5>
-                <form action="">
-                    <div class="col-12">
-                        <label class="form-label">Nueva Contraseña</label>
-                        <input type="password" class="form-control" required name="psw-1" id="psw-1">
+            <!--CAMBIO DE CONTRASEÑA FORMULARIO-->
+
+            <div class="card shadow-sm rounded p-4 d-none" id="ch-psw-form">
+                <h4 class="mb-4 text-danger text-center">Cambio de Contraseña</h4>
+                <form class="row g-4" method="POST" action="{% url 'cambiar_contrasena' %}">
+                    {% csrf_token %}
+                    
+                    <div class="col-md-6">
+                        <label class="form-label">Empleado: </label>
+                        <input type="number" class="form-control ch_emp" required name="ch_emp" readonly>
                     </div>
-                    <div class="col-12">
+
+                    <div class="col-md-12">
+                        <label class="form-label">Contraseña Nueva</label>
+                        <input type="password" class="form-control" required name="contrasena_uno" id="contrasena_uno">
+                    </div>
+                    <div class="col-md-12">
                         <label class="form-label">Confirma Contraseña</label>
-                        <input type="password" class="form-control" required name="psw-1" id="psw-1">
+                        <input type="password" class="form-control" required name="contrasena_dos" id="contrasena_dos">
                     </div>
-                    <button class="btn btn-danger">
-                        Cambiar
-                    </button>
-                    <button class="btn btn-secondary">
-                        Cancelar
-                    </button>
+                    
+                    <div class="col-6 text-center">
+                        <input class="btn btn-danger w-100" type="submit" value="Cambiar">
+                    </div>
+                    <div class="col-6 text-center">
+                        <input class="btn btn-secondary w-100" type="button" id="cancelar_ch" value="Cancelar">
+                    </div>
                 </form>
             </div>
         </div>
@@ -105,7 +115,7 @@
                                         >
                                         <i class="bi bi-exclamation-circle"></i>
                                     </button>
-                                    <button class="btn btn-primary" onclick="idEmpleado('{{empleado.numero_empleado}}'); ocultar()">
+                                    <button class="btn btn-primary btn_cambiar_contrasena" data-id-empleado="{{ empleado.numero_empleado }}">
                                         Cambiar Contraseña
                                     </button>
                                 </div>

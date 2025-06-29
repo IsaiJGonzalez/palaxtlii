@@ -25,7 +25,7 @@ def imprimir_retiros(suc,data):
         fecha_str = data.get('fecha')
         fecha_dt = datetime.fromisoformat(fecha_str)
         fecha = fecha_dt.strftime("%d de %B de %Y a las %H:%M")
-        numero_empleado = data.get('no_emp')
+        numero_empleado = data.get('numero_empleado')
         monto = data.get('monto')
         sucursal_int = suc
         sucursal = 'Av. Palma #60, Col. Vista Hermosa, San Juan Del Río, Qro.' if sucursal_int == 1 else 'Av Moctezuma #143, Col San Cayetano, San Juan del Río, Qro.' if sucursal_int == 2 else ''

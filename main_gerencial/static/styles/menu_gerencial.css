@@ -3,8 +3,14 @@
     overflow-y: auto;  /* Activa el desplazamiento vertical */
 }
 
+.ventas-scroll {
+    max-height: 250px; /* Establece una altura fija */
+    overflow-y: auto;  /* Activa el desplazamiento vertical */
+}
+
+
 /* Ajuste para que tabla ocupe todo el ancho y se vea bien */
-.productos-scroll table {
+.ventas-scroll table {
   width: 100%;
   margin-bottom: 0;
 }
@@ -17,7 +23,8 @@
 
 /* Para que graficas y productos usen toda la altura disponible en su fila */
 .graficas-container,
-.productos-container {
+.productos-container,
+.ventas-container {
   height: 400px; /* altura fija para estas dos secciones */
 }
 
@@ -29,7 +36,8 @@
 }
 
 /* Productos: scroll vertical */
-.productos-scroll {
+.productos-scroll,
+.ventas-scroll {
   height: 100%;
   overflow-y: auto;
   padding-right: 10px;
@@ -37,7 +45,8 @@
 }
 
 /* Tarjetas de producto con estilo */
-.producto-card {
+.producto-card,
+.ventas-card {
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   padding: 15px;
@@ -72,3 +81,4 @@
   padding: 12px;
   text-align: center;
 }
+

@@ -1,0 +1,28 @@
+.boton-imprimir {
+    width: 100px;
+    height: 100px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.boton-imprimir:hover {
+    background-color: #2980b9;
+    transform: scale(1.05);
+}
+
+.boton-imprimir img {
+    width: 64px;
+    height: 64px;
+}

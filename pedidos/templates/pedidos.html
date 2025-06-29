@@ -97,7 +97,7 @@
                     <th>Fecha entrega</th>
                     <th>Cliente</th>
                     <th>Fecha registro</th>
-                    <th>Acciones</th>
+                    <th class="d-none" >Acciones</th>
                 </tr>
             </thead>
             <tbody id="lista-pedidos-entregados">
@@ -107,7 +107,7 @@
                     <td>{{pedido.fecha_entrega|date:"j \\d\\e F \\d\\e Y"}}</td>
                     <td>{{pedido.nombre_cliente}}</td>
                     <td>{{pedido.fecha_registro|date:"j \\d\\e F \\d\\e Y"}}</td>
-                    <td>
+                    <td class="d-none">
                         <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#pedidoModal12345">Ver
                             Detalles</button>
                     </td>
@@ -116,18 +116,18 @@
             </tbody>
         </table>
         <!-- Paginación para pedidos entregados -->
-        <div class="pagination">
+        <div class="pagination pb-4">
             {% if pedidos_entregados.has_previous %}
             <a href="?page_entregados={{ pedidos_entregados.previous_page_number }}&orden={{ orden }}"
-                class="btn btn-secondary">Anterior</a>
+                class="btn btn-secondary m-3">Anterior</a>
             {% endif %}
             {% if pedidos_entregados.has_next %}
             <a href="?page_entregados={{ pedidos_entregados.next_page_number }}&orden={{ orden }}"
-                class="btn btn-secondary">Siguiente</a>
+                class="btn btn-secondary m-3">Siguiente</a>
             {% endif %}
         </div>
         <!-- Botón "Cargar más" para pedidos entregados -->
-        <button id="cargarMasPedidosEntregados" class="btn btn-secondary">Cargar más entregados</button>
+        <button id="cargarMasPedidosEntregados" class="btn btn-secondary d-none">Cargar más entregados</button>
 
     </div>
 </div>

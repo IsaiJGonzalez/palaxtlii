@@ -10,22 +10,95 @@
 <div class="container-fluid py-4 container_custom">
     <div class="row gx-4 gy-4">
 
-        <!-- Gráficas a la izquierda -->
-        <div class="col-lg-6 graficas-container">
-            <div class="card shadow rounded-3 h-100 d-flex flex-column">
-                <div class="card-body text-center flex-grow-1 d-flex flex-column">
-                    <h4 class="card-title mb-3"> <i class="bi bi-graph-up-arrow"></i> Gráficas de Ventas</h4>
+        <!-- Ventas a la derecha -->
+        <div class="col-lg-7 ventas-container d-flex flex-column">
+            <div class="card shadow rounded-3 flex-grow-1 d-flex flex-column">
+                <div class="card-body text-center d-flex flex-column flex-grow-1">
+                    <h4 class="card-title mb-3"><i class="bi bi-receipt"></i> Ventas Registradas</h4>
                     <div class="btn-group w-100 mb-3">
-                        <button class="btn btn-primary">Vista Hermosa</button>
-                        <button class="btn btn-secondary">Moctezuma</button>
+                        <button class="btn btn-success" id="btn_vv" type="button">Vista Hermosa</button>
+                        <button class="btn btn-secondary" id="btn_vm" type="button">Moctezuma</button>
                     </div>
-                    <div id="grafica" class="grafica-content flex-grow-1 overflow-auto bg-light rounded border"></div>
+
+                    <!-- Vista Hermosa -->
+                    <div id="vv_div" class="ventas-scroll flex-grow-1 overflow-auto">
+                        <h5 class="text-primary mb-3">Vista Hermosa</h5>
+                        <table class="table">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th># Venta</th>
+                                    <th>Total</th>
+                                    <th>Método Pago</th>
+                                    <th>ID Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio Unitario</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for venta in ventasvh %}
+                                {% for prod in venta.productos %}
+                                <tr>
+                                    <td>{{ venta.no_venta }}</td>
+                                    <td>${{ venta.total }}</td>
+                                    <td>{{ venta.metodo_pago|title }}</td>
+                                    <td>{{ prod.productoId }}</td>
+                                    <td>{{ prod.cantidad }}</td>
+                                    <td>${{ prod.precio_unitario }}</td>
+                                    <td>${{ prod.subtotal }}</td>
+                                </tr>
+                                {% endfor %}
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7">No hay ventas registradas</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Moctezuma -->
+                    <div id="vm_div" class="ventas-scroll flex-grow-1 overflow-auto d-none">
+                        <h5 class="text-primary mb-3">Moctezuma</h5>
+                        <table class="table">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th># Venta</th>
+                                    <th>Total</th>
+                                    <th>Método Pago</th>
+                                    <th>ID Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio Unitario</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for venta in ventasmc %}
+                                {% for prod in venta.productos %}
+                                <tr>
+                                    <td>{{ venta.no_venta }}</td>
+                                    <td>${{ venta.total }}</td>
+                                    <td>{{ venta.metodo_pago|title }}</td>
+                                    <td>{{ prod.productoId }}</td>
+                                    <td>{{ prod.cantidad }}</td>
+                                    <td>${{ prod.precio_unitario }}</td>
+                                    <td>${{ prod.subtotal }}</td>
+                                </tr>
+                                {% endfor %}
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7">No hay ventas registradas</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Productos a la derecha -->
-        <div class="col-lg-6 productos-container d-flex flex-column">
+        <div class="col-lg-5 productos-container d-flex flex-column">
             <div class="card shadow rounded-3 flex-grow-1 d-flex flex-column">
                 <div class="card-body text-center d-flex flex-column flex-grow-1">
                     <h4 class="card-title mb-3"> <i class="bi bi-shop"></i> Productos Disponibles</h4>
@@ -48,7 +121,8 @@
                             </thead>
                             <tbody>
                                 {% for producto in prvh %}
-                                <tr class="{% if not producto.estado %} table-info {% elif producto.existencias > producto.punto_reorden %} table-success {% elif producto.existencias == producto.punto_reorden %} table-warning {% elif producto.existencias < producto.punto_reorden %} table-danger {% endif %}">
+                                <tr
+                                    class="{% if not producto.estado %} table-info {% elif producto.existencias > producto.punto_reorden %} table-success {% elif producto.existencias == producto.punto_reorden %} table-warning {% elif producto.existencias < producto.punto_reorden %} table-danger {% endif %}">
                                     <td>{{producto.existencias}}</td>
                                     <td>{{ producto.nombre }}</td>
                                     <td>{{ producto.categoria }}</td>
@@ -76,7 +150,8 @@
                             </thead>
                             <tbody>
                                 {% for producto in prmc %}
-                                <tr class="{% if not producto.estado %} table-info {% elif producto.existencias > producto.punto_reorden %} table-success {% elif producto.existencias == producto.punto_reorden %} table-warning {% elif producto.existencias < producto.punto_reorden %} table-danger {% endif %}">
+                                <tr
+                                    class="{% if not producto.estado %} table-info {% elif producto.existencias > producto.punto_reorden %} table-success {% elif producto.existencias == producto.punto_reorden %} table-warning {% elif producto.existencias < producto.punto_reorden %} table-danger {% endif %}">
                                     <td>{{producto.existencias}}</td>
                                     <td>{{ producto.nombre }}</td>
                                     <td>{{ producto.categoria }}</td>
@@ -118,48 +193,55 @@
                                 </tr>
                             </thead>
                             {% for pedido in pedidos %}
-                                <tbody>    
+                            <tbody>
                                 {% if pedido.estado == 0%}
-                                    <tr>
-                                        <td> {{pedido.folio}} </td>
-                                        <td> {{pedido.hora_entrega}} <span>hrs</span> </td>
-                                        <td> {{pedido.nombre_cliente}} </td>            
-                                        <td class="text-start">
-                                            {% for producto in pedido.productos %}
-                                                <li>{{producto.cantidad}} {{producto.descripcion}}</li>
-                                            {% endfor %}
-                                        </td>
-                                        <td><span>$</span> {{pedido.gran_total}} </td>
-                                        <td>
-                                            <button class="btn btn-warning" 
-                                                data-bs-toggle="modal" data-bs-target="#pedidoModal"
-                                                data-anticipo="{{ pedido.anticipo }}" data-at-no_emp="{{pedido.at_no_emp}}"
-                                                data-at-nom-emp="{{pedido.at_nom_emp}}" data-cambio="{{pedido.cambio}}"
-                                                data-cel="{{pedido.cel}}" data-costo-envio="{{pedido.costo_envio}}"
-                                                data-direccion="{{pedido.direccion}}" data-especificaciones="{{pedido.especificaciones}}"
-                                                data-estado="{{pedido.estado}}" data-fecha-entrega="{{pedido.fecha_entrega}}"
-                                                data-fecha-registro="{{pedido.fecha_registro}}" data-folio="{{pedido.folio}}"
-                                                data-forma-entrega="{{pedido.forma_entrega}}" data-gran-total="{{pedido.gran_total}}"
-                                                data-hora-entrega="{{pedido.hora_entrega}}" data-metodo-pago="{{pedido.metodo_pago}}"
-                                                data-mix-ef="{{pedido.mix_ef}}" data-mix-tar="{{pedido.mix_tar}}"
-                                                data-nombre-cliente="{{pedido.nombre_cliente}}"
-                                                data-num_operacion="{{pedido.num_operacion}}" 
-                                                data-recibe="{{pedido.recibe}}" data-recibido="{{pedido.recibido}}"
-                                                data-referencias="{{pedido.referencias}}" data-sucursal="{{pedido.sucursal}}"
-                                                data-telefono="{{pedido.telefono}}" data-total="{{pedido.total}}"
-                                            >
-                                                <i class="bi bi-info-circle"></i>
-                                            </button>
-                                            {% if pedido.restante_pagado %}
-                                                <button class="btn btn-primary entregado_directo" data-folio_ed="{{pedido.folio}}"> <i class="bi bi-check-circle"></i></button>
-                                            {% else %}
-                                                <button class="btn btn-secondary entregado_directo" disabled> <i class="bi bi-check-circle"></i></button>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
+                                <tr>
+                                    <td> {{pedido.folio}} </td>
+                                    <td> {{pedido.hora_entrega}} <span>hrs</span> </td>
+                                    <td> {{pedido.nombre_cliente}} </td>
+                                    <td class="text-start">
+                                        {% for producto in pedido.productos %}
+                                        <li>{{producto.cantidad}} {{producto.descripcion}}</li>
+                                        {% endfor %}
+                                    </td>
+                                    <td><span>$</span> {{pedido.gran_total}} </td>
+                                    <td>
+                                        <button class="btn btn-warning" data-bs-toggle="modal"
+                                            data-bs-target="#pedidoModal" data-anticipo="{{ pedido.anticipo }}"
+                                            data-at-no_emp="{{pedido.at_no_emp}}"
+                                            data-at-nom-emp="{{pedido.at_nom_emp}}" data-cambio="{{pedido.cambio}}"
+                                            data-cel="{{pedido.cel}}" data-costo-envio="{{pedido.costo_envio}}"
+                                            data-direccion="{{pedido.direccion}}"
+                                            data-especificaciones="{{pedido.especificaciones}}"
+                                            data-estado="{{pedido.estado}}"
+                                            data-fecha-entrega="{{pedido.fecha_entrega}}"
+                                            data-fecha-registro="{{pedido.fecha_registro}}"
+                                            data-folio="{{pedido.folio}}" data-forma-entrega="{{pedido.forma_entrega}}"
+                                            data-gran-total="{{pedido.gran_total}}"
+                                            data-hora-entrega="{{pedido.hora_entrega}}"
+                                            data-metodo-pago="{{pedido.metodo_pago}}" data-mix-ef="{{pedido.mix_ef}}"
+                                            data-mix-tar="{{pedido.mix_tar}}"
+                                            data-nombre-cliente="{{pedido.nombre_cliente}}"
+                                            data-num_operacion="{{pedido.num_operacion}}"
+                                            data-recibe="{{pedido.recibe}}" data-recibido="{{pedido.recibido}}"
+                                            data-referencias="{{pedido.referencias}}"
+                                            data-sucursal="{{pedido.sucursal}}" data-telefono="{{pedido.telefono}}"
+                                            data-total="{{pedido.total}}">
+                                            <i class="bi bi-info-circle"></i>
+                                        </button>
+                                        {% if pedido.restante_pagado %}
+                                        <button class="btn btn-primary entregado_directo"
+                                            data-folio_ed="{{pedido.folio}}"> <i
+                                                class="bi bi-check-circle"></i></button>
+                                        {% else %}
+                                        <button class="btn btn-secondary entregado_directo" disabled> <i
+                                                class="bi bi-check-circle"></i></button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
                                 {% else %}
                                 {% endif %}
-                                </tbody>
+                            </tbody>
                             {% endfor %}
                         </table>
                     </div>
@@ -171,8 +253,6 @@
 
 
 <!--MODAL-->
-
-<!-- Modal para detalles del pedido de Juan Pérez -->
 <div class="modal fade" id="pedidoModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -247,6 +327,7 @@
 
 
 <script src="{% static 'javascript/menu_gerencial.js' %}"></script>
+<script src="{% static 'javascript/ventas.js' %}"></script>
 <!-- Incluir el script de inicialización de Bootstrap -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {

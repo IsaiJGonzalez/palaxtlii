@@ -38,9 +38,23 @@ def main_gerencial(request):
                 pd_date = datetime.strptime(pd_str,"%Y-%m-%d").date()
             if pd_date == hoy:
                 pedidos_hoy.append(pedido)
-        
 
-    return render(request, 'menu_gerencial.html', {'nombre_empleado': nombre_empleado,'prvh':productos_vh,'prmc':productos_mc,'pedidos':pedidos_hoy,'loc':loc})
+    
+
+    ventasvh = list(fs.consultar_ventas_vh().values()) if fs.consultar_ventas_vh() else []
+    ventasmc = list(fs.consultar_ventas_mc().values()) if fs.consultar_ventas_mc() else []
+
+    context = {
+            'nombre_empleado': nombre_empleado,
+            'prvh':productos_vh,
+            'prmc':productos_mc,
+            'pedidos':pedidos_hoy,
+            'loc':loc,
+            'ventasvh' : ventasvh,
+            'ventasmc' : ventasmc,
+    }
+
+    return render(request, 'menu_gerencial.html', context)
 
 
 

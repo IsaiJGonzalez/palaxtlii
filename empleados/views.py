@@ -3,7 +3,7 @@ from firebase_admin import db
 from firebase_config import fr_db
 import random
 from core.decorators import gerente_required
-
+import firebase_service as fs
 
 @gerente_required
 def empleados(request):
@@ -28,3 +28,12 @@ def empleados(request):
         empleado_ref.set({'numero_empleado': numero_empleado,'contrasena':contrasena ,'nombre' : nombre + ' ' + apellido, 'telefono' : telefono, 'sucursal': int(sucursal), 'privilegio': int(privilegio), 'ch_psw':ch_psw,'caja_activa':caja_activa})
         return redirect('empleados')
     return render(request,'empleados.html', {'empleados':empleados_lista})
+
+
+def cambiar_contrasena(request):
+    if request.method == 'POST':
+        no_emp = request.POST.get('ch_emp')
+        psw = request.POST.get('contrasena_dos')
+        fs.cambiar_contrasena(no_emp,psw)
+        return redirect('empleados')
+    return

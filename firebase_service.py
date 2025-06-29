@@ -1,5 +1,6 @@
 from firebase_admin import db
 import firebase_config
+from datetime import date
 # *** Funciones Vista Hermosa
 
 #Funciones add 
@@ -531,6 +532,25 @@ def consultar_corte(suc,corte_id):
     ref = db.reference(f'{sucursal}/corte_caja/{corte_id}').get()
     return ref
 
+def consultar_ventas_vh():
+    #obteniendo la id
+    hoy = date.today()
+    fecha = hoy.strftime(f"%Y-%m-{hoy.day}")
+    
+    ref = db.reference(f'vistahermosa/ventas/{fecha}')
+    ventas = ref.get() 
+    return ventas
+
+
+def consultar_ventas_mc():
+    hoy = date.today()
+    fecha = hoy.strftime(f"%Y-%m-{hoy.day}")
+    #fecha = '2025-06-22'
+    ref = db.reference(f'moctezuma/ventas/{fecha}')
+    ventas = ref.get() 
+    return ventas
+
+
 def verificar_exis_empleado(no_emp):
     ref = db.reference(f'empleados/{no_emp}').get()
     return ref is not None
@@ -539,6 +559,12 @@ def cambiar_locacion_empleado(no_emp, locacion):
     ref = db.reference(f'empleados/{no_emp}')
     ref.update({'sucursal':locacion})
 
+def cambiar_contrasena(no_emp,new_psw):
+    try:
+        ref = db.reference(f'empleados/{no_emp}')
+        ref.update({'contrasena' : new_psw})
+    except Exception as e:
+        print('Error al cambiar contraseña: ',e)
 
 def registrar_retiro(sucursal, data):
     nuevo_retiro = {
