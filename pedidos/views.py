@@ -95,9 +95,11 @@ def pedidos(request):
 def act_pedido_estado(request):
     #valores globales
     no_emp = request.session.get('usuario',{}).get('numero_empleado',0)
+    print(no_emp)
     caja_activa = fs.consultar_caja_activa(no_emp)
+    print(caja_activa)
     if not caja_activa:
-        return JsonResponse({'Error': 'Caja inactiva'}, status=500)
+        return JsonResponse({'Error': 'Caja inactiva'}, status=403)
     corte_id = fs.consultar_id_corte_caja_emp(no_emp)
     if request.method == 'POST':
         try:

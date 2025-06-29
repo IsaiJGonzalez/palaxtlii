@@ -123,7 +123,7 @@ document.querySelectorAll('.entregado_directo').forEach(boton => {
     boton.addEventListener('click', function() {
         const folio = this.getAttribute('data-folio_ed');
         if (confirm('¿Desea marcar como entregado?')) {
-            enviarFolio(folio, 'Pedido marcado como entregado.');
+            enviarFolio(folio,null,'Pedido marcado como entregado.');
         }
     });
 });
