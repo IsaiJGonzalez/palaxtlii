@@ -15,9 +15,9 @@ def main_gerencial(request):
     productos_vh = list(fs.obtener_productos_vh().values()) if fs.obtener_productos_vh() else []
     productos_mc = list(fs.obtener_productos_moctezuma().values()) if fs.obtener_productos_moctezuma() else []
 
-    pedidos = list(fs.obtener_pedidos().values())
+    raw_pedidos = fs.obtener_pedidos()
+    pedidos = list(raw_pedidos.values()) if raw_pedidos else []
     hoy = datetime.today().date()
-
     pedidos_hoy = []
 
     for pedido in pedidos:
