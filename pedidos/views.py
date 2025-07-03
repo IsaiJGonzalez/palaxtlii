@@ -169,6 +169,8 @@ def abonar(request):
 
         tka.ticket_abono(id_abono,folio,fecha,gran_total,abono,gran_total_restante,metodo_pago)
 
+
+    #verificando el privilegio para la redirección
     if privilegio == 1 or privilegio == 2:
         return redirect('pedidos')
     elif privilegio == 3:
