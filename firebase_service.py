@@ -535,9 +535,11 @@ def consultar_corte(suc,corte_id):
 def consultar_ventas_vh():
     #obteniendo la id
     hoy = date.today()
+    #print(hoy)
     fecha = hoy.strftime(f"%Y-%m-{hoy.day}")
-    
-    ref = db.reference(f'vistahermosa/ventas/{fecha}')
+    #print(fecha)
+
+    ref = db.reference(f'vistahermosa/ventas/{hoy}')
     ventas = ref.get() 
     return ventas
 
@@ -546,7 +548,7 @@ def consultar_ventas_mc():
     hoy = date.today()
     fecha = hoy.strftime(f"%Y-%m-{hoy.day}")
     #fecha = '2025-06-22'
-    ref = db.reference(f'moctezuma/ventas/{fecha}')
+    ref = db.reference(f'moctezuma/ventas/{hoy}')
     ventas = ref.get() 
     return ventas
 
@@ -756,6 +758,63 @@ def registrar_en_corte_vh(corte_id,tipo,metodo_pago,ingreso):
         print('Ingreso de la venta registrada')
         
     return
+
+
+###REGISTRAR ABONOS
+
+def registrar_abono(id_abono, folio, fecha, abono, metodo_pago, sucursal, gran_total_restante):
+    try:
+        # 1. Guardar el abono en abonos/{id_abono}/{siguiente_id}
+        abonos_ref = db.reference(f"abonos/{id_abono}")
+        abonos_existentes = abonos_ref.get()
+        siguiente_id = len(abonos_existentes) + 1 if abonos_existentes else 1
+
+        nuevo_abono = {
+            "monto": abono,
+            "fecha": fecha,
+            "metodo": metodo_pago,
+            "folio_nota": folio,
+            "sucursal": sucursal
+        }
+
+        abonos_ref.child(str(siguiente_id)).set(nuevo_abono)
+
+        # 2. Buscar el pedido que tenga el folio == id_abono
+        pedidos_ref = db.reference("pedidos")
+        pedidos_query = pedidos_ref.order_by_child("folio").equal_to(id_abono)
+        resultados = pedidos_query.get()
+
+        if not resultados:
+            print(f"❌ No se encontró ningún pedido con folio {id_abono}")
+            return
+
+        # 3. Obtener UID del pedido encontrado
+        for uid_pedido, datos in resultados.items():
+            anticipo_actual = float(datos.get("anticipo", 0))
+            nuevo_anticipo = anticipo_actual + float(abono)
+
+            gran_total_actual = float(datos.get("gran_total", 0))
+            nuevo_gran_total = gran_total_actual - float(abono)
+
+            # 4. Armar datos a actualizar
+            datos_actualizados = {
+                "anticipo": str(nuevo_anticipo),
+                "gran_total": nuevo_gran_total
+            }
+
+            # Verificar si el restante ya es cero
+            if float(gran_total_restante) == 0.00:
+                datos_actualizados["restante_pagado"] = True
+
+            # Actualizar pedido
+            pedidos_ref.child(uid_pedido).update(datos_actualizados)
+
+            print(f"✅ Abono registrado correctamente.")
+            print(f"Nuevo anticipo para pedido con UID {uid_pedido}: ${nuevo_anticipo:.2f}")
+            return  # Salir después de actualizar uno
+
+    except Exception as e:
+        print(f"❌ Error al registrar abono: {e}")
 
 
 ##CERRAR CAJAS

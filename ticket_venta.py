@@ -90,7 +90,7 @@ def imprimir_venta(resumen):
             p.text(f"{'Recibido:':<20}${recibido:>8.2f}\n")
             p.text(f"{'Cambio:':<20}${cambio:>8.2f}\n\n")
         elif metodo_p == 'tarjeta' or metodo_p == 'transferencia':
-            p.set(f'Número de Operación: {no_operacion}\n\n')
+            p.text(f'Número de Operación: {no_operacion}\n\n')
         
 
         #Mensaje final
@@ -183,7 +183,7 @@ def imprimir_venta(resumen):
             p.text(f"{'Recibido:':<20}${recibido:>8.2f}\n")
             p.text(f"{'Cambio:':<20}${cambio:>8.2f}\n\n")
         elif metodo_p == 'tarjeta' or metodo_p == 'transferencia':
-            p.set(f'Número de Operación: {no_operacion}\n\n')
+            p.text(f'Número de Operación: {no_operacion}\n\n')
 
         p.text('\n')
         # --- FECHA Y HORA DE IMPRESIÓN ---

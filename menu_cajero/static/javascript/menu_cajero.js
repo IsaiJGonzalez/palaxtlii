@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Asignar los valores a los elementos dentro del modal
 
-            document.getElementById("folio").innerText = "Folio: " + folio;
+            document.getElementById("folio_r").innerText = "Folio: " + folio;
             document.getElementById("no_emp").innerText = at_no_emp;
             document.getElementById("nom_emp").innerText = at_nom_emp;
 

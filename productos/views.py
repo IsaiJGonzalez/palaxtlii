@@ -43,7 +43,7 @@ def productos(request):
     return render(request,'productos.html',{'prvh':productos_vh,'prmc':productos_mc,'cats':categorias})
 
 
-@gerente_required
+@gerente_ventas_required
 def editarProducto(request):
     if(request.method == 'POST'):
         idP = request.POST.get('idP')

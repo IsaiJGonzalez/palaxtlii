@@ -19,7 +19,7 @@
                 Fecha de entrega
             </a>
         </div>
-        
+
 
         <h3 class="pb-3" id="h3_1">Pedidos por Entregar</h3>
         <table class="table table-striped table-bordered border-5 text-center align-middle" id="pedidos_act">
@@ -38,17 +38,18 @@
                 {% for pedido in pedidos_no_entregados %}
                 <tr>
                     <td class="text-bg-danger">{{ pedido.folio }}</td>
-                    <td class="text-bg-success" >{{ pedido.fecha_entrega|date:"j \\d\\e F \\d\\e Y" }}</td>
+                    <td class="text-bg-success">{{ pedido.fecha_entrega|date:"j \\d\\e F \\d\\e Y" }}</td>
                     <td>{{ pedido.nombre_cliente }}</td>
                     <td>{{ pedido.fecha_registro|date:"j \\d\\e F \\d\\e Y" }}</td>
                     <td class="text-start">
                         {% for producto in pedido.productos %}
-                            <li> {{producto.cantidad}} - {{producto.descripcion}} </li>
+                        <li> {{producto.cantidad}} - {{producto.descripcion}} </li>
                         {% endfor %}
                     </td>
                     <td>
                         {% if pedido.forma_entrega == 'tienda' %}
-                        Sucursal : {% if pedido.sucursal  == '1' %} Vista Hermosa {% endif %} {% if pedido.sucursal == '2' %} Moctezuma {% endif %} 
+                        Sucursal : {% if pedido.sucursal  == '1' %} Vista Hermosa {% endif %}
+                        {% if pedido.sucursal == '2' %} Moctezuma {% endif %}
                         {% endif %}
                         {% if pedido.forma_entrega == 'envio' %}
                         Envio a domicilio
@@ -58,28 +59,125 @@
                     <td>
                         <div style="display: flex; flex-direction: column; gap: 8px;">
                             {% if pedido.restante_pagado %}
-                                <button class="btn btn-primary mb-2  entregado_directo" data-folio_ed="{{pedido.folio}}"> <i class="bi bi-check-circle"></i></button>
+                            <button class="btn btn-primary mb-2  entregado_directo" data-folio_ed="{{pedido.folio}}"> <i
+                                    class="bi bi-check-circle"></i></button>
                             {% else %}
-                                <button class="btn btn-secondary mb-2 entregado_directo" disabled> <i class="bi bi-check-circle"></i></button>
+                            <button class="btn btn-secondary mb-2 entregado_directo" disabled> <i
+                                    class="bi bi-check-circle"></i></button>
                             {% endif %}
 
                             <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#pedidoModal"
                                 data-anticipo="{{ pedido.anticipo }}" data-at-no_emp="{{pedido.at_no_emp}}"
                                 data-at-nom-emp="{{pedido.at_nom_emp}}" data-cambio="{{pedido.cambio}}"
                                 data-cel="{{pedido.cel}}" data-costo-envio="{{pedido.costo_envio}}"
-                                data-direccion="{{pedido.direccion}}" data-especificaciones="{{pedido.especificaciones}}"
-                                data-estado="{{pedido.estado}}" data-fecha-entrega="{{pedido.fecha_entrega}}"
+                                data-direccion="{{pedido.direccion}}"
+                                data-especificaciones="{{pedido.especificaciones}}" data-estado="{{pedido.estado}}"
+                                data-fecha-entrega="{{pedido.fecha_entrega}}"
                                 data-fecha-registro="{{pedido.fecha_registro}}" data-folio="{{pedido.folio}}"
                                 data-forma-entrega="{{pedido.forma_entrega}}" data-gran-total="{{pedido.gran_total}}"
                                 data-hora-entrega="{{pedido.hora_entrega}}" data-metodo-pago="{{pedido.metodo_pago}}"
                                 data-mix-ef="{{pedido.mix_ef}}" data-mix-tar="{{pedido.mix_tar}}"
                                 data-nombre-cliente="{{pedido.nombre_cliente}}"
-                                data-num_operacion="{{pedido.num_operacion}}" 
-                                data-recibe="{{pedido.recibe}}" data-recibido="{{pedido.recibido}}"
-                                data-referencias="{{pedido.referencias}}" data-sucursal="{{pedido.sucursal}}"
-                                data-telefono="{{pedido.telefono}}" data-total="{{pedido.total}}">
+                                data-num_operacion="{{pedido.num_operacion}}" data-recibe="{{pedido.recibe}}"
+                                data-recibido="{{pedido.recibido}}" data-referencias="{{pedido.referencias}}"
+                                data-sucursal="{{pedido.sucursal}}" data-telefono="{{pedido.telefono}}"
+                                data-total="{{pedido.total}}">
                                 <i class="bi bi-info-circle"></i>
-                            </button>
+                                <button class="btn btn-success mb-2 mt-2" data-bs-toggle="modal"
+                                    data-bs-target="#abonoModal" data-folio-a="{{ pedido.folio }}"
+                                    data-gran-total-a="{{pedido.gran_total}}">
+                                    Abonar
+                                </button>
+                                <!-- Modal -->
+                                <div class="modal fade" id="abonoModal" tabindex="-1" aria-labelledby="abonoModalLabel"
+                                    aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <form method="POST" action="{% url 'abonar' %}">
+                                                {% csrf_token %}
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="abonoModalLabel">Abono</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Cerrar"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <!-- Folio (readonly) -->
+                                                    <div class="mb-3 col-md-4 text-start">
+                                                        <label for="folio" class="form-label text-start">ID:</label>
+                                                        <input type="text"
+                                                            class="form-control text-center bg-black text-white" id="id"
+                                                            name="id" readonly>
+                                                    </div>
+
+                                                    <div class="row mt-3">
+                                                            <!-- Folio -->
+                                                        <div class="mb-3 col-md-4 mt-3 text-start">
+                                                            <label for="gran_total" class="form-label">Folio: </label>
+                                                            <input type="number" step="0.01"
+                                                                class="form-control border-black text-center" id="folio"
+                                                                name="folio" required>
+                                                        </div>
+
+                                                        <!-- Fecha -->
+                                                        <div class="mb-3 col-md-6 mt-3 text-start">
+                                                            <label for="gran_total" class="form-label">Fecha y hora: </label>
+                                                            <input type="datetime-local"
+                                                                class="form-control border-black text-center" id="fecha"
+                                                                name="fecha" required>
+                                                        </div>
+                                                        
+                                                    </div>
+
+                                                    <!-- Gran Total -->
+                                                    <div class="mb-3 col-md-6">
+                                                        <label for="gran_total" class="form-label">Gran Total</label>
+                                                        <input type="number" step="0.01" class="form-control"
+                                                            id="gran_total" name="gran_total"
+                                                            readonly>
+                                                    </div>
+
+                                                    <!-- Abono -->
+                                                    <div class="mb-3 col-md-6">
+                                                        <label for="gran_total" class="form-label">Abono: </label>
+                                                        <input type="number" step="0.01" class="form-control" id="abono"
+                                                            name="abono" required>
+                                                    </div>
+
+                                                    <!-- Gran Total Restante -->
+                                                    <div class="mb-3 col-md-6">
+                                                        <label for="gran_total_restante" class="form-label">Gran Total
+                                                            Restante</label>
+                                                        <input type="number" step="0.01" class="form-control text-start"
+                                                            id="gran_total_restante" name="gran_total_restante"
+                                                            readonly>
+                                                    </div>
+
+                                                    
+                                                    <!--Forma de pago-->
+                                                    <div class="mb-3 col-auto" id="forma_de_pago_abono">
+                                                        <label class="form-label d-block">Forma de pago:</label>
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="radio" name="pago" id="efectivo" value="efectivo">
+                                                            <label class="form-check-label" for="efectivo">Efectivo</label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="radio" name="pago" id="tarjeta" value="tarjeta">
+                                                            <label class="form-check-label" for="tarjeta">Tarjeta</label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="radio" name="pago" id="transferencia" value="transferencia">
+                                                            <label class="form-check-label" for="transferencia">Transferencia</label>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="submit" class="btn btn-primary">Registrar</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                         </div>
                     </td>
                 </tr>
@@ -97,7 +195,7 @@
                     <th>Fecha entrega</th>
                     <th>Cliente</th>
                     <th>Fecha registro</th>
-                    <th class="d-none" >Acciones</th>
+                    <th class="d-none">Acciones</th>
                 </tr>
             </thead>
             <tbody id="lista-pedidos-entregados">
@@ -128,7 +226,6 @@
         </div>
         <!-- Botón "Cargar más" para pedidos entregados -->
         <button id="cargarMasPedidosEntregados" class="btn btn-secondary d-none">Cargar más entregados</button>
-
     </div>
 </div>
 
@@ -185,15 +282,19 @@
                 <h6 id="total" class="text-end text-bg-success p-2"></h6>
                 <h6 id="anticipo" class="text-end text-bg-primary p-2"></h6>
                 <h5 class=" text-end text-bg-dark p-3" id="restante"></h5>
-                <div class="mb-3 col-5 d-none" id="forma_de_pago">
+                <div class="mb-3 col-auto d-none" id="forma_de_pago">
                     <label class="form-label d-block">Forma de pago:</label>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="pago" id="efectivo" value="efectivo">
+                        <label class="form-check-label" for="efectivo">Efectivo</label>
+                    </div>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="pago" id="tarjeta" value="tarjeta">
                         <label class="form-check-label" for="tarjeta">Tarjeta</label>
                     </div>
                     <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="pago" id="efectivo" value="efectivo">
-                        <label class="form-check-label" for="efectivo">Efectivo</label>
+                        <input class="form-check-input" type="radio" name="pago" id="transferencia" value="transferencia">
+                        <label class="form-check-label" for="transferencia">Transferencia</label>
                     </div>
                 </div>
             </div>
@@ -279,7 +380,7 @@
             var mix_tar = button.getAttribute("data-mix-tar");
             var nombre_cliente = button.getAttribute("data-nombre-cliente");
             var num_operacion = button.getAttribute("data-num_operacion");
-            
+
             var importe = button.getAttribute("data-importe");
             var precio_unitario = button.getAttribute("data-precio-unitario");
             var recibe = button.getAttribute("data-recibe");
@@ -312,9 +413,9 @@
             document.getElementById("anticipo").innerText = 'Anticipó: ' + '$' + anticipo;
             document.getElementById('restante').innerText = 'Pago Restante: ' + '$' + gran_total;
             document.getElementById('especificaciones').innerText = especificaciones;
-            
-            document.getElementById('pagado').setAttribute('data-folio',folio)
-            
+
+            document.getElementById('pagado').setAttribute('data-folio', folio)
+
 
             if (gran_total != 0) {
                 div_pagos.classList.remove('d-none');
@@ -328,4 +429,5 @@
 
 
 <script src="{% static 'javascript/pagado.js'  %}"></script>
+<script src="{% static 'javascript/abono.js' %}" ></script>
 {% endblock %}

@@ -68,6 +68,115 @@
                                 <button class="btn btn-secondary entregado_directo" disabled> <i
                                         class="bi bi-check-circle"></i></button>
                                 {% endif %}
+                                <button class="btn btn-success mb-2 mt-2" data-bs-toggle="modal"
+                                    data-bs-target="#abonoModal" data-folio-a="{{ pedido.folio }}"
+                                    data-gran-total-a="{{pedido.gran_total}}">
+                                    Abonar
+                                </button>
+                                <!-- Modal -->
+                                <div class="modal fade" id="abonoModal" tabindex="-1" aria-labelledby="abonoModalLabel"
+                                    aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <form method="POST" action="{% url 'abonar' %}">
+                                                {% csrf_token %}
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="abonoModalLabel">Abono</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Cerrar"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <!-- Folio (readonly) -->
+                                                    <div class="mb-3 col-md-4 text-start">
+                                                        <label for="folio" class="form-label text-start">ID:</label>
+                                                        <input type="text"
+                                                            class="form-control text-center bg-black text-white fw-bold"
+                                                            id="id" name="id" readonly>
+                                                    </div>
+                                                    <hr>
+                                                    <div class="row mt-3">
+                                                        <!-- Folio -->
+                                                        <div class="mb-3 col-md-4 mt-3 text-start">
+                                                            <label for="gran_total" class="form-label">Folio:
+                                                            </label>
+                                                            <input type="number" step="0.01"
+                                                                class="form-control border-black text-center" id="folio"
+                                                                name="folio" required>
+                                                        </div>
+
+                                                        <!-- Fecha -->
+                                                        <div class="mb-3 col-md-6 mt-3 text-start">
+                                                            <label for="gran_total" class="form-label">Fecha y
+                                                                hora: </label>
+                                                            <input type="datetime-local"
+                                                                class="form-control border-black text-center" id="fecha"
+                                                                name="fecha" required>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <!-- Gran Total -->
+                                                    <div class="mb-3 col-md-6">
+                                                        <label for="gran_total" class="form-label">Gran
+                                                            Total</label>
+                                                        <input type="number" step="0.01"
+                                                            class="form-control bg-success fw-bold text-white"
+                                                            id="gran_total" name="gran_total" readonly>
+                                                    </div>
+
+                                                    <!-- Abono -->
+                                                    <div class="mb-3 col-md-6">
+                                                        <label for="gran_total" class="form-label">Abono:
+                                                        </label>
+                                                        <input type="number" step="0.01"
+                                                            class="form-control border-black" id="abono" name="abono"
+                                                            required>
+                                                    </div>
+
+                                                    <!-- Gran Total Restante -->
+                                                    <div class="mb-5 col-md-6">
+                                                        <label for="gran_total_restante" class="form-label">Gran
+                                                            Total
+                                                            Restante</label>
+                                                        <input type="number" step="0.01"
+                                                            class="form-control text-start bg-danger text-white fw-bold"
+                                                            id="gran_total_restante" name="gran_total_restante"
+                                                            readonly>
+                                                    </div>
+
+
+                                                    <!--Forma de pago-->
+                                                    <div class="mb-3 col-auto bg-primary-subtle m-2 fw-bold"
+                                                        id="forma_de_pago_abono">
+                                                        <label class="form-label d-block">Forma de pago:</label>
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="radio" name="pago"
+                                                                id="efectivo" value="efectivo">
+                                                            <label class="form-check-label"
+                                                                for="efectivo">Efectivo</label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="radio" name="pago"
+                                                                id="tarjeta" value="tarjeta">
+                                                            <label class="form-check-label"
+                                                                for="tarjeta">Tarjeta</label>
+                                                        </div>
+                                                        <div class="form-check form-check-inline">
+                                                            <input class="form-check-input" type="radio" name="pago"
+                                                                id="transferencia" value="transferencia">
+                                                            <label class="form-check-label"
+                                                                for="transferencia">Transferencia</label>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="submit" class="btn btn-primary">Registrar</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                         {% else %}
@@ -90,7 +199,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p class="text-bg-danger w-25 fw-bold pt-1 pb-1" id="folio"></p>
+                <p class="text-bg-danger w-25 fw-bold pt-1 pb-1" id="folio_r"></p>
                 <p class="text-bg-warning fw-bold" id="cliente"></p>
                 <p class="text-bg-warning fw-bold" id="telefono"></p>
                 <hr class="table-group-divider">
@@ -134,7 +243,7 @@
                 <h6 id="total" class="text-end text-bg-success p-2"></h6>
                 <h6 id="anticipo" class="text-end text-bg-primary p-2"></h6>
                 <h5 class=" text-end text-bg-dark p-3" id="restante"></h5>
-                <div class="mb-3 col-5 d-none" id="forma_de_pago">
+                <div class="mb-3 col-auto d-none" id="forma_de_pago">
                     <label class="form-label d-block">Forma de pago:</label>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="pago" id="tarjeta" value="tarjeta">
@@ -143,6 +252,11 @@
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="pago" id="efectivo" value="efectivo">
                         <label class="form-check-label" for="efectivo">Efectivo</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="pago" id="transferencia"
+                            value="transferencia">
+                        <label class="form-check-label" for="transferencia">Transferencia</label>
                     </div>
                 </div>
             </div>
@@ -158,9 +272,10 @@
     <form action="{% url 'impresion_prueba' %}" method="post">
         {% csrf_token %}
         <button class="boton-imprimir" type="submit">
-        Imprimir prueba
-    </button>
+            Imprimir prueba
+        </button>
     </form>
 </div>
 <script src="{% static 'javascript/menu_cajero.js' %}"></script>
+<script src="{% static 'javascript/abono.js' %}"></script>
 {% endblock %}

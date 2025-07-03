@@ -1,10 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 import firebase_service as fs
 from firebase_config import fr_db
 from django.core.paginator import Paginator
 from datetime import datetime, timedelta
 from django.http import JsonResponse
 import json
+import ticket_abono as tka
 from core.decorators import gerente_required, ventas_required, cajero_required, gerente_ventas_required
 
 
@@ -19,6 +20,11 @@ def convertir_fecha(fecha_str):
 
 @gerente_ventas_required
 def pedidos(request):
+    num_emp = request.session.get('usuario',{}).get('numero_empleado',0)
+    caja_activa = fs.consultar_caja_activa(num_emp)
+    if not caja_activa:
+        return redirect('apertura_caja')
+
     # --- Parámetros base ---
     fecha_limite = datetime.now() - timedelta(weeks=5)
     orden = request.GET.get('orden', 'entrega')
@@ -99,7 +105,7 @@ def act_pedido_estado(request):
     caja_activa = fs.consultar_caja_activa(no_emp)
     print(caja_activa)
     if not caja_activa:
-        return JsonResponse({'Error': 'Caja inactiva'}, status=403)
+        return redirect('apertura_caja')
     corte_id = fs.consultar_id_corte_caja_emp(no_emp)
     if request.method == 'POST':
         try:
@@ -125,3 +131,45 @@ def act_pedido_estado(request):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)  # Envía error como JSON
     return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+
+
+
+def abonar(request):
+    
+    num_emp = request.session.get('usuario',{}).get('numero_empleado',0)
+    privilegio = request.session.get('usuario',{}).get('privilegio',0)
+    locacion = request.session.get('usuario',{}).get('sucursal',0)
+    sucursal = fs.consultar_sucursal(locacion)
+    caja_activa = fs.consultar_caja_activa(num_emp)
+    print(caja_activa)
+    if not caja_activa:
+        return redirect('apertura_caja')
+    if request.method == 'POST':
+        
+        #obteniendo valores para el registrar el abono en el corte
+        corte_id = fs.consultar_id_corte_caja_emp(num_emp)
+
+        #obteniendo los valores del formulario
+        id_abono =  request.POST.get('id')
+        folio =  int(request.POST.get('folio'))
+        fecha =  request.POST.get('fecha')
+        gran_total =  float(request.POST.get('gran_total'))
+        abono =  float(request.POST.get('abono'))
+        gran_total_restante =  float(request.POST.get('gran_total_restante'))
+        metodo_pago = request.POST.get('pago')
+        
+        ##registrando el abono
+        fs.registrar_abono(id_abono,folio,fecha,abono,metodo_pago,sucursal,gran_total_restante)
+
+        if locacion == 1:
+            fs.registrar_en_corte_vh(corte_id,'pedido',metodo_pago,abono)
+        elif locacion == 2:
+            fs.registrar_en_corte_mc(corte_id,'pedido',metodo_pago,abono)
+
+        tka.ticket_abono(id_abono,folio,fecha,gran_total,abono,gran_total_restante,metodo_pago)
+
+    if privilegio == 1 or privilegio == 2:
+        return redirect('pedidos')
+    elif privilegio == 3:
+        return redirect('menu_cajero')
