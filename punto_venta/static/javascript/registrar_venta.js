@@ -43,7 +43,17 @@ function registrarCompra() {
     agregarCampoOculto(form, "resumen_data", JSON.stringify(resumenData));
 
     // 🧾 Método de pago y valores asociados
-    const metodoPago = document.querySelector('input[name="metodo_pago"]:checked').value;
+    const metodoPagoInput = document.querySelector('input[name="metodo_pago"]:checked');
+    let metodoPago;
+
+    if (!metodoPagoInput) {
+        alert("Seleccione método de pago");
+        return;
+    } else {
+        metodoPago = metodoPagoInput.value;
+    }
+
+
     const recibidoValue = metodoPago === "efectivo" ? document.getElementById("recibido").value : 0;
     const recibido = recibidoValue ? parseFloat(recibidoValue) : 0.00;
     const cambioValue = metodoPago === "efectivo" ? document.getElementById("cambio").value : 0;
@@ -56,7 +66,7 @@ function registrarCompra() {
     agregarCampoOculto(form, "numero_operacion", operacionValue);
 
     // ✅ Envía el formulario
-    form.submit();
+    form.requestSubmit();
 }
 
 function agregarCampoOculto(form, name, value) {
@@ -66,3 +76,18 @@ function agregarCampoOculto(form, name, value) {
     input.value = value;
     form.appendChild(input);
 }
+
+document.getElementById('venta_form').addEventListener('submit', function (e) {
+
+    console.log('OVERLAYYYY')
+
+    e.preventDefault(); // Solo si quieres evitar que se envíe inmediatamente
+
+    const overlay = document.getElementById('overlay-loading');
+    overlay.classList.remove('d-none');
+
+    document.getElementById('registrarCompra').disabled = true;
+
+    // Si después quieres enviar el form:
+    this.submit(); // solo si hiciste preventDefault antes
+});

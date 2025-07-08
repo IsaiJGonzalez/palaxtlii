@@ -540,8 +540,17 @@ def consultar_ventas_vh():
     #print(fecha)
 
     ref = db.reference(f'vistahermosa/ventas/{hoy}')
-    ventas = ref.get() 
-    return ventas
+    ventas = ref.get()
+    if not ventas:
+        return []
+
+    for venta in ventas.values():
+        for detalle in venta.get('productos', []):
+            id_producto = detalle.get('productoId')
+            detalle['nombre_producto'] = obtener_producto_vh(id_producto)
+
+    return list(ventas.values())
+
 
 
 def consultar_ventas_mc():
@@ -549,8 +558,15 @@ def consultar_ventas_mc():
     fecha = hoy.strftime(f"%Y-%m-{hoy.day}")
     #fecha = '2025-06-22'
     ref = db.reference(f'moctezuma/ventas/{hoy}')
-    ventas = ref.get() 
-    return ventas
+    ventas = ref.get()
+    if not ventas:
+        return []
+    for venta in ventas.values():
+        for item in venta.get('productos', []):
+            id_producto = item.get('productoId')
+            item['nombre_producto'] = obtener_producto_mc(id_producto)
+
+    return list(ventas.values())
 
 
 def verificar_exis_empleado(no_emp):

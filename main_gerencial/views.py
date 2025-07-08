@@ -41,8 +41,10 @@ def main_gerencial(request):
 
     
 
-    ventasvh = list(fs.consultar_ventas_vh().values()) if fs.consultar_ventas_vh() else []
-    ventasmc = list(fs.consultar_ventas_mc().values()) if fs.consultar_ventas_mc() else []
+    ventasmc = fs.consultar_ventas_mc() or []
+    ventasvh = fs.consultar_ventas_vh() or []
+
+
 
     context = {
             'nombre_empleado': nombre_empleado,
