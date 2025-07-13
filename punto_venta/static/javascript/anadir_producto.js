@@ -161,9 +161,20 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
+
+    //OBSERVADOR PARA EL SPAN DEL TOTAL, PARA ACTUALIZAR EL CAMBIO DE ACUERDO A NUEVOS PRODUCTOS AÑADIDOS
+    const observer = new MutationObserver(() => {
+        calcularCambio(); // Llama tu función cuando cambie el contenido del span
+    });
+
+    
     // Actualiza el cambio cada vez que cambien el método de pago o el monto recibido
     metodoEfectivo.addEventListener('change', calcularCambio);
     recibidoInput.addEventListener('input', calcularCambio);
+    totalElement.addEventListener('change', calcularCambio)
+    
+    // Observar cambios en el contenido del span
+    observer.observe(totalElement, { childList: true, characterData: true, subtree: true });
 });
 
 function actualizarTotalTabla() {

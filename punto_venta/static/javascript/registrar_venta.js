@@ -53,17 +53,39 @@ function registrarCompra() {
         metodoPago = metodoPagoInput.value;
     }
 
+    let recibido = 0;
+    let cambio = 0;
+    let operacionValue = "";
 
-    const recibidoValue = metodoPago === "efectivo" ? document.getElementById("recibido").value : 0;
-    const recibido = recibidoValue ? parseFloat(recibidoValue) : 0.00;
-    const cambioValue = metodoPago === "efectivo" ? document.getElementById("cambio").value : 0;
-    const cambio = cambioValue ? parseFloat(cambioValue) : 0.00;
-    const operacionValue = metodoPago !== "efectivo" ? document.getElementById("operacion").value : "";
+    if (metodoPago === "efectivo") {
+        const recibidoInput = document.getElementById("recibido").value;
+        if (!recibidoInput || parseFloat(recibidoInput) === 0) {
+            alert("Debe declarar cuánto recibió del cliente.");
+            return;
+        }
+        recibido = parseFloat(recibidoInput);
+
+        const cambioInput = document.getElementById("cambio").value;
+        if (!cambioInput || parseFloat(cambioInput) < 0) {
+            alert("Verifique cambio negativo");
+            return;
+        }
+        cambio = parseFloat(cambioInput);
+
+    } else {
+        operacionValue = document.getElementById("operacion").value;
+        if (!operacionValue.trim()) {
+            alert("Debe ingresar el número de operación.");
+            return;
+        }
+    }
+
 
     agregarCampoOculto(form, "metodo_pago", metodoPago);
     agregarCampoOculto(form, "recibido", recibido);
     agregarCampoOculto(form, "cambio", cambio);
     agregarCampoOculto(form, "numero_operacion", operacionValue);
+
 
     // ✅ Envía el formulario
     form.requestSubmit();
