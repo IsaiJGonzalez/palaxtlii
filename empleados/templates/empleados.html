@@ -14,7 +14,7 @@
 
         <!-- FORMULARIO A LA IZQUIERDA -->
         <div class="col-lg-4 offset-lg-1">
-            <div class="card shadow-sm rounded p-4" id="div-form">
+            <div class="card shadow-sm rounded p-5" id="div-form">
                 <h4 class="mb-4 text-primary text-center">Registrar Empleado</h4>
                 <form class="row g-4" method="POST">
                     {% csrf_token %}
@@ -96,8 +96,8 @@
                         <div class="col">
                             <div class="card shadow-sm h-100">
                                 <div class="card-body">
-                                    <h5 class="card-title"> {{ empleado.nombre }} </h5>
-                                    <p class="card-text"> <strong>No. Empleado </strong> {{ empleado.numero_empleado }}
+                                    <h5 class="card-title rounded-3 p-2 fw-bold text-center" style="background-color: rgb(255, 176, 112);"> {{ empleado.nombre }} </h5>
+                                    <p class="card-text text-danger"> No. Empleado:  <strong>{{ empleado.numero_empleado }}</strong> 
                                     </p>
                                     <p class="card-text">Sucursal:
                                         {% if empleado.sucursal  == 1 %} Vista Hermosa {% endif %}
@@ -136,10 +136,43 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="modalLabel">Datos de empleado</h5>
+                        <h5 class="modal-title" id="modalLabel">Datos del empleado</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <div class="modal-body">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Nombre:</th>
+                                    <td id="modalNombre" ></td>
+                                </tr>
+                                <tr>
+                                    <th>No. Emp:</th>
+                                    <td id="modalNumero"></td>
+                                </tr>
+                                <tr>
+                                    <th>Teléfono:</th>
+                                    <td id="modalTelefono"></td>
+                                </tr>
+                                <tr>
+                                    <th>Sucursal:</th>
+                                    <td id="modalSucursal"></td>
+                                </tr>
+                                <tr>
+                                    <th>Contraseña:</th>
+                                    <td id="modalContrasena"></td>
+                                </tr>
+                                <tr>
+                                    <th>Privilegio:</th>
+                                    <td id="modalPrivilegio"></td>
+                                </tr>
+                                <tr>
+                                    <th>Caja:</th>
+                                    <td  class="cajaActiva_Inactiva" id="modalCaja"></td>
+                                </tr>
+                            </thead>
+                        </table>
+                        <!--
                         <h3 id="modalNombre"></h3>
                         <p id="modalNumero"></p>
                         <p id="modalTelefono"></p>
@@ -147,6 +180,7 @@
                         <p id="modalContrasena"></p>
                         <p id="modalPrivilegio"></p>
                         <p id="modalCaja"></p>
+                        -->
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -169,16 +203,26 @@
             let contrasena = button.getAttribute("data-contrasena");
             let privilegio = button.getAttribute("data-privilegio");
             let caja = button.getAttribute('data-caja');
-            let caja_activa = caja === 'true' ? 'Activa' : 'Inactiva';
+            let caja_activa = caja === 'True' ? 'Activa' : 'Inactiva';
+            if (caja){
+                const filaCaja = document.querySelector(".cajaActiva_Inactiva");
+                if (caja === 'True') {
+                    filaCaja.style.backgroundColor = '#d4edda'; // verde claro tipo éxito
+                    filaCaja.style.color = '#155724'; // texto verde oscuro
+                } else {
+                    filaCaja.style.backgroundColor = '#f8d7da'; // rojo claro tipo error
+                    filaCaja.style.color = '#721c24'; // texto rojo oscuro
+                }
+            }
             // Asignar los valores a los elementos dentro del modal
 
-            document.getElementById("modalNombre").innerText = "Nombre: " + nombre;
-            document.getElementById("modalNumero").innerText = "No. Empleado: " + numero;
-            document.getElementById("modalTelefono").innerText = "Teléfono: " + telefono;
-            document.getElementById("modalSucursal").innerText = "Sucursal: " + sucursal;
-            document.getElementById("modalContrasena").innerText = "Contraseña: " + contrasena;
-            document.getElementById("modalPrivilegio").innerText = "Privilegio: " + privilegio;
-            document.getElementById('modalCaja').innerText = 'Caja: ' + caja_activa;
+            document.getElementById("modalNombre").innerText = "" + nombre;
+            document.getElementById("modalNumero").innerText = "" + numero;
+            document.getElementById("modalTelefono").innerText = "" + telefono;
+            document.getElementById("modalSucursal").innerText = "" + sucursal;
+            document.getElementById("modalContrasena").innerText = "" + contrasena;
+            document.getElementById("modalPrivilegio").innerText = "" + privilegio;
+            document.getElementById('modalCaja').innerText = '' + caja_activa;
         });
     });
 </script>

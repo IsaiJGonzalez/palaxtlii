@@ -13,12 +13,12 @@ document.addEventListener("DOMContentLoaded", function () {
             let puntoReorden = button.getAttribute("data-reorden");
             
             // Asignar los valores a los elementos dentro del modal
-            document.getElementById("modalNombre").innerText = "Nombre: " + nombre;
-            document.getElementById("modalCategoria").innerText = "Categoría: " + categoria;
-            document.getElementById("modalPrecio").innerText = "Precio: $" + precio;
-            document.getElementById("modalReorden").innerText = "Reorden: " + puntoReorden;
-            document.getElementById("modalExistencias").innerText = "Existencias: " + existencias;
-            document.getElementById("modalEstado").innerText = "Estado: " + estado;
+            document.getElementById("modalNombre").innerText = "" + nombre;
+            document.getElementById("modalCategoria").innerText = "" + categoria;
+            document.getElementById("modalPrecio").innerText = "$" + precio;
+            document.getElementById("modalReorden").innerText = "" + puntoReorden;
+            document.getElementById("modalExistencias").innerText = "" + existencias;
+            document.getElementById("modalEstado").innerText = "" + estado;
         });
 
 

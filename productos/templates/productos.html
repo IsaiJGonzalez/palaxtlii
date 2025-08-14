@@ -102,7 +102,13 @@
                 <!-- Productos de Vista Hermosa -->
                 <div id="vhp" class="overflow-auto" style="max-height: 450px;">
                     {% for cat in cats %}
-                    <h3 class="mb-2 mt-4" style="color: blue;"> - {{ cat.nombre }} </h3>
+                    <table class="table mt-3">
+                        <thead>
+                            <tr>
+                                <th class="text-black fs-4  rounded-4" style="background-color: rgb(255, 210, 173);">{{ cat.nombre }}</th>
+                            </tr>
+                        </thead>
+                    </table>
                     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-1">
                         {% for producto in prvh %}
                         {% if producto.categoria == cat.nombre %}
@@ -110,8 +116,8 @@
                             <div class="card shadow-sm h-100 {%if producto.estado == False %} bg-info-subtle {% elif producto.existencias < producto.punto_reorden %} bg-danger-subtle {% elif producto.existencias == producto.punto_reorden %} bg-warning-subtle {% elif producto.existencias > producto.punto_reorden %} bg-success-subtle {% endif %}">
                                 <div class="card-body d-flex flex-column">
                                     <h5 class="card-title">{{ producto.nombre }}</h5>
-                                    <p class="card-text"><strong>Precio:</strong> {{ producto.precio }}</p>
-                                    <p class="card-text bg-black fw-bold" style="color: azure;">Sucursal: Vista Hermosa</p>
+                                    <p class="card-text"><strong>Precio:</strong> ${{ producto.precio }}</p>
+                                    <p class="card-text rounded-2 p-1 bg-black fw-bold" style="color: azure;">Sucursal: Vista Hermosa</p>
 
                                     <!-- Botones -->
                                     <div class="mt-auto d-flex justify-content-between">
@@ -147,7 +153,13 @@
                 <!-- Productos de Moctezuma -->
                 <div class="d-none overflow-auto" id="mcp" style="max-height: 450px;">
                     {% for cat in cats %}
-                    <h3 class="mb-2 mt-4" style="color: blue;"> - {{ cat.nombre }} </h3>
+                    <table class="table mt-3">
+                        <thead>
+                            <tr>
+                                <th class="text-black fs-4  rounded-4" style="background-color: rgb(172, 216, 255);">{{ cat.nombre }}</th>
+                            </tr>
+                        </thead>
+                    </table>
                     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-1">
                         {% for producto in prmc %}
                         {% if producto.categoria == cat.nombre %}
@@ -155,8 +167,8 @@
                             <div class="card shadow-sm h-100 {%if producto.estado == False %} bg-info-subtle {% elif producto.existencias < producto.punto_reorden %} bg-danger-subtle {% elif producto.existencias == producto.punto_reorden %} bg-warning-subtle {% elif producto.existencias > producto.punto_reorden %} bg-success-subtle {% endif %}">
                                 <div class="card-body d-flex flex-column">
                                     <h5 class="card-title">{{ producto.nombre }}</h5>
-                                    <p class="card-text"><strong>Precio:</strong> {{ producto.precio }}</p>
-                                    <p class="card-text bg-black fw-bold" style="color: azure;">Sucursal: Moctezuma</p>
+                                    <p class="card-text"><strong>Precio:</strong> ${{ producto.precio }}</p>
+                                    <p class="card-text rounded-2 p-1 bg-black fw-bold" style="color: azure;">Sucursal: Moctezuma</p>
 
                                     <!-- Botones -->
                                     <div class="mt-auto d-flex justify-content-between">
@@ -198,16 +210,46 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel">Datos de los productos: </h5>
+                <h5 class="modal-title" id="modalLabel">Datos del producto: </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
+                <table class="table table-bordered border-dark-subtle">
+                    <thead>
+                        <tr>
+                            <th>Producto:</th>
+                            <td id="modalNombre"></td>
+                        </tr>
+                        <tr>
+                            <th>Categoría:</th>
+                            <td id="modalCategoria"></td>
+                        </tr>
+                        <tr>
+                            <th>Precio:</th>
+                            <td id="modalPrecio"></td>
+                        </tr>
+                        <tr>
+                            <th>Existencias mínimas</th>
+                            <td id="modalReorden"></td>
+                        </tr>
+                        <tr>
+                            <th>Existencia Actual</th>
+                            <td id="modalExistencias"></td>
+                        </tr>
+                        <tr>
+                            <th>Estado:</th>
+                            <td id="modalEstado"></td>
+                        </tr>
+                    </thead>
+                </table>
+                <!-- 
                 <h3 id="modalNombre"></h3>
                 <p id="modalCategoria"></p>
                 <p id="modalPrecio"></p>
                 <p id="modalReorden"></p>
                 <p id="modalExistencias"></p>
                 <p id="modalEstado"></p>
+                -->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
