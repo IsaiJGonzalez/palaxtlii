@@ -32,4 +32,5 @@ urlpatterns = [
     path('apertura_caja/',include('apertura_caja.urls')),
     path('corte_caja/',include('corte_caja.urls')),
     path('retiros/',include('retiros.urls')),
+    path('historial_caja/',include('historial_cajas.urls'))
 ]

@@ -856,3 +856,25 @@ def cerrar_cajas(sucursal,no_emp,apertura_id,corte_id,fecha_corte,billetes,moned
     else:
         print('Error al cerrar cajas')
 
+
+
+#CONSULTA DE CAJAS
+
+def consultar_aperturas(sucursal):
+    ruta = 'vistahermosa' if sucursal == 1 else 'moctezuma' if sucursal == 2 else None
+    if ruta:
+        ref_apertura = db.reference(f'{ruta}/apertura_caja')
+        aperturas = ref_apertura.get()
+    else:
+        print('Error al obtener aperturas')
+    return aperturas
+
+
+def consultar_cortes(sucursal):
+    ruta = 'vistahermosa' if sucursal == 1 else 'moctezuma' if sucursal == 2 else None
+    if ruta:
+        ref_corte = db.reference(f'{ruta}/corte_caja')
+        cortes = ref_corte.get()
+    else:
+        print('Error al obtener aperturas')
+    return cortes

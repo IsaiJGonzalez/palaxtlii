@@ -1,0 +1,124 @@
+{% extends 'base_gerencial.html' %}
+
+{% block items %}
+<title>Historial Cajas</title>
+{% endblock %}
+
+{% block content %}
+<!--
+<div>
+    <table>
+        <thead>
+            <tr>
+                <th>Filtrar Por:</th>
+                
+            </tr>
+        </thead>
+    </table>
+</div>
+-->
+<div class="mt-4">
+    <table class="table table-striped table-bordered mb-0 text-center">
+        <thead>
+            <tr>
+                <th class="bg-secondary-subtle">Apertura</th>
+                <th class="bg-secondary-subtle">Corte</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td> <!--SUBTABLA DE APERTURA-->
+                    <table class="table table-bordered mb-0 fw-light">
+                        <thead>
+                            <tr>
+                                <th class="text-white" style="background-color: rgb(42, 35, 146);">Estado</th>
+                                <th class="text-white" style="background-color: rgb(42, 35, 146);">F/Hr de Asignación</th>
+                                <th class="text-white" style="background-color: rgb(42, 35, 146);">Empleado</th>
+                                <th class="text-white" style="background-color: rgb(42, 35, 146);">Fondo de Caja</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for apertura in aperturas %}
+                            <tr>
+                                <td class="
+                                text-white fw-normal
+                                {% if apertura.estado == True %} bg-success {% elif apertura.estado == False %} bg-secondary {% endif %}
+                                "> 
+                                    {% if apertura.estado == True %} Activo {% elif apertura.estado == False %} Innactivo {% endif %} 
+                                </td>
+                                <td class="fecha-asignacion fw-normal"> {{apertura.fecha_asignacion}} </td>
+                                <td class="text-danger fw-normal"> {{apertura.no_emp}} </td>
+                                <td class="fw-normal">${{apertura.fondo_caja}} </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </td>
+                <td> <!--SUBTABLA DE CORTE-->
+                    <table class="table table-bordered mb-0 fw-light">
+                        <thead>
+                            <tr>
+                                <!--<th class="text-white" style="background-color: rgb(42, 35, 146);">E</th>-->
+                                <th class="text-white" style="background-color: rgb(42, 35, 146);" >F/Hr de Corte</th>
+                                <th class="text-white" style="background-color: rgb(42, 35, 146);">Retiros</th> 
+                                <th class="text-white" style="background-color: rgb(42, 35, 146);">Esperado en caja</th>
+                                <th class="text-white" style="background-color: rgb(42, 35, 146);">Entregado</th>
+                                <th class="text-white" style="background-color: rgb(42, 35, 146);">Diferencia</th>
+                                <th class="text-white" style="background-color: rgb(42, 35, 146);">Estatus</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for corte in cortes %}
+                                <tr>
+                                    <!--
+                                    <td class="
+                                    text-white fw-normal
+                                    {% if corte.estado == True %} bg-success {% elif corte.estado == False %} bg-secondary {% endif %}
+                                
+                                    "> 
+                                        {% if corte.estado == True %} Activo {% elif corte.estado == False %} Innactivo {% endif %} 
+                                    </td>
+                                    -->
+                                    <td class="fw-normal fecha-asignacion"> {{corte.fecha_corte}} </td>
+                                    <td class="fw-normal"> ${{corte.retiros}} </td>
+                                    <td class="fw-normal"> ${{corte.esperado_en_caja}} </td>
+                                    <td class="fw-normal"> ${{corte.total_en_caja}} </td>
+                                    <td class="fw-normal"> ${{corte.diferencia}} </td>
+                                    <td class="fw-normal" 
+                                        {% if corte.diferencia < 0 %} style="background-color: rgb(59, 62, 241); color: white;" {% elif corte.diferencia > 0 %} style="background-color: rgb(174, 45, 45); color: white;" {% else %} style="background-color: rgb(45, 174, 69); color: white;" {% endif %}
+                                    >
+                                        {% if corte.diferencia < 0 %} Sobrante {% elif corte.diferencia > 0 %} Faltante {% else %} Exacto {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+<script>
+    //PONER LA FECHA DE ASIGNACION EN FECHA LEGIBLE
+    document.querySelectorAll('.fecha-asignacion').forEach(td => {
+        const raw = td.textContent.trim();
+        const date = new Date(raw);
+
+        // Formatear como dd/mm/yyyy hh:mm
+        const formatted = date.toLocaleString('es-MX', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+        });
+
+        td.textContent = formatted;
+    });
+</script>
+
+
+{% endblock %}
