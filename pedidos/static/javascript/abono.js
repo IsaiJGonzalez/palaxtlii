@@ -36,3 +36,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     abonoInput.addEventListener('input', actualizarRestante);
 });
+
+
+const btnAbono = document.getElementById('btnAbono');
+btnAbono.addEventListener('click',function(){
+    const overlay = document.getElementById('overlay-loading');
+    overlay.classList.remove('d-none');
+})

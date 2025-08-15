@@ -172,7 +172,7 @@
 
                                                 </div>
                                                 <div class="modal-footer">
-                                                    <button type="submit" class="btn btn-primary">Registrar</button>
+                                                    <button type="submit" class="btn btn-primary" id="btnAbono">Registrar</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -229,18 +229,18 @@
     </div>
 </div>
 
-<!-- Modal para detalles del pedido de Juan Pérez -->
+<!-- Modal para detalles del pedido seleccionado -->
 <div class="modal fade" id="pedidoModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title fw-bold text-primary">Resumen: </h5>
+                <h5 class="modal-title fw-bold text-black">Resumen: </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p class="text-bg-danger w-25 fw-bold pt-1 pb-1" id="folio_r"></p>
-                <p class="text-bg-warning fw-bold" id="cliente"></p>
-                <p class="text-bg-warning fw-bold" id="telefono"></p>
+                <p class="text-bg-danger w-25 fw-bold pt-1 pb-1 p-2 rounded-2" id="folio_r"></p>
+                <p class="text-bg-warning fw-bold p-1 rounded-2" id="cliente"></p>
+                <p class="text-bg-warning fw-bold p-1 rounded-2" id="telefono"></p>
                 <hr class="table-group-divider">
                 <h6>Atendio: </h6>
                 <table class="table justify-content-center">
@@ -279,9 +279,9 @@
                 <p id="especificaciones"></p>
                 <hr>
                 <hr class="table-group-divider">
-                <h6 id="total" class="text-end text-bg-success p-2"></h6>
-                <h6 id="anticipo" class="text-end text-bg-primary p-2"></h6>
-                <h5 class=" text-end text-bg-dark p-3" id="restante"></h5>
+                <h6 id="total" class="text-end text-bg-success p-2 rounded-2"></h6>
+                <h6 id="anticipo" class="text-end text-bg-primary p-2 rounded-2"></h6>
+                <h5 class=" text-end text-bg-dark p-3 rounded-2" id="restante"></h5>
                 <div class="mb-3 col-auto d-none" id="forma_de_pago">
                     <label class="form-label d-block">Forma de pago:</label>
                     <div class="form-check form-check-inline">
@@ -305,6 +305,15 @@
         </div>
     </div>
 </div>
+
+<div id="overlay-loading" class="overlay d-none">
+    <div class="overlay-content">
+        <div class="spinner-border text-light" role="status"></div>
+        <p class="mt-3">Registrando abono...</p>
+    </div>
+</div>
+
+
 
 <!-- Bootstrap JS para que los modales funcionen -->
 

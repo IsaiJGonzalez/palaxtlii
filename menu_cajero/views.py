@@ -7,11 +7,18 @@ import ticket_prueba as tk_pr
 
 @cajero_required
 def menu_cajero(request):
+    empleado = request.session.get('usuario',{}).get('numero_empleado',0)
+    caja_activa = fs.consultar_caja_activa(empleado)
+
+    if not caja_activa:
+        return redirect('apertura_caja')
+
     sucursal_empleado = request.session.get('usuario',{}).get('sucursal', 0)
     loc = fs.consultar_sucursal(sucursal_empleado)
     pedidos = list(fs.obtener_pedidos().values())
     hoy = datetime.today().date()
     pedidos_hoy = []
+    
 
     for pedido in pedidos:
         
