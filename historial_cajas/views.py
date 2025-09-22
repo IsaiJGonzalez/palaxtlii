@@ -15,4 +15,6 @@ def historial_caja(request):
         'aperturas' : aperturas,
         'cortes' : cortes
     }
+
+    print(cortes)
     return render(request,'historial_cajas.html',context)

@@ -148,7 +148,7 @@ def registrar_venta(request):
                     't' : mix_tar
                 }
 
-            fs.registrar_en_corte_vh(id_corte,'venta',metodo_pago,total)
+            fs.registrar_en_corte_vh(id_corte,'venta',metodo_pago,total,resumen)
             tv.imprimir_venta(resumen=resumen) 
 
         elif direccion_empleado == 2:
@@ -199,7 +199,7 @@ def registrar_venta(request):
                     't' : mix_tar
                 }
 
-            fs.registrar_en_corte_mc(id_corte,'venta',metodo_pago,total)
+            fs.registrar_en_corte_mc(id_corte,'venta',metodo_pago,total,resumen)
             tv.imprimir_venta(resumen=resumen)
             
         else:

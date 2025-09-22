@@ -735,7 +735,7 @@ def corte_caja_mc(no_emp, apertura_id,fondo):
 
 
 #función para registrar ventas y pedidos en corte 
-def registrar_en_corte_mc(corte_id,tipo,metodo_pago,ingreso):
+def registrar_en_corte_mc(corte_id,tipo,metodo_pago,ingreso,resumen=None):
     ref = db.reference(f'moctezuma/corte_caja/{corte_id}')
     if (tipo == 'pedido'):
         #validando si el metodo de pago es mixto
@@ -806,9 +806,18 @@ def registrar_en_corte_mc(corte_id,tipo,metodo_pago,ingreso):
                 ref.child('esperado_en_caja').set(suma_e)
             print('Ingreso de la venta registrada')
 
+        #ingresando la venta al corte
+        venta_historica = ref.child('venta_historica')
+        #verificamos las ventas que hay
+        ventas_actuales = venta_historica.get() or {}
+        # Calcular el siguiente número
+        siguiente_num = str(len(ventas_actuales) + 1)
+        # Guardar la nueva venta en esa posición
+        venta_historica.child(siguiente_num).set(resumen)
+
     return
 
-def registrar_en_corte_vh(corte_id,tipo,metodo_pago,ingreso):
+def registrar_en_corte_vh(corte_id,tipo,metodo_pago,ingreso,resumen=None):
     ref = db.reference(f'vistahermosa/corte_caja/{corte_id}')
     if (tipo == 'pedido'):
         #validando si el metodo de pago es mixto
@@ -878,6 +887,16 @@ def registrar_en_corte_vh(corte_id,tipo,metodo_pago,ingreso):
                 suma_e = val_e_act + ingreso if val_e_act else ingreso
                 ref.child('esperado_en_caja').set(suma_e)
             print('Ingreso de la venta registrada')
+        
+        #ingresando la venta al corte
+        venta_historica = ref.child('venta_historica')
+        #verificamos las ventas que hay
+        ventas_actuales = venta_historica.get() or {}
+        # Calcular el siguiente número
+        siguiente_num = str(len(ventas_actuales) + 1)
+        # Guardar la nueva venta en esa posición
+        venta_historica.child(siguiente_num).set(resumen)
+
     return
 
 
@@ -969,7 +988,7 @@ def consultar_aperturas(sucursal):
     ruta = 'vistahermosa' if sucursal == 1 else 'moctezuma' if sucursal == 2 else None
     if ruta:
         ref_apertura = db.reference(f'{ruta}/apertura_caja')
-        aperturas = ref_apertura.get()
+        aperturas = ref_apertura.order_by_key().limit_to_last(10).get()
     else:
         print('Error al obtener aperturas')
     return aperturas
@@ -979,7 +998,7 @@ def consultar_cortes(sucursal):
     ruta = 'vistahermosa' if sucursal == 1 else 'moctezuma' if sucursal == 2 else None
     if ruta:
         ref_corte = db.reference(f'{ruta}/corte_caja')
-        cortes = ref_corte.get()
+        cortes = ref_corte.order_by_key().limit_to_last(10).get()
     else:
         print('Error al obtener aperturas')
     return cortes
