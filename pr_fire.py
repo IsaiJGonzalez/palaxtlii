@@ -3,4 +3,4 @@ from firebase_admin import db
 import firebase_service as sv
 import firebase_config
 
-print(sv.consultar_aperturas(1))
+print(sv.obtener_seriabilidad_vh())

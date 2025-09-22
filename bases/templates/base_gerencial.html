@@ -15,7 +15,7 @@
 
 <style>
     .navbar-custom {
-        background-color: rgb(255, 249, 245) !important;
+        background-color: rgb(255, 246, 236) !important;
     }
 </style>
 
@@ -25,25 +25,25 @@
             <div class="container-fluid">
                 <a class="navbar-brand">
                     <img src="{% static '/logo.png' %}" alt="Palaxtli" width="70" height="65" class="d-inline-block">
-                    Bienvenido <strong> {{nombre_empleado}} </strong>
+                    <strong> {{nombre_empleado}} </strong>
                 </a>
                 <ul class="navbar-nav d-flex flex-row gap-4">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'menu_gerencial' %}">Inicio</a>
+                        <a class="nav-link" href="{% url 'menu_gerencial' %}"><strong>Inicio</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'pedidos' %}">Historial de Pedidos</a>
+                        <a class="nav-link" href="{% url 'pedidos' %}"><strong>Historial de Pedidos</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'punto_venta' %}">Punto de Venta</a>
+                        <a class="nav-link" href="{% url 'punto_venta' %}"><strong>Punto de Venta</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'registro_pedidos' %}">Registrar Pedido</a>
+                        <a class="nav-link" href="{% url 'registro_pedidos' %}"><strong>Registrar Pedido</strong></a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
-                            Configuración
+                            <strong>Configuración</strong>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="{% url 'codigos' %}">Códigos / Categorías</a></li>

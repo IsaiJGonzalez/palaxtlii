@@ -177,6 +177,55 @@ document.addEventListener("DOMContentLoaded", function() {
     observer.observe(totalElement, { childList: true, characterData: true, subtree: true });
 });
 
+
+//metodo mixto
+document.addEventListener("DOMContentLoaded", function() {
+    const efectivoInput = document.getElementById('mix_ef'); // Captura el elemento donde está el total
+    const totalElement = document.getElementById('total');
+    const tarjetaInput = document.getElementById("mix_tar");
+    const metodoMixto = document.getElementById('metodo_mixto');
+    const recibidoInput = document.getElementById('recibido_mixto');
+    const cambioOutput = document.getElementById('cambio_mixto');
+
+    function calcularCambio() {
+        const efectivo = parseFloat(efectivoInput.value) || 0; // Convierte el total a número
+        const recibido = parseFloat(recibidoInput.value) || 0; // Convierte lo recibido a número
+        const total = parseFloat(totalElement.textContent) || 0;
+        
+        if (metodoMixto.checked) { // Verifica si el método "Mixto" está seleccionado
+            //1. del total restar lo que se va a dar en efectivo y el resto ponerlo en el de tarjeta
+            const tarjeta = total - efectivo;
+            tarjetaInput.value = tarjeta.toFixed(2);
+
+            //2.de acuerdo al efectivo a pagar sacar el cambio de lo recibido
+            const cambio = recibido - efectivo;
+            cambioOutput.value = cambio.toFixed(2); // Muestra el cambio con dos decimales
+        } else {
+            cambioOutput.value = 0.00; // Si otro método está seleccionado, el cambio es 0
+            recibidoInput.value = 0.00;
+
+        }
+    }
+
+
+    //OBSERVADOR PARA EL SPAN DEL TOTAL, PARA ACTUALIZAR EL CAMBIO DE ACUERDO A NUEVOS PRODUCTOS AÑADIDOS
+    const observer = new MutationObserver(() => {
+        calcularCambio(); // Llama tu función cuando cambie el contenido del span
+    });
+
+    
+    // Actualiza el cambio cada vez que cambien el método de pago o el monto recibido
+    metodoMixto.addEventListener('change', calcularCambio);
+    recibidoInput.addEventListener('input', calcularCambio);
+    efectivoInput.addEventListener('input', calcularCambio)
+    
+    // Observar cambios en el contenido del span
+    observer.observe(totalElement, { childList: true, characterData: true, subtree: true });
+});
+
+
+
+
 function actualizarTotalTabla() {
     let total = 0;
     const filas = document.querySelectorAll('#resumenTabla tr'); // Todas las filas de la tabla

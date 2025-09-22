@@ -21,6 +21,7 @@ function registrarCompra() {
         const cells = row.getElementsByTagName("td");
         const rowData = {
             productoId: cells[0].getAttribute("data-id"),
+            productoNombre : cells[0].textContent.trim(),
             cantidad: parseInt(cells[1].innerText,10),
             precio_unitario: parseFloat(cells[2].innerText),
             subtotal: parseFloat(cells[3].innerText),
@@ -56,6 +57,8 @@ function registrarCompra() {
     let recibido = 0;
     let cambio = 0;
     let operacionValue = "";
+    let mix_ef = 0;
+    let mix_tar = 0;
 
     if (metodoPago === "efectivo") {
         const recibidoInput = document.getElementById("recibido").value;
@@ -73,10 +76,64 @@ function registrarCompra() {
         cambio = parseFloat(cambioInput);
 
     } else {
-        operacionValue = document.getElementById("operacion").value;
-        if (!operacionValue.trim()) {
-            alert("Debe ingresar el número de operación.");
-            return;
+        //obtener la operación de la tarjeta
+        if (metodoPago === "tarjeta"){
+            operacionValue = document.getElementById("operacion").value;
+            if (!operacionValue.trim()) {
+                alert("Debe ingresar el número de operación de la tarjeta.");
+                return;
+            }
+        }
+        //operacion transferencia
+        if (metodoPago === "transferencia"){
+            operacionValue = document.getElementById("operacion_transferencia").value;
+            if (!operacionValue.trim()) {
+                alert("Debe ingresar el número de operación de la transferencia.");
+                return;
+            }
+        }
+        
+        //operación mixta
+        if (metodoPago === "mixto"){
+
+            //traer lo que se paga en efectivo y en tarjeta
+            const mix_efInput = document.getElementById("mix_ef").value;
+            if (!mix_efInput  || parseFloat(mix_efInput) === 0){
+                alert("Debe declarar cuánto se pagará en efectivo.");
+                return;
+            }
+            mix_ef = parseFloat(mix_efInput);
+
+            const mix_tarInput = document.getElementById("mix_tar").value;
+            if (!mix_tarInput || parseFloat(mix_tarInput) === 0){
+                alert("Debe declarar cuánto se pagará en tarjeta/transferencia");
+                return;
+            }
+            mix_tar = parseFloat(mix_tarInput);
+
+            //traer el recibido y el cambio
+            const recibidoInput = document.getElementById("recibido_mixto").value;
+            if (!recibidoInput || parseFloat(recibidoInput) === 0) {
+                alert("Debe declarar cuánto recibió del cliente.");
+                return;
+            }
+            recibido = parseFloat(recibidoInput);
+
+            const cambioInput = document.getElementById("cambio_mixto").value;
+            if (!cambioInput || parseFloat(cambioInput) < 0) {
+                alert("Verifique cambio negativo");
+                return;
+            }
+            cambio = parseFloat(cambioInput);
+            
+            //traer el numero de operación
+            operacionValue = document.getElementById("operacion_mixto").value;
+            if (!operacionValue.trim()) {
+                alert("Debe ingresar el número de operación de la transferencia.");
+                return;
+            }
+
+
         }
     }
 
@@ -85,6 +142,8 @@ function registrarCompra() {
     agregarCampoOculto(form, "recibido", recibido);
     agregarCampoOculto(form, "cambio", cambio);
     agregarCampoOculto(form, "numero_operacion", operacionValue);
+    agregarCampoOculto(form, "mix_ef", mix_ef);
+    agregarCampoOculto(form, "mix_tar", mix_tar);
 
 
     // ✅ Envía el formulario

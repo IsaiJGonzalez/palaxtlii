@@ -94,9 +94,12 @@ def registrar_venta(request):
         total = sum(float(p['subtotal']) for p in resumen_data)
 
         metodo_pago = request.POST.get('metodo_pago')
-        recibido = int(request.POST.get('recibido'))
-        cambio = int(request.POST.get('cambio'))
+        recibido = float(request.POST.get('recibido'))
+        cambio = float(request.POST.get('cambio'))
         operacion = request.POST.get('numero_operacion')
+        mix_ef = float(request.POST.get('mix_ef') or 0)
+        mix_tar = float(request.POST.get('mix_tar') or 0)
+
 
         if direccion_empleado == 1:
             no_venta = fs.obtener_seriabilidad_vh()
@@ -118,7 +121,9 @@ def registrar_venta(request):
                 metodo_pago=metodo_pago,
                 recibido=recibido,
                 cambio=cambio,
-                no_operacion=operacion
+                no_operacion=operacion,
+                mix_ef=mix_ef,
+                mix_tar=mix_tar
             )
             resumen = {
                 "ubicacion": direccion_sucursal,
@@ -132,8 +137,16 @@ def registrar_venta(request):
                 "recibido": recibido,
                 "cambio": cambio,
                 "no_operacion": operacion,
-                'loc_emp':direccion_empleado
+                'loc_emp':direccion_empleado,
+                "mix_ef" : mix_ef,
+                "mix_tar" : mix_tar
             }
+
+            if metodo_pago == "mixto":
+                total = {
+                    'e' : mix_ef,
+                    't' : mix_tar
+                }
 
             fs.registrar_en_corte_vh(id_corte,'venta',metodo_pago,total)
             tv.imprimir_venta(resumen=resumen) 
@@ -158,7 +171,9 @@ def registrar_venta(request):
                 metodo_pago=metodo_pago,
                 recibido=recibido,
                 cambio=cambio,
-                no_operacion=operacion
+                no_operacion=operacion,
+                mix_ef=mix_ef,
+                mix_tar=mix_tar
             )
 
             resumen = {
@@ -173,8 +188,16 @@ def registrar_venta(request):
                 "recibido": recibido,
                 "cambio": cambio,
                 "no_operacion": operacion,
-                'loc_emp':direccion_empleado
+                'loc_emp':direccion_empleado,
+                "mix_ef" : mix_ef,
+                "mix_tar" : mix_tar
             }
+
+            if metodo_pago == "mixto":
+                total = {
+                    'e' : mix_ef,
+                    't' : mix_tar
+                }
 
             fs.registrar_en_corte_mc(id_corte,'venta',metodo_pago,total)
             tv.imprimir_venta(resumen=resumen)

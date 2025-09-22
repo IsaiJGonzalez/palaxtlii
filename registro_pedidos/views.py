@@ -106,10 +106,22 @@ def guardar_pedido(request):
             )
 
             if locacion_empleado == 1 and anticipo:
-                a = int(anticipo)
+                if metodo_pago == "mixto":
+                    a = {
+                        "t" : data.get("mix_tar"),
+                        "e" : data.get("mix_ef")
+                    }
+                else:
+                    a = int(anticipo)
                 fs.registrar_en_corte_vh(id_corte,'pedido',metodo_pago,a)
             elif locacion_empleado == 2 and anticipo:
-                a = int(anticipo)
+                if metodo_pago == "mixto":
+                    a = {
+                        "t" : data.get("mix_tar"),
+                        "e" : data.get("mix_ef")
+                    }
+                else:
+                    a = int(anticipo)
                 fs.registrar_en_corte_mc(id_corte,'pedido',metodo_pago,a)
             try:
                 script_path = os.path.join(settings.BASE_DIR,"ticket_utils.py")

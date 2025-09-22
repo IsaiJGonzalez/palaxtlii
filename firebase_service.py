@@ -129,7 +129,10 @@ def registrar_venta_vh(
     metodo_pago,
     recibido=None,
     cambio=None,
-    no_operacion=None):
+    no_operacion=None,
+    mix_ef = None,
+    mix_tar = None,
+    ):
 
     venta_data = {
         'ubicacion':ubicacion,
@@ -142,7 +145,9 @@ def registrar_venta_vh(
         'metodo_pago':metodo_pago,
         'recibido':recibido,
         'cambio':cambio,
-        'no_operacion':no_operacion
+        'no_operacion':no_operacion,
+        'mix_ef':mix_ef,
+        'mix_tar':mix_tar
     }
     venta_data = {i: j for i, j in venta_data.items() if j is not None}
     fecha_str = fecha_venta if isinstance(fecha_venta, str) else fecha_venta.strftime('%Y-%m-%d')
@@ -266,7 +271,10 @@ def registrar_venta_mc(
     metodo_pago,
     recibido=None,
     cambio=None,
-    no_operacion=None):
+    no_operacion=None,
+    mix_ef = None,
+    mix_tar = None
+    ):
 
     venta_data = {
         'ubicacion':ubicacion,
@@ -279,7 +287,9 @@ def registrar_venta_mc(
         'metodo_pago':metodo_pago,
         'recibido':recibido,
         'cambio':cambio,
-        'no_operacion':no_operacion
+        'no_operacion':no_operacion,
+        'mix_ef':mix_ef,
+        'mix_tar':mix_tar
     }
     venta_data = {i: j for i, j in venta_data.items() if j is not None}
     fecha_str = fecha_venta if isinstance(fecha_venta, str) else fecha_venta.strftime('%Y-%m-%d')
@@ -728,51 +738,146 @@ def corte_caja_mc(no_emp, apertura_id,fondo):
 def registrar_en_corte_mc(corte_id,tipo,metodo_pago,ingreso):
     ref = db.reference(f'moctezuma/corte_caja/{corte_id}')
     if (tipo == 'pedido'):
-        path = f'pedidos/{metodo_pago}'
-        val_actual = ref.child(path).get()
-        suma = val_actual + ingreso if val_actual else ingreso
-        ref.child(path).set(suma)
-        if (metodo_pago == 'efectivo'):
+        #validando si el metodo de pago es mixto
+        if metodo_pago == "mixto":
+            #1. si el metodo de pago es mixto se obtienen los valores de ingreso
+            #almacenados en el diccionario
+            tarjeta = float(ingreso.get("t")) #t = tarjeta
+            efectivo = float(ingreso.get("e")) # e = efectivo
+            #2. se ingresan los montos en el respectivo apartado para efectivo
+            #y tarjeta 
+            #Tarjeta: 
+            path = f'pedidos/tarjeta'
+            val_actual = ref.child(path).get()
+            suma = val_actual + tarjeta if val_actual else tarjeta
+            ref.child(path).set(suma)
+
+            #Efectivo: 
+            path = f'pedidos/efectivo'
+            val_actual = ref.child(path).get()
+            suma = val_actual + efectivo if val_actual else efectivo
+            ref.child(path).set(suma)
+
+            #Actualizando el esperado en caja
             val_e_act = ref.child('esperado_en_caja').get()
-            suma_e = val_e_act + ingreso if val_e_act else ingreso
+            suma_e = val_e_act + efectivo if val_e_act else efectivo
             ref.child('esperado_en_caja').set(suma_e)
-        print('Ingreso del pedido registrado')
+        else:
+            path = f'pedidos/{metodo_pago}'
+            val_actual = ref.child(path).get()
+            suma = val_actual + ingreso if val_actual else ingreso
+            ref.child(path).set(suma)
+            if (metodo_pago == 'efectivo'):
+                val_e_act = ref.child('esperado_en_caja').get()
+                suma_e = val_e_act + ingreso if val_e_act else ingreso
+                ref.child('esperado_en_caja').set(suma_e)
+            print('Ingreso del pedido registrado')
     elif (tipo == 'venta'):
-        path = f'ventas/{metodo_pago}'
-        val_actual = ref.child(path).get()
-        suma = val_actual + ingreso if val_actual else ingreso
-        ref.child(path).set(suma)
-        if (metodo_pago == 'efectivo'):
+        if metodo_pago == "mixto":
+            #1. Obtenemos del ingreso lo pagado con efectivo y tarjeta
+            efectivo = float(ingreso.get('e'))
+            tarjeta = float(ingreso.get('t'))
+            #2. se ingresan los montos en el respectivo apartado para efectivo
+            #y tarjeta 
+            #Tarjeta: 
+            path = f'ventas/tarjeta'
+            val_actual = ref.child(path).get()
+            suma = val_actual + tarjeta if val_actual else tarjeta
+            ref.child(path).set(suma)
+
+            #Efectivo: 
+            path = f'ventas/efectivo'
+            val_actual = ref.child(path).get()
+            suma = val_actual + efectivo if val_actual else efectivo
+            ref.child(path).set(suma)
+
+            #Actualizando el esperado en caja
             val_e_act = ref.child('esperado_en_caja').get()
-            suma_e = val_e_act + ingreso if val_e_act else ingreso
+            suma_e = val_e_act + efectivo if val_e_act else efectivo
             ref.child('esperado_en_caja').set(suma_e)
-        print('Ingreso de la venta registrada')
+        else:
+            path = f'ventas/{metodo_pago}'
+            val_actual = ref.child(path).get()
+            suma = val_actual + ingreso if val_actual else ingreso
+            ref.child(path).set(suma)
+            if (metodo_pago == 'efectivo'):
+                val_e_act = ref.child('esperado_en_caja').get()
+                suma_e = val_e_act + ingreso if val_e_act else ingreso
+                ref.child('esperado_en_caja').set(suma_e)
+            print('Ingreso de la venta registrada')
 
     return
 
 def registrar_en_corte_vh(corte_id,tipo,metodo_pago,ingreso):
     ref = db.reference(f'vistahermosa/corte_caja/{corte_id}')
     if (tipo == 'pedido'):
-        path = f'pedidos/{metodo_pago}'
-        val_actual = ref.child(path).get()
-        suma = val_actual + ingreso if val_actual else ingreso
-        ref.child(path).set(suma)
-        if (metodo_pago == 'efectivo'):
+        #validando si el metodo de pago es mixto
+        if metodo_pago == "mixto":
+            #1. si el metodo de pago es mixto se obtienen los valores de ingreso
+            #almacenados en el diccionario
+            tarjeta = float(ingreso.get("t")) #t = tarjeta
+            efectivo = float(ingreso.get("e")) # e = efectivo
+            #2. se ingresan los montos en el respectivo apartado para efectivo
+            #y tarjeta 
+            #Tarjeta: 
+            path = f'pedidos/tarjeta'
+            val_actual = ref.child(path).get()
+            suma = val_actual + tarjeta if val_actual else tarjeta
+            ref.child(path).set(suma)
+
+            #Efectivo: 
+            path = f'pedidos/efectivo'
+            val_actual = ref.child(path).get()
+            suma = val_actual + efectivo if val_actual else efectivo
+            ref.child(path).set(suma)
+
+            #Actualizando el esperado en caja
             val_e_act = ref.child('esperado_en_caja').get()
-            suma_e = val_e_act + ingreso if val_e_act else ingreso
+            suma_e = val_e_act + efectivo if val_e_act else efectivo
             ref.child('esperado_en_caja').set(suma_e)
-        print('Ingreso del pedido registrado')
+        else:
+            path = f'pedidos/{metodo_pago}'
+            val_actual = ref.child(path).get()
+            suma = val_actual + ingreso if val_actual else ingreso
+            ref.child(path).set(suma)
+            if (metodo_pago == 'efectivo'):
+                val_e_act = ref.child('esperado_en_caja').get()
+                suma_e = val_e_act + ingreso if val_e_act else ingreso
+                ref.child('esperado_en_caja').set(suma_e)
+            print('Ingreso del pedido registrado')
     elif (tipo == 'venta'):
-        path = f'ventas/{metodo_pago}'
-        val_actual = ref.child(path).get()
-        suma = val_actual + ingreso if val_actual else ingreso
-        ref.child(path).set(suma)
-        if (metodo_pago == 'efectivo'):
+        if metodo_pago == "mixto":
+            #1. Obtenemos del ingreso lo pagado con efectivo y tarjeta
+            efectivo = float(ingreso.get('e'))
+            tarjeta = float(ingreso.get('t'))
+            #2. se ingresan los montos en el respectivo apartado para efectivo
+            #y tarjeta 
+            #Tarjeta: 
+            path = f'ventas/tarjeta'
+            val_actual = ref.child(path).get()
+            suma = val_actual + tarjeta if val_actual else tarjeta
+            ref.child(path).set(suma)
+
+            #Efectivo: 
+            path = f'ventas/efectivo'
+            val_actual = ref.child(path).get()
+            suma = val_actual + efectivo if val_actual else efectivo
+            ref.child(path).set(suma)
+
+            #Actualizando el esperado en caja
             val_e_act = ref.child('esperado_en_caja').get()
-            suma_e = val_e_act + ingreso if val_e_act else ingreso
+            suma_e = val_e_act + efectivo if val_e_act else efectivo
             ref.child('esperado_en_caja').set(suma_e)
-        print('Ingreso de la venta registrada')
-        
+        else:
+            path = f'ventas/{metodo_pago}'
+            val_actual = ref.child(path).get()
+            suma = val_actual + ingreso if val_actual else ingreso
+            ref.child(path).set(suma)
+            if (metodo_pago == 'efectivo'):
+                val_e_act = ref.child('esperado_en_caja').get()
+                suma_e = val_e_act + ingreso if val_e_act else ingreso
+                ref.child('esperado_en_caja').set(suma_e)
+            print('Ingreso de la venta registrada')
     return
 
 

@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="container py-4">
+<div class="container py-4 shadow bg-white mt-1">
     <div class="bg-white p-4 card-style">
         <div class="text-center mb-4">
             <h3 class="fw-bold text-black mb-0">Palaxtli</h3>
@@ -130,6 +130,12 @@
                         <label class="form-check-label" for="metodo_transferencia"> <i class="bi bi-send-dash"></i>
                             Transferencia</label>
                     </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="metodo_pago" id="metodo_mixto"
+                            value="mixto">
+                        <label class="form-check-label" for="metodo_mixto"> <i class="bi bi-shuffle"></i>
+                            Mixto</label>
+                    </div>
                 </div>
 
                 <div class="col-md-6">
@@ -144,11 +150,53 @@
                             <label class="form-label">Número de Operación</label>
                             <input type="text" id="operacion" class="form-control">
                         </div>
+                        <div id="transferencia-fields" class="col-md-5 d-none">
+                            <label class="form-label">Número de Operación</label>
+                            <input type="text" id="operacion_transferencia" class="form-control">
+                        </div>
+                        <div id="mixto-fields" class="col-md-10 d-none">
+                            <div class="table-responsive">
+                                <table class="table table-borderless align-middle">
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-end fw-bold">Efectivo $</td>
+                                            <td>
+                                                <input type="number" id="mix_ef" class="form-control text-end fw-bold fs-6">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-end fw-bold">Tarjeta $</td>
+                                            <td>
+                                                <input type="number" id="mix_tar" class="form-control text-end fw-bold fs-6 text-danger" readonly>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-end fw-bold">Número de Operación</td>
+                                            <td>
+                                                <input type="text" id="operacion_mixto" class="form-control text-end fw-bold fs-6 text-primary">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-end fw-bold">Recibido</td>
+                                            <td>
+                                                <input type="number" id="recibido_mixto" class="form-control text-end fw-bold fs-6">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-end fw-bold">Cambio</td>
+                                            <td>
+                                                <input type="number" id="cambio_mixto" class="form-control text-end fw-bold fs-6" readonly>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="text-end">
-                <button type="submit" class="btn btn-success btn-lg px-5" id="registrarCompra">Registrar Compra</button>
+                <button type="submit" class="btn btn-success btn-lg px-2" id="registrarCompra"><i class="bi bi-cart-plus"></i> Registrar Venta</button>
             </div>
         </form>
     </div>
@@ -182,8 +230,12 @@
     const metodoRadios = document.querySelectorAll('input[name="metodo_pago"]');
     metodoRadios.forEach(radio => {
         radio.addEventListener('change', () => {
-            document.getElementById('efectivo-fields').classList.toggle('d-none', radio.value !== 'efectivo');
-            document.getElementById('operacion-fields').classList.toggle('d-none', radio.value === 'efectivo');
+            const metodo = radio.value;
+
+            document.getElementById('efectivo-fields').classList.toggle('d-none', metodo !== 'efectivo');
+            document.getElementById('operacion-fields').classList.toggle('d-none', metodo !== 'tarjeta');
+            document.getElementById('transferencia-fields').classList.toggle('d-none', metodo !== 'transferencia');
+            document.getElementById('mixto-fields').classList.toggle('d-none', metodo !== 'mixto');
         });
     });
 </script>

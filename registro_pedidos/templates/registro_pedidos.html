@@ -154,7 +154,7 @@
     </div>
     <hr class="table-group-divider">
 
-    <div class="mb-3 col-6 d-none" id="forma_de_pago">
+    <div class="mb-4 col-12 d-none" id="forma_de_pago">
         <label class="form-label d-block">Forma de pago:</label>
         <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" name="pago" id="tarjeta" onchange="recuadros_pago()">
@@ -169,9 +169,9 @@
             <label class="form-check-label" for="transferencia"> <i class="bi bi-send"></i> Transferencia</label>
         </div>
         <!-- Añadir opción de Pago Mixto -->
-        <div class="form-check form-check-inline d-none">
+        <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" name="pago" id="mixto" onchange="recuadros_pago()">
-            <label class="form-check-label" for="mixto">Mixto (Efectivo + Tarjeta)</label>
+            <label class="form-check-label" for="mixto"> <i class="bi bi-shuffle"></i> Mixto (Efectivo + Tarjeta)</label>
         </div>
     </div>
 
@@ -445,6 +445,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 <!----------------------------------------------------->
 
+<!--Enviando el pedido-->
 <script>
 document.getElementById("form-pedido").addEventListener("submit", function(event) {
     event.preventDefault();
@@ -498,10 +499,11 @@ document.getElementById("form-pedido").addEventListener("submit", function(event
         recibido: efectivo_seleccionado ? parseFloat(document.getElementById("recibido")?.value || 0):0,
         cambio: efectivo_seleccionado ? parseFloat(document.getElementById("cambio")?.value || 0):0,
 
-        num_operacion : tarjeta_seleccionada 
-        ? document.getElementById("id_operacion")?.value 
-        || (mixto_seleccionado ? document.getElementById('operacion_mixto')?.value : 0) 
-        : 0,
+        num_operacion: tarjeta_seleccionada
+        ? document.getElementById("id_operacion")?.value || 0
+        : (mixto_seleccionado
+            ? document.getElementById("operacion_mixto")?.value || 0
+            : 0),
         
         sucursal: tienda_seleccionada ? document.querySelector("#tienda_seleccionada select")?.value || "":"",
         
