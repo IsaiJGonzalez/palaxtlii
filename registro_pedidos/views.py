@@ -67,7 +67,6 @@ def guardar_pedido(request):
             metodo_pago = data.get('metodo_pago')
             
 
-
             if gran_total == 0 :
                 restante_pagado = True
             elif gran_total > 0 :

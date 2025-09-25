@@ -79,6 +79,8 @@ def imprimir_venta(resumen):
         #Totales
         total = resumen.get('total',0.0)
         metodo_p = resumen.get('metodo_pago')
+        mix_ef = resumen.get('mix_ef',0.0)
+        mix_tar = resumen.get('mix_tar',0.0)
         recibido = resumen.get('recibido',0.0)
         cambio = resumen.get('cambio',0.0)
         no_operacion = resumen.get('no_operacion','')
@@ -86,7 +88,13 @@ def imprimir_venta(resumen):
         p.set(bold=False)
         p.text(f'Método de Pago: {metodo_p}\n\n')
         p.text(f"{'Total:':<20}${total:>8.2f}\n")
-        if metodo_p == 'efectivo':
+        if metodo_p == 'mixto':
+            p.text(f"{'Tarjeta:':<20}${mix_tar:>8.2f}\n")
+            p.text(f'Número de Operación: {no_operacion}\n')
+            p.text(f"{'Efectivo:':<20}${mix_ef:>8.2f}\n")
+            p.text(f"{'Recibido:':<20}${recibido:>8.2f}\n")
+            p.text(f"{'Cambio:':<20}${cambio:>8.2f}\n\n")
+        elif metodo_p == 'efectivo':
             p.text(f"{'Recibido:':<20}${recibido:>8.2f}\n")
             p.text(f"{'Cambio:':<20}${cambio:>8.2f}\n\n")
         elif metodo_p == 'tarjeta' or metodo_p == 'transferencia':

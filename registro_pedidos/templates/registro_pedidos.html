@@ -499,7 +499,7 @@ document.getElementById("form-pedido").addEventListener("submit", function(event
         recibido: efectivo_seleccionado ? parseFloat(document.getElementById("recibido")?.value || 0):0,
         cambio: efectivo_seleccionado ? parseFloat(document.getElementById("cambio")?.value || 0):0,
 
-        num_operacion: tarjeta_seleccionada
+        num_operacion: tarjeta_seleccionada || transferencia_seleccionada
         ? document.getElementById("id_operacion")?.value || 0
         : (mixto_seleccionado
             ? document.getElementById("operacion_mixto")?.value || 0

@@ -112,11 +112,22 @@ def imprimir_ticket(data,loc):
         p.text(f"{'Anticipo:':<20}${anticipo:>8.2f}\n")
         
         metodo = data.get('metodo_pago','')
+        p.text(f"Método de pago:  {metodo}")
+        if (metodo == 'mixto'):
+            mix_tar = float(data.get('mix_tar',''))
+            mix_ef = float(data.get('mix_ef',''))
+            p.text(f"{'Tarjeta:':<20}${mix_tar:>8.2f}\n")
+            p.text(f"{'No. Operación:':<20}${str(data.get('num_operacion', ''))}\n")
+            p.text(f"{'Efectivo:':<20}${mix_ef:>8.2f}\n")
+            p.text(f"{'Recibido:':<20}${data.get('recibido', 0):>8.2f}\n")
+            p.text(f"{'Cambio:':<20}${data.get('cambio', 0):>8.2f}\n")
         if (metodo == 'efectivo'):
             p.text(f"{'Recibido:':<20}${data.get('recibido', 0):>8.2f}\n")
             p.text(f"{'Cambio:':<20}${data.get('cambio', 0):>8.2f}\n")
         elif (metodo=='tarjeta' or metodo=='transferencia'):
             p.text('Pago con: Tarjeta / Transferencia\n')
+            p.text(f"{'No. Operación:':<20}${str(data.get('num_operacion', ''))}\n")
+
         p.text(f"{'Total Restante:':<20}${data.get('gran_total',0):>8.2f}\n")
         p.text("-" * 48 + "\n")
 
@@ -231,13 +242,22 @@ def imprimir_ticket(data,loc):
         p.text(f"{'Envío:':<20}${data.get('costo_envio', 0):>8.2f}\n")
         p.text(f"{'Subtotal:':<20}${data.get('total', 0):>8.2f}\n")
         p.text(f"{'Anticipo:':<20}${anticipo:>8.2f}\n")
-        
         metodo = data.get('metodo_pago','')
+        p.text(f"Método de pago:  {metodo}")
+        if (metodo == 'mixto'):
+            mix_tar = float(data.get('mix_tar',''))
+            mix_ef = float(data.get('mix_ef',''))
+            p.text(f"{'Tarjeta:':<20}${mix_tar:>8.2f}\n")
+            p.text(f"{'No. Operación:':<20}${str(data.get('num_operacion', ''))}\n")
+            p.text(f"{'Efectivo:':<20}${mix_ef:>8.2f}\n")
+            p.text(f"{'Recibido:':<20}${data.get('recibido', 0):>8.2f}\n")
+            p.text(f"{'Cambio:':<20}${data.get('cambio', 0):>8.2f}\n")
         if (metodo == 'efectivo'):
             p.text(f"{'Recibido:':<20}${data.get('recibido', 0):>8.2f}\n")
             p.text(f"{'Cambio:':<20}${data.get('cambio', 0):>8.2f}\n")
         elif (metodo=='tarjeta' or metodo=='transferencia'):
             p.text('Pago con: Tarjeta / Transferencia\n')
+            p.text(f"{'No. Operación:':<20}${str(data.get('num_operacion', ''))}\n")
         p.text(f"{'Total Restante:':<20}${data.get('gran_total',0):>8.2f}\n")
         p.text("-" * 48 + "\n")
         
