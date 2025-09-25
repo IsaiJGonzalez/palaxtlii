@@ -8,11 +8,13 @@ import ticket_prueba as tk_pr
 # Create your views here.
 @ventas_required
 def menu_ventas(request):
+    empleado = request.session.get('usuario',{}).get('numero_empleado',0)
     sucursal_empleado = request.session.get('usuario',{}).get('sucursal', 0)
     loc = fs.consultar_sucursal(sucursal_empleado)
     pedidos = list(fs.obtener_pedidos().values())
     hoy = datetime.today().date()
     pedidos_hoy = []
+    id_corte = str(fs.consultar_id_corte_caja_emp(empleado))
 
     for pedido in pedidos:
         
@@ -36,5 +38,6 @@ def menu_ventas(request):
     context = {
             'pedidos':pedidos_hoy,
             'loc':loc,
+            'corte' : id_corte
     }
     return render(request,'menu_ventas.html',context)

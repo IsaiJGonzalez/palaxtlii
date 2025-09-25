@@ -12,6 +12,18 @@ def productos(request):
     productos_vh = list(fs.obtener_productos_vh().values()) if fs.obtener_productos_vh() else []
     productos_mc = list(fs.obtener_productos_moctezuma().values()) if fs.obtener_productos_moctezuma() else []
     categorias_r = fr_db.child('categorias').get()
+    privilegio = request.session.get('usuario',{}).get('privilegio')
+
+    #templates de acuerdo al privilegio
+    if privilegio == 1 :
+        template = 'base_gerencial.html'
+    elif privilegio == 2:
+        template = 'base_ventas.html'
+    elif privilegio == 3:
+        template = 'base_cajero.html'
+    else :
+        redirect('login')
+
     if categorias_r:
         categorias = [{"id": k, "nombre": v["nombre"]} for k, v in categorias_r.items()]
     else:
@@ -40,7 +52,15 @@ def productos(request):
             fs.agregar_productos_vh(nombre,existencias,precio,categoria,ingredientes,estado,punto_reorden,1)
             
         return redirect('productos')
-    return render(request,'productos.html',{'prvh':productos_vh,'prmc':productos_mc,'cats':categorias})
+    
+    context = {
+        'prvh':productos_vh,
+        'prmc':productos_mc,
+        'cats':categorias,
+        'template' : template    
+    }
+
+    return render(request,'productos.html',context)
 
 
 @gerente_ventas_required

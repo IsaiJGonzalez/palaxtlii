@@ -51,37 +51,8 @@ def imprimir_apertura(data):
         p.set(align='center', bold=False)
         p.text('Este documento es evidencia del fondo entregado. Reporte inconsistencias de inmediato.\n')
         p.cut()
-
-        ##REPETICIÓN
-
-        #Encabezado ----
-        p.text('-' * 48)
-        p.set(align='center',bold=False, width=1, height=1)
-        p.text('Apertura de Caja\n')
-        p.text('-' * 48 + '\n')
-
-        p.set(align='left',bold=False,width=1,height=1)
-
-        p.text(f'Fecha y hora: {fecha}\n')
-        p.text(f'No. Emp: {numero_emp}\n')
-        p.text(f'Nombre: {nombre_emp}\n')
-        p.text(f'Sucursal: {sucursal}\n')
-        p.text('-' * 48 + '\n')
-
-        p.set(align='center',bold=False, width=1, height=1)
-
-        p.text('Recibí el fondo de:\n')
-        p.text(f'$ {fondo}\n\n\n\n\n')
-
-        p.set(align='center',bold=False, width=1, height=1)
-        p.text('_' * 25 + '\n')
-        p.text('Firma')
-        p.text('\n\n')
-        p.set(align='center', bold=False)
-        p.text('Este documento es evidencia del fondo entregado. Reporte inconsistencias de inmediato.\n')
-        p.cut()
         p.close()
-
+        
     except Exception as e:
         print("❌ Error general al imprimir ticket:", e)
 

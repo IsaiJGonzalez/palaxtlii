@@ -1002,3 +1002,13 @@ def consultar_cortes(sucursal):
     else:
         print('Error al obtener aperturas')
     return cortes
+
+
+def consultar_venta_historica(id,sucursal):
+    ruta = 'vistahermosa' if sucursal == 1 else 'moctezuma' if sucursal == 2 else None
+    if ruta:
+        ref = db.reference(f"{ruta}/corte_caja/{id}/venta_historica")
+        venta_historica = ref.get()
+    else:
+        print("Error")
+    return venta_historica if venta_historica else []

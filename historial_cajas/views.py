@@ -1,7 +1,10 @@
 from django.shortcuts import render
 import firebase_service as fs
+from core.decorators import login_required, gerente_required
 
 # Create your views here.
+
+@gerente_required
 def historial_caja(request):
 
     sucursal = request.session.get('usuario',{}).get('sucursal')
@@ -16,5 +19,14 @@ def historial_caja(request):
         'cortes' : cortes
     }
 
-    print(cortes)
     return render(request,'historial_cajas.html',context)
+
+
+@login_required
+def ver_ventas(request,id):
+    sucursal = request.session.get('usuario',{}).get('sucursal')
+    venta_historica = fs.consultar_venta_historica(id,sucursal)
+    context = {
+        'v_h' : venta_historica
+    }
+    return render(request, 'ver_ventas.html',context)

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ventas de Caja</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container py-4">
+    <h2 class="mb-4">Ventas de Caja {{ corte_id }}</h2>
+
+    {% if v_h %}
+        {% for venta in v_h %}
+            {% if venta %}
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <strong>Venta #{{ venta.no_venta }}</strong> — {{ venta.fecha_venta }} — <strong> {{ venta.metodo_pago|title }} </strong>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Empleado:</strong> {{ venta.at_nom_emp }} ({{ venta.at_no_emp }})</p>
+                        <p><strong>Ubicación:</strong> {{ venta.ubicacion }}</p>
+                        {% if venta.metodo_pago != "efectivo" %}
+                            <p><strong>Operación:</strong> {{ venta.no_operacion|default:"—" }}</p>
+                        {% endif %}
+
+                        <table class="table table-bordered table-sm align-middle">
+                            <thead class="table-secondary">
+                                <tr class="text-center">
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio Unitario</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for producto in venta.productos %}
+                                    <tr>
+                                        <td class="text-center">{{ producto.productoNombre }}</td>
+                                        <td class="text-center">{{ producto.cantidad }}</td>
+                                        <td class="text-end">${{ producto.precio_unitario }}</td>
+                                        <td class="text-end">${{ producto.subtotal }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        
+                        <div class="">
+
+                            <div class="text-end">
+                                
+                                <p><strong>Total:</strong> ${{ venta.total }}</p>
+                                {% if venta.metodo_pago == "mixto" %}
+
+                                <p><strong>Tarjeta:</strong> ${{ venta.mix_tar }}</p>
+                                <p><strong>Efectivo:</strong> ${{ venta.mix_ef }}</p>
+                                
+
+                                {% endif %}
+                                <p><strong>Recibido:</strong> ${{ venta.recibido }}</p>
+                                <p><strong>Cambio:</strong> ${{ venta.cambio }}</p>
+                            </div>
+                            <div>
+                                <button class="btn btn-primary">Imprimir ticket</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-warning">No se encontraron ventas para este corte.</div>
+    {% endif %}
+</div>
+</body>
+</html>

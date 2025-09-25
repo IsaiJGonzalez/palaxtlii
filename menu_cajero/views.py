@@ -18,7 +18,7 @@ def menu_cajero(request):
     pedidos = list(fs.obtener_pedidos().values())
     hoy = datetime.today().date()
     pedidos_hoy = []
-    
+    id_corte = str(fs.consultar_id_corte_caja_emp(empleado))
 
     for pedido in pedidos:
         
@@ -42,6 +42,7 @@ def menu_cajero(request):
     context = {
             'pedidos':pedidos_hoy,
             'loc':loc,
+            'corte' : id_corte
     }
 
     return render(request, 'menu_cajero.html',context)

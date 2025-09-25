@@ -268,13 +268,16 @@
     </div>
 </div>
 
-<div class="m-lg-3">
+<div class="d-flex gap-2 pt-4" style="padding-left: 2%;">
     <form action="{% url 'impresion_prueba' %}" method="post">
         {% csrf_token %}
-        <button class="boton-imprimir" type="submit">
+        <button class="boton-imprimir" type="submit" title="Imprime un mensaje para probar el estatus de la impresora">
             Imprimir prueba
         </button>
     </form>
+    <a href="{% url 'ver_ventas' corte %}" target="_blank" class="btn btn-info m-0 p-1 rounded-5 align-content-center fw-bold text-white" title="Observa las ventas realizadas en tu caja">
+        -Ver ventas-
+    </a>
 </div>
 <script src="{% static 'javascript/menu_cajero.js' %}"></script>
 <script src="{% static 'javascript/abono.js' %}"></script>
