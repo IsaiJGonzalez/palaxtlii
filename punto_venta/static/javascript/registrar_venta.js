@@ -1,3 +1,33 @@
+//prevenir el evento del ticket modal
+document.getElementById('ticketModal').addEventListener("click",function(event){
+    event.preventDefault();
+})
+
+
+let ticketIn; //
+
+function ejecutarVenta(ticket) {
+    const total = parseFloat(document.getElementById("total").textContent) || 0;
+
+    if (total <= 0) {
+        alert("No hay registros para venta.");
+        return;
+    }
+    ticketIn = ticket;
+
+    registrarCompra(); // tu función original
+}
+
+document.getElementById("btnImprimirTicket").addEventListener("click", function () {
+    ejecutarVenta(1);
+});
+
+document.getElementById("btnSinTicket").addEventListener("click", function () {
+    ejecutarVenta(0);
+});
+
+
+/*
 document.getElementById("registrarCompra").addEventListener("click", function (event) {
     event.preventDefault();
     
@@ -10,8 +40,13 @@ document.getElementById("registrarCompra").addEventListener("click", function (e
         registrarCompra();
     }
 });
+*/
 
 function registrarCompra() {
+    ///MANDANDO PIMERO LA COSA DEL TICKET
+    const form = document.getElementById("venta_form");
+
+    ///
     const resumenData = [];
     const tbody = document.querySelector("#resumenTabla tbody");
     const rows = tbody.getElementsByTagName("tr");
@@ -29,7 +64,7 @@ function registrarCompra() {
         resumenData.push(rowData);
     }
 
-    const form = document.getElementById("venta_form");
+
 
     // 🧽 Elimina campos ocultos agregados previamente, excepto el csrfmiddlewaretoken
     const camposPrevios = form.querySelectorAll('input[type="hidden"]');
@@ -144,7 +179,7 @@ function registrarCompra() {
     agregarCampoOculto(form, "numero_operacion", operacionValue);
     agregarCampoOculto(form, "mix_ef", mix_ef);
     agregarCampoOculto(form, "mix_tar", mix_tar);
-
+    agregarCampoOculto(form, "ticket", ticketIn);
 
     // ✅ Envía el formulario
     form.requestSubmit();
@@ -167,7 +202,10 @@ document.getElementById('venta_form').addEventListener('submit', function (e) {
     const overlay = document.getElementById('overlay-loading');
     overlay.classList.remove('d-none');
 
-    document.getElementById('registrarCompra').disabled = true;
+    document.getElementById('btnImprimirTicket').disabled = true;
+    document.getElementById('btnSinTicket').disabled = true;
+    document.getElementById('btnCancelarModalTicket').disabled = true
+
 
     // Si después quieres enviar el form:
     this.submit(); // solo si hiciste preventDefault antes

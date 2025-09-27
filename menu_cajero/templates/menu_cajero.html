@@ -78,7 +78,7 @@
                                     aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
-                                            <form method="POST" action="{% url 'abonar' %}">
+                                            <form method="POST" id="abonoForm" action="{% url 'abonar' %}">
                                                 {% csrf_token %}
                                                 <div class="modal-header">
                                                     <h5 class="modal-title" id="abonoModalLabel">Abono</h5>
@@ -170,10 +170,14 @@
                                                     </div>
 
                                                 </div>
-                                                <div class="modal-footer">
-                                                    <button type="submit" class="btn btn-primary">Registrar</button>
+                                                <div class="modal-footer"> 
+                                                    <button type="submit" class="btn btn-primary" id="registrarAbonoBtn">Registrar</button>
                                                 </div>
                                             </form>
+                                            <!-- Overlay -->
+                                            <div id="overlay" style="display:none;">
+                                                <div class="spinner"></div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -188,7 +192,6 @@
         </div>
     </div>
 </div>
-
 
 <!--MODAL-->
 <div class="modal fade" id="pedidoModal" tabindex="-1" aria-hidden="true">

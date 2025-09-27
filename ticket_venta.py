@@ -113,8 +113,10 @@ def imprimir_venta(resumen):
         p.text(f"\nFecha de impresión: {fecha_hora}\n")
 
         p.cut()
-
+        p.close()
+        
         #Ticket Negocio
+        """
         # --- LOGO ---
         logo_path = os.path.join(settings.BASE_DIR, "static", "logo_ticket.bmp")
         if os.path.exists(logo_path):
@@ -199,7 +201,8 @@ def imprimir_venta(resumen):
         p.text(f"\nFecha de impresión: {fecha_hora}\n")
 
         p.cut()
-        p.close()
+        
+        """
 
     except Exception as e:
         print("❌ Error general al imprimir ticket:", e)

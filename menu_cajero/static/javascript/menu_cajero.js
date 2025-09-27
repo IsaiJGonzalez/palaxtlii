@@ -113,3 +113,9 @@ function enviarFolio(folio,pagoSeleccionado,mensajeExito) {
 function getCSRFToken() {
     return document.querySelector('[name=csrfmiddlewaretoken]').value;
 }
+
+//olverlau
+document.getElementById('registrarAbonoBtn').addEventListener('click', function () {
+    document.getElementById('overlay').style.display = 'flex';
+    // Aquí puedes continuar con tu lógica de envío o validación
+});

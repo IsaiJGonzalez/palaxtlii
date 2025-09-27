@@ -1,5 +1,5 @@
 
-document.getElementById('form_apertura').addEventListener('submit',function(e){
+document.getElementById('form_corte').addEventListener('submit',function(e){
     e.preventDefault();
 
     //impidiendo el mandado de form si es 0.00 el total
@@ -12,6 +12,7 @@ document.getElementById('form_apertura').addEventListener('submit',function(e){
     document.getElementById('overlay').style.display = 'flex';
     e.target.submit();
 })
+
 
 document.addEventListener("DOMContentLoaded", function () {
     const denominaciones = {

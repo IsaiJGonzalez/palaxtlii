@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from core.decorators import gerente_required, ventas_required, cajero_required
 import firebase_service as fs
 from datetime import datetime
@@ -9,12 +9,18 @@ import ticket_prueba as tk_pr
 @ventas_required
 def menu_ventas(request):
     empleado = request.session.get('usuario',{}).get('numero_empleado',0)
+    caja_activa = fs.consultar_caja_activa(empleado)
+
+    if not caja_activa:
+        return redirect('apertura_caja')
+    
     sucursal_empleado = request.session.get('usuario',{}).get('sucursal', 0)
     loc = fs.consultar_sucursal(sucursal_empleado)
     pedidos = list(fs.obtener_pedidos().values())
     hoy = datetime.today().date()
     pedidos_hoy = []
-    id_corte = str(fs.consultar_id_corte_caja_emp(empleado))
+    id_corteRaw = str(fs.consultar_id_corte_caja_emp(empleado))
+    id_corte = id_corteRaw if id_corteRaw else []
 
     for pedido in pedidos:
         

@@ -1,4 +1,5 @@
 document.getElementById('pagado').addEventListener('click', function() {
+    document.getElementById('overlay').style.display = 'flex';
     const folio = this.getAttribute('data-folio'); // Obtiene el folio asignado
     const pagoInput = document.querySelector('input[name="pago"]:checked');
 // Verifica si hay pago seleccionado
@@ -48,3 +49,4 @@ function enviarFolio(folio,pagoSeleccionado,mensajeExito) {
 function getCSRFToken() {
     return document.querySelector('[name=csrfmiddlewaretoken]').value;
 }
+

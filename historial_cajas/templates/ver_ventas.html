@@ -7,8 +7,7 @@
 </head>
 <body class="bg-light">
 <div class="container py-4">
-    <h2 class="mb-4">Ventas de Caja {{ corte_id }}</h2>
-
+    <h2 class="mb-4">Ventas de Caja </h2>
     {% if v_h %}
         {% for venta in v_h %}
             {% if venta %}
@@ -60,7 +59,33 @@
                                 <p><strong>Cambio:</strong> ${{ venta.cambio }}</p>
                             </div>
                             <div>
-                                <button class="btn btn-primary">Imprimir ticket</button>
+                                <form method="POST" action="{% url 'imprimir_ticket' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="corte" value="{{ corte_id }}">
+                                    <input type="hidden" name="venta" value="{{ venta.no_venta }}">
+                                    <input type="hidden" name="fecha" value="{{ venta.fecha_venta }}">
+                                    <input type="hidden" name="metodo" value="{{ venta.metodo_pago }}">
+                                    <input type="hidden" name="empleado_nombre" value="{{ venta.at_nom_emp }}">
+                                    <input type="hidden" name="empleado_numero" value="{{ venta.at_no_emp }}">
+                                    <input type="hidden" name="ubicacion" value="{{ venta.ubicacion }}">
+                                    {% if venta.metodo_pago != "efectivo" %}
+                                    <input type="hidden" name="operacion" value="{{ venta.no_operacion|default:"—" }}">
+                                    {% endif %}
+                                    <input type="hidden" name="total" value="{{ venta.total }}">
+                                    {% if venta.metodo_pago == "mixto" %}
+                                    <input type="hidden" name="mix_tarjeta" value="{{ venta.mix_tar }}">
+                                    <input type="hidden" name="mix_efectivo" value="{{ venta.mix_ef }}">
+                                    {% endif %}
+                                    <input type="hidden" name="recibido" value="{{ venta.recibido }}">
+                                    <input type="hidden" name="cambio" value="{{ venta.cambio }}">
+                                    {% for producto in venta.productos %}
+                                        <input type="hidden" name="productos_nombre[]" value="{{ producto.productoNombre }}">
+                                        <input type="hidden" name="productos_cantidad[]" value="{{ producto.cantidad }}">
+                                        <input type="hidden" name="productos_precio_unitario[]" value="{{ producto.precio_unitario }}">
+                                        <input type="hidden" name="productos_subtotal[]" value="{{ producto.subtotal }}">
+                                    {% endfor %}
+                                    <button type="submit" class="btn btn-primary">Imprimir ticket</button>
+                                </form>
                             </div>
                         </div>
                     </div>

@@ -195,8 +195,30 @@
                     </div>
                 </div>
             </div>
-            <div class="text-end">
-                <button type="submit" class="btn btn-success btn-lg px-2" id="registrarCompra"><i class="bi bi-cart-plus"></i> Registrar Venta</button>
+            <!-- <button type="submit" class="btn btn-success btn-lg px-2" id="registrarCompra"><i class="bi bi-cart-plus"></i> Registrar Venta</button>  -->
+            <!-- Botón que dispara el modal -->
+            <button type="button" class="btn btn-success btn-lg px-2" data-bs-toggle="modal" data-bs-target="#ticketModal">
+                <i class="bi bi-cart-plus"></i> Registrar Venta
+            </button>
+
+            <!-- Modal -->
+            <div class="modal fade" id="ticketModal" tabindex="-1" aria-labelledby="ticketModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content text-center p-4">
+                    <h5 class="modal-title mb-4" id="ticketModalLabel">Selecciona una opción:</h5>
+
+                    <!-- Botones principales -->
+                    <div class="d-grid gap-3 mb-4">
+                        <button id="btnImprimirTicket" class="btn btn-lg rounded-3 py-3" style="background-color: rgb(112, 147, 230); color: aliceblue;">Imprimir Ticket del Cliente</button>
+                        <button id="btnSinTicket" class="btn btn-lg rounded-3 py-3" style="background-color: rgb(243, 128, 128); color: aliceblue;">Continuar sin Ticket</button>
+                    </div>
+
+                    <!-- Botón cancelar -->
+                    <button id="btnCancelarModalTicket" type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    </div>
+                </div>
             </div>
         </form>
     </div>
@@ -205,7 +227,7 @@
 <div id="overlay-loading" class="overlay d-none">
     <div class="overlay-content">
         <div class="spinner-border text-light" role="status"></div>
-        <p class="mt-3">Imprimiendo ticket...</p>
+        <p class="mt-3">Registrando Venta...</p>
     </div>
 </div>
 

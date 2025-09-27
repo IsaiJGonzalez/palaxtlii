@@ -38,8 +38,8 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-const btnAbono = document.getElementById('btnAbono');
-btnAbono.addEventListener('click',function(){
-    const overlay = document.getElementById('overlay-loading');
-    overlay.classList.remove('d-none');
-})
+//olverlau
+document.getElementById('btnAbono').addEventListener('click', function () {
+    document.getElementById('overlay').style.display = 'flex';
+    // Aquí puedes continuar con tu lógica de envío o validación
+});

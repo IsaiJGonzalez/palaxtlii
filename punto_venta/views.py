@@ -19,7 +19,6 @@ def punto_venta(request):
     nombre_emp = request.session.get('usuario',{}).get('nombre','Desconocido')
     no_emp = request.session.get('usuario',{}).get('numero_empleado',0)
     caja_activa = fs.consultar_caja_activa(no_emp)
-    print(caja_activa)
     if not caja_activa:
         return redirect('apertura_caja')
     
@@ -99,7 +98,8 @@ def registrar_venta(request):
         operacion = request.POST.get('numero_operacion')
         mix_ef = float(request.POST.get('mix_ef') or 0)
         mix_tar = float(request.POST.get('mix_tar') or 0)
-
+        ticket = int(request.POST.get('ticket'))
+        print('Tic', ticket)
 
         if direccion_empleado == 1:
             no_venta = fs.obtener_seriabilidad_vh()
@@ -142,6 +142,8 @@ def registrar_venta(request):
                 "mix_tar" : mix_tar
             }
 
+            print(resumen)
+
             if metodo_pago == "mixto":
                 total = {
                     'e' : mix_ef,
@@ -149,7 +151,10 @@ def registrar_venta(request):
                 }
 
             fs.registrar_en_corte_vh(id_corte,'venta',metodo_pago,total,resumen)
-            tv.imprimir_venta(resumen=resumen) 
+            if ticket == 1:
+                print("Imprimiento ticket...")
+                tv.imprimir_venta(resumen=resumen) 
+            
 
         elif direccion_empleado == 2:
             no_venta = fs.obtener_seriabilidad_mc()
@@ -193,6 +198,8 @@ def registrar_venta(request):
                 "mix_tar" : mix_tar
             }
 
+            print(resumen)
+
             if metodo_pago == "mixto":
                 total = {
                     'e' : mix_ef,
@@ -200,7 +207,9 @@ def registrar_venta(request):
                 }
 
             fs.registrar_en_corte_mc(id_corte,'venta',metodo_pago,total,resumen)
-            tv.imprimir_venta(resumen=resumen)
+            if ticket == 1:
+                print("Imprimiento ticket...")
+                tv.imprimir_venta(resumen=resumen) 
             
         else:
             return JsonResponse({'error': 'Empleado sin sucursal válida'}, status=400)
