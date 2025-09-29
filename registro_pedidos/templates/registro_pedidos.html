@@ -268,13 +268,17 @@
         const checkbox = document.getElementById('anticipoCheck');
         const input = document.getElementById('anticipoInput');
         const div_formaPago = document.getElementById('forma_de_pago');
-        let div_tr_tar = document.getElementById('div_tarjeta_transferencia_r');
-        let div_efectivo = document.getElementById('div_efectivo_r');
-        let div_mix = document.getElementById('div_pago_mixto');
+        const div_tr_tar = document.getElementById('div_tarjeta_transferencia_r');
+        const div_efectivo = document.getElementById('div_efectivo_r');
+        const div_mix = document.getElementById('div_pago_mixto');
+        const radios = document.querySelectorAll('input[name="pago"]');
 
         if (checkbox.checked) {
             input.disabled = false;
             div_formaPago.classList.remove('d-none');
+            radios.forEach(radio => {
+                radio.required = true;
+            });
         } else {
             input.disabled = true;
             input.value = '';
@@ -282,6 +286,10 @@
             div_tr_tar.classList.add('d-none');
             div_efectivo.classList.add('d-none');
             div_mix.classList.add('d-none');
+            radios.forEach(radio => {
+                radio.required = false;
+                radio.checked = false; // opcional: limpia selección
+            });
         }
     }
 

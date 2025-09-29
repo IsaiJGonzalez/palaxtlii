@@ -174,10 +174,7 @@
                                                     <button type="submit" class="btn btn-primary" id="registrarAbonoBtn">Registrar</button>
                                                 </div>
                                             </form>
-                                            <!-- Overlay -->
-                                            <div id="overlay" style="display:none;">
-                                                <div class="spinner"></div>
-                                            </div>
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -281,6 +278,12 @@
     <a href="{% url 'ver_ventas' corte %}" target="_blank" class="btn btn-info m-0 p-1 rounded-5 align-content-center fw-bold text-white" title="Observa las ventas realizadas en tu caja">
         -Ver ventas-
     </a>
+</div>
+
+
+<!-- Overlay -->
+<div id="overlay" style="display:none;">
+    <div class="spinner"></div>
 </div>
 <script src="{% static 'javascript/menu_cajero.js' %}"></script>
 <script src="{% static 'javascript/abono.js' %}"></script>

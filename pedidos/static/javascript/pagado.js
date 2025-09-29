@@ -1,15 +1,14 @@
 document.getElementById('pagado').addEventListener('click', function() {
-    document.getElementById('overlay').style.display = 'flex';
     const folio = this.getAttribute('data-folio'); // Obtiene el folio asignado
     const pagoInput = document.querySelector('input[name="pago"]:checked');
 // Verifica si hay pago seleccionado
     
 
     if (!pagoInput) {
-        alert('Por favor, selecciona una forma de pago antes de continuar.');
+        alert('Por favor, selecciona una forma de pago antes de continuar.AAAAA');
         return;
     }
-
+    document.getElementById('overlay').style.display = 'flex';
     const pagoSeleccionado = pagoInput.value;
 
     enviarFolio(folio,pagoSeleccionado,'Pedido actualizado correctamente.');

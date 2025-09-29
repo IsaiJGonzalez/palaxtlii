@@ -27,7 +27,7 @@ def imprimir_venta(resumen):
         p.set(align='center', bold=False, width=2, height=2)
         p.text(f"{resumen.get('ubicacion', '')}\n\n")
         p.text("TICKET VENTA\n")
-        p.text("Cliente\n")
+        p.text("General\n")
         p.set(align='left', bold=False, width=1, height=1)
 
         fecha_str = resumen.get('fecha_venta', '')

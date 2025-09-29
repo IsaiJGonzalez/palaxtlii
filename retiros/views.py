@@ -40,7 +40,7 @@ def retiros(request):
 
 
     if request.method == 'POST':
-        confirmacion = int(request.POST.get('confirmacion'))
+        confirmacion = str(request.POST.get('confirmacion'))
         access = fs.consultar_confirmacion(confirmacion)
         retira = request.POST.get('retira')
         existe_empleado = fs.verificar_exis_empleado(retira)

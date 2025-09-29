@@ -90,3 +90,14 @@ def editarProducto(request):
         return JsonResponse({'mensaje': 'Producto editado correctamente'}, status=200)
     
     return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+
+def eliminarProducto(request, sucursal_id, producto_id):
+    if request.method == 'DELETE':
+        sucursal = int(sucursal_id)
+        producto = str(producto_id)
+        try:
+            fs.eliminarProducto(sucursal, producto)
+            return JsonResponse({'status': 'ok'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)

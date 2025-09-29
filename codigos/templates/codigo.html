@@ -2,73 +2,86 @@
 {% load static %}
 
 {% block items %}
-<title>Códigos/Categorias</title>
+<title>Gestión de Códigos y Categorías</title>
+<link rel="stylesheet" href="{% static 'css/panaderia.css' %}">
 <script src="{% static 'javascript/add_cat.js' %}"></script>
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
+<div class="container py-5">
+    <div class="row g-4">
         <!-- Formulario de Códigos -->
         <div class="col-md-6">
-            <h4>Agregar Código</h4>
-            <form method="post">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <label for="codigo" class="form-label">Código</label>
-                    <input type="text" class="form-control" id="codigo" name="codigo" placeholder="Introduce un código">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-warning text-white d-flex align-items-center">
+                    <i class="bi bi-upc-scan me-2 fs-4"></i>
+                    <h5 class="mb-0">Agregar Código</h5>
                 </div>
-                <button type="submit" class="btn btn-primary">Guardar</button>
-            </form>
-
-            <!-- Tabla de Códigos -->
-            <h5 class="mt-4">Lista de Códigos</h5>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th scope="col">Código</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for codigo in codigos %}
-                        <tr>
-                            <td> {{codigo.codigo}} </td>
-                        </tr>
-                    {% endfor %}                    
-                </tbody>
-            </table>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="codigo" class="form-label">Código</label>
+                            <input type="text" class="form-control" id="codigo" name="codigo" placeholder="Ej. PAN001">
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100">Guardar Código</button>
+                    </form>
+                </div>
+                <div class="card-footer bg-light">
+                    <h6 class="mb-3">Lista de Códigos</h6>
+                    <table class="table table-sm table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Código</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for codigo in codigos %}
+                                <tr>
+                                    <td>{{ codigo.codigo }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
         <!-- Formulario de Categorías -->
         <div class="col-md-6">
-            <h4>Agregar Categoría</h4>
-            <form method="post" id="form_cat">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <label for="categoria" class="form-label">Categoría</label>
-                    <input type="text" class="form-control" id="categoria" name="categoria"
-                        placeholder="Introduce una categoría">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-success text-white d-flex align-items-center">
+                    <i class="bi bi-tags me-2 fs-4"></i>
+                    <h5 class="mb-0">Agregar Categoría</h5>
                 </div>
-                <button class="btn btn-success" id="guardar_cat" name="guardar_cat">Guardar</button>
-            </form>
-
-            <!-- Tabla de Categorías -->
-            <h5 class="mt-4">Lista de Categorías</h5>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th scope="col">Categoría</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Aquí puedes iterar las categorías -->
-                    {% for cat in cats %}
-                        <tr>
-                            <td> {{cat.nombre}} </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                <div class="card-body">
+                    <form method="post" id="form_cat">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="categoria" class="form-label">Categoría</label>
+                            <input type="text" class="form-control" id="categoria" name="categoria" placeholder="Ej. Pan dulce">
+                        </div>
+                        <button class="btn btn-success w-100" id="guardar_cat" name="guardar_cat">Guardar Categoría</button>
+                    </form>
+                </div>
+                <div class="card-footer bg-light">
+                    <h6 class="mb-3">Lista de Categorías</h6>
+                    <table class="table table-sm table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Categoría</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cat in cats %}
+                                <tr>
+                                    <td>{{ cat.nombre }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>

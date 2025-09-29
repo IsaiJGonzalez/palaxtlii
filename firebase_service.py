@@ -23,6 +23,12 @@ def agregar_productos_vh(nombre,existencias,precio,categoria,ingredientes,estado
     n_ref.set(nuevo_producto)
     print("Producto(s) añadido correctamente")
 
+def eliminarProducto(sucursal,id):
+    suc = 'vistahermosa' if sucursal == 1 else 'moctezuma' if sucursal == 2 else ''
+    print(suc)
+    ref = db.reference(f'{suc}/productos/{id}')
+    ref.delete()
+    print('PR elimiado')
 
 def agregar_insumos_vh(nombre,cantidad,medida):
     ref = db.reference("/vistahermosa/insumos")

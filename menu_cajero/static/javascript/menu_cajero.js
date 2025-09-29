@@ -75,6 +75,7 @@ document.getElementById('pagado').addEventListener('click', function() {
     }
 
     const pagoSeleccionado = pagoInput.value;
+    document.getElementById('overlay').style.display = 'flex';
 
     enviarFolio(folio,pagoSeleccionado,'Pedido actualizado correctamente.');
 });

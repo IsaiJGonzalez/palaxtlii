@@ -24,7 +24,7 @@
                     <div id="vv_div" class="ventas-scroll flex-grow-1 overflow-auto">
                         <h5 class="text-primary mb-3">Vista Hermosa</h5>
                         <table class="table">
-                            <thead class="table-primary">
+                            <thead class="">
                                 <tr>
                                     <th># Venta</th>
                                     <th>Total</th>
@@ -59,7 +59,7 @@
                     <div id="vm_div" class="ventas-scroll flex-grow-1 overflow-auto d-none">
                         <h5 class="text-primary mb-3">Moctezuma</h5>
                         <table class="table">
-                            <thead class="table-primary">
+                            <thead class="">
                                 <tr>
                                     <th># Venta</th>
                                     <th>Total</th>
@@ -339,10 +339,7 @@
                                                                 class="btn btn-primary">Registrar</button>
                                                         </div>
                                                     </form>
-                                                    <!-- Overlay -->
-                                                    <div id="overlay" style="display:none;">
-                                                        <div class="spinner"></div>
-                                                    </div>
+                                                    
                                                 </div>
                                             </div>
                                         </div>
@@ -370,9 +367,9 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p class="text-bg-danger w-25 fw-bold pt-1 pb-1" id="folio_r"></p>
-                <p class="text-bg-warning fw-bold" id="cliente"></p>
-                <p class="text-bg-warning fw-bold" id="telefono"></p>
+                <p class="text-bg-danger w-25 fw-bold pt-1 pb-1 rounded-2 text-center" id="folio_r"></p>
+                <p class="text-bg-warning fw-bold rounded-2" id="cliente"></p>
+                <p class="text-bg-warning fw-bold rounded-2" id="telefono"></p>
                 <hr class="table-group-divider">
                 <h6>Atendio: </h6>
                 <table class="table justify-content-center">
@@ -411,9 +408,9 @@
                 <p id="especificaciones"></p>
                 <hr>
                 <hr class="table-group-divider">
-                <h6 id="total" class="text-end text-bg-success p-2"></h6>
-                <h6 id="anticipo" class="text-end text-bg-primary p-2"></h6>
-                <h5 class=" text-end text-bg-dark p-3" id="restante"></h5>
+                <h6 id="total" class="text-end text-bg-success p-2 rounded-2"></h6>
+                <h6 id="anticipo" class="text-end text-bg-primary p-2 rounded-2"></h6>
+                <h5 class=" text-end text-bg-dark p-3 rounded-2" id="restante"></h5>
                 <div class="mb-3 col-auto d-none" id="forma_de_pago">
                     <label class="form-label d-block">Forma de pago:</label>
                     <div class="form-check form-check-inline">
@@ -439,7 +436,9 @@
     </div>
 </div>
 
-
+<div id="overlay" style="display:none;">
+    <div class="spinner"></div>
+</div>
 <script src="{% static 'javascript/menu_gerencial.js' %}"></script>
 <script src="{% static 'javascript/ventas.js' %}"></script>
 <script src="{% static 'javascript/abono.js' %}"></script>
