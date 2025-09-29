@@ -560,10 +560,6 @@ def consultar_ventas_vh():
     if not ventas:
         return []
 
-    for venta in ventas.values():
-        for detalle in venta.get('productos', []):
-            id_producto = detalle.get('productoId')
-            detalle['nombre_producto'] = obtener_producto_vh(id_producto)
 
     return list(ventas.values())
 
@@ -577,10 +573,6 @@ def consultar_ventas_mc():
     ventas = ref.get()
     if not ventas:
         return []
-    for venta in ventas.values():
-        for item in venta.get('productos', []):
-            id_producto = item.get('productoId')
-            item['nombre_producto'] = obtener_producto_mc(id_producto)
 
     return list(ventas.values())
 

@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from firebase_config import fr_db
 import firebase_service as fs
 from datetime import datetime
@@ -9,6 +9,11 @@ from core.decorators import gerente_required, ventas_required, cajero_required, 
 
 @gerente_required
 def main_gerencial(request):
+    empleado = request.session.get('usuario',{}).get('numero_empleado',0)
+    caja_activa = fs.consultar_caja_activa(empleado)
+
+    if not caja_activa:
+        return redirect('apertura_caja')
     nombre_empleado = request.session.get("usuario",{}).get('nombre', 'Usuario')
     sucursal_empleado = request.session.get('usuario',{}).get('sucursal', 0)
     loc = fs.consultar_sucursal(sucursal_empleado)
