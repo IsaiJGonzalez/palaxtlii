@@ -38,8 +38,8 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-//olverlau
-document.getElementById('btnAbono').addEventListener('click', function () {
+//olverlay
+document.getElementById('registrarAbonoBtn').addEventListener('click', function () {
     document.getElementById('overlay').style.display = 'flex';
     // Aquí puedes continuar con tu lógica de envío o validación
 });

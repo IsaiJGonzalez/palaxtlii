@@ -157,7 +157,7 @@ def abonar(request):
         gran_total =  float(request.POST.get('gran_total'))
         abono =  float(request.POST.get('abono'))
         gran_total_restante =  float(request.POST.get('gran_total_restante'))
-        metodo_pago = request.POST.get('pago')
+        metodo_pago = request.POST.get('abono_pago')
         
         ##registrando el abono
         fs.registrar_abono(id_abono,folio,fecha,abono,metodo_pago,sucursal,gran_total_restante)

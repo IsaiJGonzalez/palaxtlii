@@ -5,7 +5,7 @@ document.getElementById('pagado').addEventListener('click', function() {
     
 
     if (!pagoInput) {
-        alert('Por favor, selecciona una forma de pago antes de continuar.AAAAA');
+        alert('Por favor, selecciona una forma de pago antes de continuar.');
         return;
     }
     document.getElementById('overlay').style.display = 'flex';
