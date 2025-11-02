@@ -99,12 +99,35 @@
                 <form action="{% url 'cambiar_locacion' %}" method="post">
                     {% csrf_token %}
                     <div class="modal-body">
-                        <h6 class="" id="">Selecciona una locación</h6>
-                        <select class="form-select" id="selectLocacion" name="locacion">
-                            <option value="1">Vista Hermosa</option>
-                            <option value="2">Moctezuma</option>
-                        </select>
-
+                        <!--
+                        {% if caja_activa  %}
+                            <h6 class="text-white bg-danger rounded-2 p-2"> 
+                                <i class="bi bi-exclamation-circle-fill text-white text-center"></i> 
+                                Tienes una caja activa en sucursal: 
+                                {% if sucursal == 1 %} 
+                                    Vista Hermosa 
+                                {% elif sucursal == 2 %} 
+                                    Moctezuma
+                                {% endif %} 
+                            </h6>
+                            <h6 class="mb-2" id="">Selecciona una opción</h6>
+                            <select class="form-select mb-4" id="selectOption" name="option">
+                                <option value="0">Selecciona una opción</option>
+                                <option value="1">Traspasar caja</option>
+                                <option value="2">Inhabilitar ventas</option>
+                            </select>
+                        {% endif %}
+                        -->
+                        <div class="" id="form-Location">
+                            <h6 class="" id="">Selecciona una locación</h6>
+                            <select class="form-select" id="selectLocacion" name="locacion">
+                                <option value="0">Seleccina una opción</option>
+                                <option value="1">Vista Hermosa</option>
+                                <option value="2">Moctezuma</option>
+                            </select>
+                        </div>
+                        
+                        
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>

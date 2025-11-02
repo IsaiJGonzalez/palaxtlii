@@ -3,4 +3,4 @@ from firebase_admin import db
 import firebase_service as sv
 import firebase_config
 
-print(sv.eliminarProducto(2,'-OSpbGBqRPqaeATI4j81'))
+print(sv.consultar_caja_activa(39708))

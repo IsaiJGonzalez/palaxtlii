@@ -92,7 +92,8 @@ def pedidos(request):
             'pedidos_no_entregados': pedidos_no_entregados,
             'pedidos_entregados': pedidos_entregados_pag,
             'orden': orden,
-            'base':base
+            'base':base,
+            'caja_activa' : caja_activa
         },
     )
 

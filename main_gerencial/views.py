@@ -52,6 +52,8 @@ def main_gerencial(request):
 
 
     context = {
+            'caja_activa' : caja_activa,
+            'sucursal' : sucursal_empleado,
             'nombre_empleado': nombre_empleado,
             'prvh':productos_vh,
             'prmc':productos_mc,

@@ -78,7 +78,6 @@ def apertura_caja(request):
             fs.corte_caja_mc(no_emp,apertura_id,fondo)
             tk.imprimir_apertura(data)
 
-
         else:
             return redirect('login')
         return redirect('apertura_caja')
