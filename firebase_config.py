@@ -3,7 +3,7 @@ from firebase_admin import credentials, firestore, db
 
 # Ruta al archivo JSON con credenciales
 #keys = credentials.Certificate("C:/Users/isaij/Desktop/keys.json")
-keys = credentials.Certificate("C:/Users/isaij/Desktop/palaxtli-92bc5-firebase-adminsdk-fbsvc-6e256d61ab.json")
+keys = credentials.Certificate("C:/credenciales/keys.json")
 firebase_admin.initialize_app(keys,{
     "databaseURL": "https://palaxtli-92bc5-default-rtdb.firebaseio.com"
     #"databaseURL": "https://palaxtlipr-default-rtdb.firebaseio.com/"
