@@ -5,291 +5,231 @@ from django.conf import settings
 from datetime import datetime
 import json
 import locale
+import time  # <--- NECESARIO para la pausa
 
-locale.setlocale(locale.LC_TIME, "es_ES.UTF-8")
+# Configuración de locale segura
+try:
+    locale.setlocale(locale.LC_TIME, "es_ES.UTF-8")
+except locale.Error:
+    try:
+        locale.setlocale(locale.LC_TIME, "es_ES")
+    except:
+        pass
 
-
-def imprimir_ticket(data,loc):
+def imprimir_ticket(data, loc):
     try:
         printer_name = "POS-80"
         p = Win32Raw(printer_name)
         
-        # --- LOGO ---
-        logo_path = os.path.join(settings.BASE_DIR, "static", "logo_ticket.bmp")
-        if os.path.exists(logo_path):
+        # =======================================================
+        # CORRECCIÓN DE IMPRESORA (Modo Chino + Acentos)
+        # =======================================================
+        p._raw(b'\x1c\x2e')       # Desactivar modo Kanji/Chino
+        time.sleep(0.1)           # Pausa técnica
+        p.charcode('CP850')       # Configurar idioma Español
+        # =======================================================
+
+        # Función interna para imprimir el contenido (evita duplicar código)
+        def imprimir_contenido(titulo_seccion):
+            # --- LOGO ---
+            logo_path = os.path.join(settings.BASE_DIR, "static", "logo_ticket.bmp")
+            if os.path.exists(logo_path):
+                try:
+                    p.set(align='center', bold=False, width=2, height=2)
+                    p.image(logo_path)
+                except Exception as e:
+                    pass # Ignorar error de logo para no detener impresión
+
+            # --- ENCABEZADO ---
+            p.set(align='center', bold=False, width=2, height=2)
+            
+            # Dirección de la sucursal emisora
+            if loc == 1:
+                p.text('Av. Palma #60, Col. Vista Hermosa,\nSan Juan Del Río, Qro.\n\n')
+            elif loc == 2:
+                p.text('Av Moctezuma #143, Col San Cayetano,\nSan Juan del Río, Qro.\n\n')
+            
+            p.text("TICKET DE PEDIDO\n")
+            p.text(f"{titulo_seccion}\n\n") # Cliente o Negocio
+            
+            # --- DATOS GENERALES ---
+            p.set(align='left', bold=False, width=1, height=1)
+            p.text(f"Folio:    {data.get('folio', '')}\n")
+            p.text(f"Cliente:  {data.get('nombre_cliente', '')}\n")
+            p.text(f"Teléfono: {data.get('telefono', '')}\n")
+
+            # Fecha de entrega
+            fecha_str = data.get('fecha_entrega')
             try:
-                p.set(align='center', bold=False, width=2, height=2)
-                p.image(logo_path)
-            except Exception as e:
-                print("⚠️ Error al imprimir logo:", e)
-        else:
-            print("⚠️ Logo no encontrado en:", logo_path)
+                fecha_ob = datetime.strptime(fecha_str, "%Y-%m-%d")
+                fecha_en = fecha_ob.strftime("%d de %B de %Y")
+            except:
+                fecha_en = fecha_str
 
-        # --- ENCABEZADO ---
-        p.set(align='center', bold=False, width=2, height=2)
-        if(loc == 1):
-            p.text('Av. Palma #60, Col. Vista Hermosa, San Juan Del Río, Qro.\n\n')
-        elif(loc == 2):
-            p.text('Av Moctezuma #143, Col San Cayetano, San Juan del Río, Qro.\n\n')
-        p.text("TICKET DE PEDIDO\n")
-        p.text("Cliente\n\n")
-        p.set(align='left', bold=False, width=1, height=1)
-        p.text(f"Folio: {data.get('folio', '')}\n")
-        p.text(f"Cliente: {data.get('nombre_cliente', '')}\n")
-        p.text(f"Teléfono: {data.get('telefono', '')}\n")
+            p.text(f"Entrega:  {fecha_en}\n")
+            p.text(f"Hora:     {data.get('hora_entrega','')} hrs.\n")
+            p.text('-' * 48 + '\n')
 
-        fecha_str = data.get('fecha_entrega')
-        fecha_ob = datetime.strptime(fecha_str, "%Y-%m-%d")
-        fecha_en = fecha_ob.strftime("%d de %B de %Y")
+            # --- FORMA DE ENTREGA ---
+            p.text('Detalles de Entrega:\n')
+            forma_entrega = data.get('forma_entrega')
+            sucursal_entrega = str(data.get('sucursal'))
 
-        p.text(f"Fecha de Entrega: {fecha_en}\n")
-        p.text(f"Hora de Entrega: {data.get('hora_entrega','')} hrs.")
-        p.text('Forma de Entrega: ')
+            if forma_entrega == "tienda":
+                p.text('RECOGE EN SUCURSAL:\n')
+                if sucursal_entrega == '1':
+                    p.text('Av. Palma #60, Col. Vista Hermosa\n')
+                elif sucursal_entrega == '2':
+                    p.text('Av Moctezuma #143, Col San Cayetano\n')
+            
+            elif forma_entrega == 'envio':
+                p.text('ENVÍO A DOMICILIO:\n')
+                direccion = data.get('direccion', '')
+                recibe = data.get('recibe', '')
+                cel = data.get('cel', '')
+                referencia = data.get('referencias', '')
+                
+                p.text(f"Dir: {direccion}\n")
+                if recibe: p.text(f"Recibe: {recibe}\n")
+                if cel: p.text(f"Tel: {cel}\n")
+                if referencia: p.text(f"Ref: {referencia}\n")
+            
+            p.text("-" * 48 + "\n")
 
-        forma_entrega = data.get('forma_entrega')
-        sucursal = data.get('sucursal')
-        if(forma_entrega == "tienda"):
-            p.text('Sucursal\n')
-            if (sucursal == '1'):
-                p.text('Av. Palma #60, Col. Vista Hermosa, San Juan Del Río, Qro.\n')
-            elif(sucursal == '2'):
-                p.text('Av Moctezuma #143, Col San Cayetano, San Juan del Río, Qro.\n')
-        elif(forma_entrega=='envio'):
-            p.text('Envio a:\n')
-            direccion = data.get('direccion')
-            recibe = data.get('recibe')
-            cel = data.get('cel')
-            referencia = data.get('referencias')
-            p.text(f"{direccion}\n")
-            p.text(f"Recibe: - {recibe}\n")
-            p.text(f"Contacto: - {cel}\n")
-            p.text(f'Referencias: {referencia}\n')
-        p.text("-" * 48 + "\n")
+            # --- PRODUCTOS ---
+            p.set(bold=True)
+            p.text(f"{'Producto':<24}{'Cant':>6}{'P.U.':>8}{'Total':>10}\n")
+            p.set(bold=False)
 
-        # --- PRODUCTOS (formato tabla) ---
-        p.set(bold=True)
-        p.text(f"{'Producto':<24}{'Cant':>6}{'P.U.':>8}{'Importe':>10}\n")
-        p.set(bold=False)
+            productos = data.get("productos", [])
+            for producto in productos:
+                try:
+                    cantidad = int(producto.get("cantidad", 0))
+                    precio = float(producto.get("precio_unitario", 0))
+                    total_prod = float(producto.get("importe", 0))
+                    nombre = producto.get("descripcion", "")
+                except:
+                    continue
 
-        productos = data.get("productos", [])
-        for producto in productos:
-            cantidad = int(producto.get("cantidad", 0))
-            nombre = producto.get("descripcion", "")
-            precio = float(producto.get("precio_unitario", 0))
-            total = float(producto.get("importe", 0))
+                lineas_nombre = [nombre[i:i+24] for i in range(0, len(nombre), 24)]
+                for i, linea in enumerate(lineas_nombre):
+                    if i == len(lineas_nombre) - 1:
+                        p.text(f"{linea:<24}{cantidad:>6}{precio:>8.2f}{total_prod:>10.2f}\n")
+                    else:
+                        p.text(f"{linea:<24}\n")
 
-            # Dividir el nombre si es muy largo en bloques de 24 caracteres
-            lineas_nombre = [nombre[i:i+24] for i in range(0, len(nombre), 24)]
-            for i, linea in enumerate(lineas_nombre):
-                if i == len(lineas_nombre) - 1:
-                    # Última línea: imprime con los datos
-                    p.text(f"{linea:<24}{cantidad:>6}{precio:>8.2f}{total:>10.2f}\n")
+            p.text("-" * 48 + "\n")
+
+            # --- ESPECIFICACIONES ---
+            especificaciones = data.get('especificaciones')
+            if especificaciones:
+                p.text('Especificaciones:\n')
+                p.text(f"{especificaciones}\n")
+                p.text("-" * 48 + "\n")
+
+            # --- CALCULOS DE TOTALES ---
+            try:
+                subtotal_raw = float(data.get('total', 0))
+                costo_envio = float(data.get('costo_envio', 0))
+                gSubtotal = subtotal_raw - costo_envio
+                
+                anticipo_str = str(data.get('anticipo', '0'))
+                # Limpieza simple de anticipo
+                if anticipo_str.replace('.', '', 1).isdigit():
+                    anticipo = float(anticipo_str)
                 else:
-                    # Líneas previas: solo el texto del producto
-                    p.text(f"{linea:<24}\n")
+                    anticipo = 0.0
 
+                gran_total = float(data.get('gran_total', 0))
+            except:
+                gSubtotal = 0
+                costo_envio = 0
+                anticipo = 0
+                gran_total = 0
 
-        p.text("-" * 48 + "\n")
-        p.set(align='left', bold=False, width=1, height=1)
-        p.text('Especificaciones: \n')
-        especificaciones = data.get('especificaciones')
-        p.text(especificaciones)
-        p.text('\n')
-        p.text("-" * 48 + "\n")
-        # --- TOTALES ---
-        subtotal = data.get('total', 0)
-        envio = data.get('costo_envio', 0)
+            # Impresión de Totales
+            p.set(bold=False)
+            p.text(f"{'Importe Productos:':<20}${gSubtotal:>8.2f}\n")
+            p.text(f"{'Costo Envío:':<20}${costo_envio:>8.2f}\n")
+            p.text(f"{'Subtotal Ticket:':<20}${subtotal_raw:>8.2f}\n")
+            p.text(f"{'Anticipo:':<20}${anticipo:>8.2f}\n")
+            
+            # --- MÉTODO DE PAGO ---
+            metodo = data.get('metodo_pago', '').lower()
+            p.text("-" * 48 + "\n")
+            p.text(f"Método de pago: {metodo.upper()}\n")
 
-        gSubtotal = subtotal - envio
+            if metodo == 'mixto':
+                try:
+                    mix_tar = float(data.get('mix_tar', 0))
+                    mix_ef = float(data.get('mix_ef', 0))
+                    p.text(f"{'Tarjeta:':<20}${mix_tar:>8.2f}\n")
+                    p.text(f"{'Efectivo:':<20}${mix_ef:>8.2f}\n")
+                except:
+                    pass
+            
+            if metodo in ['mixto', 'tarjeta', 'transferencia']:
+                num_op = str(data.get('num_operacion', ''))
+                if num_op:
+                    p.text(f"No. Operación: {num_op}\n")
 
-        anticipo = str(data.get('anticipo', '0'))
-        anticipo = float(anticipo) if anticipo.replace('.', '', 1).isdigit() else 0  # 
+            if metodo in ['efectivo', 'mixto']:
+                try:
+                    recibido = float(data.get('recibido', 0))
+                    cambio = float(data.get('cambio', 0))
+                    p.text(f"{'Recibido:':<20}${recibido:>8.2f}\n")
+                    p.text(f"{'Cambio:':<20}${cambio:>8.2f}\n")
+                except:
+                    pass
 
-        p.set(bold=False)
-        p.text(f"{'Importe Total:':<20}${gSubtotal:>8.2f}\n")
-        p.text(f"{'Envío:':<20}${data.get('costo_envio', 0):>8.2f}\n")
-        p.text(f"{'Subtotal:':<20}${data.get('total', 0):>8.2f}\n")
-        p.text(f"{'Anticipo:':<20}${anticipo:>8.2f}\n")
-        
-        metodo = data.get('metodo_pago','')
-        p.text(f"Método de pago:  {metodo}")
-        if (metodo == 'mixto'):
-            mix_tar = float(data.get('mix_tar',''))
-            mix_ef = float(data.get('mix_ef',''))
-            p.text(f"{'Tarjeta:':<20}${mix_tar:>8.2f}\n")
-            p.text(f"{'No. Operación:':<20}${str(data.get('num_operacion', ''))}\n")
-            p.text(f"{'Efectivo:':<20}${mix_ef:>8.2f}\n")
-            p.text(f"{'Recibido:':<20}${data.get('recibido', 0):>8.2f}\n")
-            p.text(f"{'Cambio:':<20}${data.get('cambio', 0):>8.2f}\n")
-        if (metodo == 'efectivo'):
-            p.text(f"{'Recibido:':<20}${data.get('recibido', 0):>8.2f}\n")
-            p.text(f"{'Cambio:':<20}${data.get('cambio', 0):>8.2f}\n")
-        elif (metodo=='tarjeta' or metodo=='transferencia'):
-            p.text('Pago con: Tarjeta / Transferencia\n')
-            p.text(f"{'No. Operación:':<20}${str(data.get('num_operacion', ''))}\n")
+            # Total Restante en Grande
+            p.set(bold=True)
+            p.text(f"{'TOTAL RESTANTE:':<20}${gran_total:>8.2f}\n")
+            p.set(bold=False)
+            p.text("-" * 48 + "\n")
 
-        p.text(f"{'Total Restante:':<20}${data.get('gran_total',0):>8.2f}\n")
-        p.text("-" * 48 + "\n")
+            # --- PIE DE TICKET ---
+            p.set(align='center')
+            no_emp = data.get('at_no_emp', '')
+            nom_emp = data.get('at_nom_emp', '')
+            p.text(f'Atendió: {no_emp} - {nom_emp}\n')
+            
+            p.text("¡Gracias por su preferencia!\n")
+            p.text("Whatsapp: 427 159 0622\n")
+            
+            fecha_hora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+            p.text(f"\nImpreso: {fecha_hora}\n")
+            
+            # Espacio final y corte
+            p.text("\n\n")
 
-        # --- MENSAJE FINAL ---
-        p.set(align='center')
-        no_emp = data.get('at_no_emp')
-        nom_emp = data.get('at_nom_emp')
-        p.text('Atendio:\n')
-        p.text(no_emp )
-        p.text(' - ') 
-        p.text(nom_emp)
-        p.text('\n')
-        p.text("¡Gracias por su preferencia!\n")
-        p.text("Whatsapp: 427 159 0622\n")
-
-        # --- FECHA Y HORA DE IMPRESIÓN ---
-        fecha_hora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        p.text(f"\nFecha de impresión: {fecha_hora}\n")
-
-        # --- ALIMENTAR Y CORTE ---
-        p.text("\n")
+        # 1. IMPRIMIR COPIA CLIENTE
+        imprimir_contenido("COPIA CLIENTE")
         p.cut()
 
-#-- IMPRESION DEL NEGOCIO --------------------------->
-        # --- LOGO ---
-        logo_path = os.path.join(settings.BASE_DIR, "static", "logo_ticket.bmp")
-        if os.path.exists(logo_path):
-            try:
-                p.set(align='center', bold=False, width=2, height=2)
-                p.image(logo_path)
-            except Exception as e:
-                print("⚠️ Error al imprimir logo:", e)
-        else:
-            print("⚠️ Logo no encontrado en:", logo_path)
-
-        # --- ENCABEZADO ---
-        p.set(align='center', bold=False, width=2, height=2)
-        if(loc == 1):
-            p.text('Av. Palma #60, Col. Vista Hermosa, San Juan Del Río, Qro.\n\n')
-        elif(loc == 2):
-            p.text('Av Moctezuma #143, Col San Cayetano, San Juan del Río, Qro.\n\n')
-        p.text("TICKET DE PEDIDO\n")
-        p.text("Negocio\n\n")
-        p.set(align='left', bold=False, width=1, height=1)
-        p.text(f"Folio: {data.get('folio', '')}\n")
-        p.text(f"Cliente: {data.get('nombre_cliente', '')}\n")
-        p.text(f"Teléfono: {data.get('telefono', '')}\n")
-        p.text(f"Fecha de Entrega: {fecha_en}\n")
-        p.text(f"Hora de Entrega: {data.get('hora_entrega','')} hrs.")
-        p.text('Forma de Entrega: ')
-
-        forma_entrega = data.get('forma_entrega')
-        sucursal = data.get('sucursal')
-        if(forma_entrega == "tienda"):
-            p.text('Sucursal\n')
-            if (sucursal == '1'):
-                p.text('Av. Palma #60, Col. Vista Hermosa, San Juan Del Río, Qro.\n')
-            elif(sucursal == '2'):
-                p.text('Av Moctezuma #143, Col San Cayetano, San Juan del Río, Qro.\n')
-        elif(forma_entrega=='envio'):
-            p.text('Envio a:\n')
-            direccion = data.get('direccion')
-            recibe = data.get('recibe')
-            cel = data.get('cel')
-            referencia = data.get('referencias')
-            p.text(f"{direccion}\n")
-            p.text(f"Recibe: - {recibe}\n")
-            p.text(f"Contacto: - {cel}\n")
-            p.text(f'Referencias: {referencia}\n')
-        p.text("-" * 48 + "\n")
-
-        # --- PRODUCTOS (formato tabla) ---
-        p.set(bold=True)
-        p.text(f"{'Producto':<24}{'Cant':>6}{'P.U.':>8}{'Importe':>10}\n")
-        p.set(bold=False)
-
-        productos = data.get("productos", [])
-        for producto in productos:
-            cantidad = int(producto.get("cantidad", 0))
-            nombre = producto.get("descripcion", "")
-            precio = float(producto.get("precio_unitario", 0))
-            total = float(producto.get("importe", 0))
-
-            # Dividir el nombre si es muy largo en bloques de 24 caracteres
-            lineas_nombre = [nombre[i:i+24] for i in range(0, len(nombre), 24)]
-            for i, linea in enumerate(lineas_nombre):
-                if i == len(lineas_nombre) - 1:
-                    # Última línea: imprime con los datos
-                    p.text(f"{linea:<24}{cantidad:>6}{precio:>8.2f}{total:>10.2f}\n")
-                else:
-                    # Líneas previas: solo el texto del producto
-                    p.text(f"{linea:<24}\n")
-
-        p.text("-" * 48 + "\n")
-        p.set(align='left', bold=False, width=1, height=1)
-        p.text('Especificaciones: \n')
-        especificaciones = data.get('especificaciones')
-        p.text(especificaciones)
-        p.text('\n')
-        p.text("-" * 48 + "\n")
-        # --- TOTALES ---
-        subtotal = data.get('total', 0)
-        envio = data.get('costo_envio', 0)
-
-        gSubtotal = subtotal - envio
-
-        anticipo = str(data.get('anticipo', '0'))
-        anticipo = float(anticipo) if anticipo.replace('.', '', 1).isdigit() else 0  # 
-
-        p.set(bold=False)
-        p.text(f"{'Importe Total:':<20}${gSubtotal:>8.2f}\n")
-        p.text(f"{'Envío:':<20}${data.get('costo_envio', 0):>8.2f}\n")
-        p.text(f"{'Subtotal:':<20}${data.get('total', 0):>8.2f}\n")
-        p.text(f"{'Anticipo:':<20}${anticipo:>8.2f}\n")
-        metodo = data.get('metodo_pago','')
-        p.text(f"Método de pago:  {metodo}")
-        if (metodo == 'mixto'):
-            mix_tar = float(data.get('mix_tar',''))
-            mix_ef = float(data.get('mix_ef',''))
-            p.text(f"{'Tarjeta:':<20}${mix_tar:>8.2f}\n")
-            p.text(f"{'No. Operación:':<20}${str(data.get('num_operacion', ''))}\n")
-            p.text(f"{'Efectivo:':<20}${mix_ef:>8.2f}\n")
-            p.text(f"{'Recibido:':<20}${data.get('recibido', 0):>8.2f}\n")
-            p.text(f"{'Cambio:':<20}${data.get('cambio', 0):>8.2f}\n")
-        if (metodo == 'efectivo'):
-            p.text(f"{'Recibido:':<20}${data.get('recibido', 0):>8.2f}\n")
-            p.text(f"{'Cambio:':<20}${data.get('cambio', 0):>8.2f}\n")
-        elif (metodo=='tarjeta' or metodo=='transferencia'):
-            p.text('Pago con: Tarjeta / Transferencia\n')
-            p.text(f"{'No. Operación:':<20}${str(data.get('num_operacion', ''))}\n")
-        p.text(f"{'Total Restante:':<20}${data.get('gran_total',0):>8.2f}\n")
-        p.text("-" * 48 + "\n")
-        
-
-        # --- MENSAJE FINAL ---
-        p.set(align='center')
-        no_emp = data.get('at_no_emp')
-        nom_emp = data.get('at_nom_emp')
-        p.text('Atendio:\n')
-        p.text(no_emp )
-        p.text(' - ') 
-        p.text(nom_emp)
-        p.text('\n')
-        # --- FECHA Y HORA DE IMPRESIÓN ---
-        fecha_hora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        p.text(f"\nFecha de impresión: {fecha_hora}\n")
-
-        # --- ALIMENTAR Y CORTE ---
-        p.text("\n")
+        # 2. IMPRIMIR COPIA NEGOCIO
+        imprimir_contenido("COPIA NEGOCIO")
         p.cut()
 
-
+        # CERRAR CONEXIÓN
         p.close()
+
     except Exception as e:
         print("❌ Error general al imprimir ticket:", e)
-
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         print("Uso: python print_ticket.py '<json>' <loc>")
         sys.exit(1)
+    
     raw_json = sys.argv[1]
-    loc = int(sys.argv[2])
-    data = json.loads(raw_json)
-    imprimir_ticket(data, loc)
+    try:
+        loc_arg = int(sys.argv[2])
+    except:
+        loc_arg = 1
+        
+    try:
+        data_parsed = json.loads(raw_json)
+        imprimir_ticket(data_parsed, loc_arg)
+    except json.JSONDecodeError as e:
+        print("❌ Error al decodificar JSON:", e)

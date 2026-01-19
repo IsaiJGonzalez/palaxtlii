@@ -1,8 +1,9 @@
 import sys
 from escpos.printer import Win32Raw
 import os
+import time  # <--- AGREGADO: Necesario para la pausa de configuración
 from django.conf import settings
-from datetime import datetime,date
+from datetime import datetime, date
 import locale
 import firebase_service as fs
 
@@ -11,6 +12,14 @@ def imprimir_venta(resumen):
     try:
         printer_name = "POS-80"
         p = Win32Raw(printer_name)
+
+        # =======================================================
+        # CORRECCIÓN DE IMPRESORA (Modo Chino + Acentos)
+        # =======================================================
+        p._raw(b'\x1c\x2e')       # Desactivar modo Kanji/Chino
+        time.sleep(0.1)           # Pequeña pausa para que procese
+        p.charcode('CP850')       # Configurar idioma Español
+        # =======================================================
 
         # --- LOGO ---
         logo_path = os.path.join(settings.BASE_DIR, "static", "logo_ticket.bmp")
@@ -33,6 +42,8 @@ def imprimir_venta(resumen):
         fecha_str = resumen.get('fecha_venta', '')
         try:
             fechaOb = datetime.strptime(fecha_str, "%Y-%m-%d")
+            # Nota: para que %B salga en español, tu sistema debe tener el locale configurado,
+            # si no, saldrá en inglés.
             fecha_f = fechaOb.strftime('%d de %B de %Y')
         except:
             fecha_f = fecha_str
@@ -44,6 +55,7 @@ def imprimir_venta(resumen):
 
         # --- PRODUCTOS ---
         p.set(bold=True)
+        # Ajusté un poco el espaciado para asegurar alineación
         p.text(f"{'Producto':<24}{'Cant':>6}{'P.U.':>8}{'Importe':>10}\n")
         p.set(bold=False)
 
@@ -64,11 +76,15 @@ def imprimir_venta(resumen):
                 elif loc_emp == 2:
                     nombre = fs.obtener_producto_mc(producto_id)
 
+            # Dividir nombre en líneas de 24 caracteres para que no rompa la tabla
             lineas_nombre = [nombre[i:i+24] for i in range(0, len(nombre), 24)]
+            
             for i, linea in enumerate(lineas_nombre):
                 if i == len(lineas_nombre) - 1:
+                    # Última línea del nombre: imprime también los números
                     p.text(f"{linea:<24}{cantidad:>6}{precio:>8.2f}{importe:>10.2f}\n")
                 else:
+                    # Líneas extra del nombre: solo imprime texto
                     p.text(f"{linea:<24}\n")
 
         p.text('-' * 48 + '\n')
@@ -84,7 +100,11 @@ def imprimir_venta(resumen):
 
         p.set(bold=False)
         p.text(f"Método de Pago: {metodo_p}\n\n")
+        
+        # Totales alineados
+        p.set(bold=True)
         p.text(f"{'Total:':<20}${total:>8.2f}\n")
+        p.set(bold=False)
 
         if metodo_p == 'mixto':
             p.text(f"{'Tarjeta:':<20}${mix_tar:>8.2f}\n")
@@ -109,7 +129,7 @@ def imprimir_venta(resumen):
         p.text(f"\nFecha de impresión: {fecha_hora}\n")
 
         p.cut()
-        p.close()
+        p.close()  # Siempre cerrar la conexión
 
     except Exception as e:
         print("❌ Error general al imprimir ticket:", e)
