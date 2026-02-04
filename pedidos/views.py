@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from django.http import JsonResponse
 import json
 import ticket_abono as tka
-from core.decorators import gerente_required, ventas_required, cajero_required, gerente_ventas_required
+from core.decorators import gerente_required, ventas_required, cajero_required, gerente_ventas_required, login_required
 
 
 def convertir_fecha(fecha_str):
@@ -18,7 +18,7 @@ def convertir_fecha(fecha_str):
         return None
 
 
-@gerente_ventas_required
+@login_required
 def pedidos(request):
     num_emp = request.session.get('usuario',{}).get('numero_empleado',0)
     caja_activa = fs.consultar_caja_activa(num_emp)
@@ -89,6 +89,7 @@ def pedidos(request):
         request,
         'pedidos.html',
         {
+            'priv' : privilegio,
             'pedidos_no_entregados': pedidos_no_entregados,
             'pedidos_entregados': pedidos_entregados_pag,
             'orden': orden,

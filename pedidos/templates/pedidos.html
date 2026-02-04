@@ -10,7 +10,7 @@
 {% block content %}
 <div class="container">
     <div class="pt-3">
-
+        {% if priv == 1 or priv == 2 %}
         <div class="mb-3">
             <strong>Ordenar por:</strong>
             <a href="?orden=registro" class="btn btn-outline-primary {% if orden == 'registro' %}active{% endif %}">
@@ -20,14 +20,14 @@
                 Fecha de entrega
             </a>
         </div>
-
+        {% endif %}
 
         <h3 class="pb-3" id="h3_1">Pedidos por Entregar</h3>
         <div class="table-responsive">
             <table
                 class="table table-hover table-striped table-bordered border-light text-center align-middle shadow-sm rounded-4 overflow-hidden"
                 id="pedidos_act">
-                <thead class="bg-dark text-white text-uppercase fw-normal">
+                <thead class="bg-dark text-white fw-normal">
                     <tr>
                         <th scope="col" class="py-3">Folio</th>
                         <th scope="col" class="py-3">Fecha Entrega</th>
@@ -41,8 +41,8 @@
                 <tbody id="lista-pedidos-no-entregados">
                     {% for pedido in pedidos_no_entregados %}
                     <tr class="bg-light">
-                        <td class="text-danger fw-bold">{{ pedido.folio }}</td>
-                        <td class="bg-primary text-white fw-bold shadow-sm">
+                        <td class="text-white fw-bold" style="background-color: #ff0000;">{{ pedido.folio }}</td>
+                        <td class="text-white fw-bold shadow-sm" style="background-color: #29246b;">
                             {{ pedido.fecha_entrega|date:"j \d\e F \d\e Y" }}</td>
                         <td class="text-dark">{{ pedido.nombre_cliente }}</td>
                         <td class="text-secondary">{{ pedido.fecha_registro|date:"j \d\e F \d\e Y" }}</td>
@@ -65,7 +65,8 @@
                         </td>
                         <td>
                             <div class="d-grid gap-2">
-                                {% if pedido.restante_pagado %}
+                                {% if priv == 1 or priv == 2 %}
+                                {% if pedido.restante_pagado  %}
                                 <button class="btn btn-success btn-sm rounded-pill entregado_directo"
                                     data-folio_ed="{{pedido.folio}}">
                                     <i class="bi bi-check-circle me-1"></i> Entregado
@@ -94,6 +95,7 @@
                                     data-total="{{pedido.total}}">
                                     <i class="bi bi-info-circle me-1"></i> Detalles
                                 </button>
+                                {% endif %}
 
                                 <button class="btn btn-primary btn-sm rounded-pill" data-bs-toggle="modal"
                                     data-bs-target="#abonoModal" data-folio-a="{{ pedido.folio }}"
@@ -103,103 +105,126 @@
 
                                 <div class="modal fade" id="abonoModal" tabindex="-1" aria-labelledby="abonoModalLabel"
                                     aria-hidden="true">
-                                    <div class="modal-dialog modal-lg modal-dialog-centered">
-                                        <div class="modal-content border-0 shadow-lg rounded-4">
+                                    <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
+                                        <div class="modal-content border-0 shadow-lg rounded-3">
+
                                             <form method="POST" action="{% url 'abonar' %}">
                                                 {% csrf_token %}
-                                                <div class="modal-header bg-primary text-white rounded-top-4 py-3">
-                                                    <h5 class="modal-title fw-bold">Registrar Abono</h5>
+
+                                                <div class="modal-header bg-dark text-white py-2 px-3 border-0">
+                                                    <h6 class="modal-title fw-bold text-uppercase" id="abonoModalLabel">
+                                                        <i class="bi bi-cash-stack me-2"></i>Registrar Abono
+                                                    </h6>
                                                     <button type="button" class="btn-close btn-close-white"
                                                         data-bs-dismiss="modal" aria-label="Cerrar"></button>
                                                 </div>
 
-                                                <div class="modal-body p-4">
-                                                    <div class="mb-4">
-                                                        <label for="id" class="form-label fw-semibold text-muted">ID del
-                                                            Pedido</label>
-                                                        <input type="text"
-                                                            class="form-control form-control-lg text-center bg-light border-0 rounded-3"
-                                                            id="id" name="id" readonly>
+                                                <div class="modal-body p-3">
+                                                    <div
+                                                        class="d-flex justify-content-between align-items-center bg-light p-2 mb-3 border-start border-4 border-dark rounded-end">
+                                                        <div>
+                                                            <label
+                                                                class="d-block small fw-bold text-muted text-uppercase text-start"
+                                                                style="font-size: 0.65rem;">ID Interno</label>
+                                                            <input type="text"
+                                                                class="fw-bold border-0 bg-transparent p-0 m-0 text-dark"
+                                                                id="id" name="id" readonly>
+                                                        </div>
+                                                        <i class="bi bi-info-circle-fill text-secondary"></i>
                                                     </div>
 
-                                                    <div class="row g-3 mb-4">
-                                                        <div class="col-md-4">
+                                                    <div class="row g-2 mb-3">
+                                                        <div class="col-6">
                                                             <label for="folio"
-                                                                class="form-label fw-semibold text-muted">Folio</label>
+                                                                class="form-label small fw-bold text-secondary mb-1">Folio
+                                                                Referencia</label>
                                                             <input type="number" step="0.01"
-                                                                class="form-control rounded-3" id="folio" name="folio"
-                                                                required>
+                                                                class="form-control form-control-sm border-secondary shadow-sm"
+                                                                id="folio" name="folio" required>
                                                         </div>
-                                                        <div class="col-md-8">
+                                                        <div class="col-6">
                                                             <label for="fecha"
-                                                                class="form-label fw-semibold text-muted">Fecha y hora
-                                                                del Abono</label>
-                                                            <input type="datetime-local" class="form-control rounded-3"
+                                                                class="form-label small fw-bold text-secondary mb-1">Fecha
+                                                                y Hora</label>
+                                                            <input type="datetime-local"
+                                                                class="form-control form-control-sm border-secondary shadow-sm"
                                                                 id="fecha" name="fecha" required>
                                                         </div>
                                                     </div>
 
-                                                    <div class="row g-3 mb-4">
-                                                        <div class="col-md-4">
-                                                            <label for="gran_total"
-                                                                class="form-label fw-semibold text-muted">Gran
-                                                                Total</label>
-                                                            <input type="number" step="0.01"
-                                                                class="form-control bg-light rounded-3" id="gran_total"
-                                                                name="gran_total" readonly>
+                                                    <div class="row g-2 mb-3">
+                                                        <div class="col-4">
+                                                            <label class="small fw-bold text-muted mb-1"
+                                                                style="font-size: 0.7rem;">Total Pedido</label>
+                                                            <div class="input-group input-group-sm">
+                                                                <span
+                                                                    class="input-group-text bg-light border-0">$</span>
+                                                                <input type="number"
+                                                                    class="form-control bg-light border-0 fw-semibold"
+                                                                    id="gran_total" name="gran_total" readonly>
+                                                            </div>
                                                         </div>
-                                                        <div class="col-md-4">
-                                                            <label for="abono"
-                                                                class="form-label fw-semibold text-muted">Monto del
-                                                                Abono</label>
-                                                            <input type="number" step="0.01"
-                                                                class="form-control rounded-3 border-primary" id="abono"
-                                                                name="abono" required>
+                                                        <div class="col-4">
+                                                            <label class="small fw-bold text-dark mb-1"
+                                                                style="font-size: 0.7rem;">Monto Abono</label>
+                                                            <div class="input-group input-group-sm">
+                                                                <span
+                                                                    class="input-group-text bg-dark text-white border-dark">$</span>
+                                                                <input type="number" step="0.01"
+                                                                    class="form-control border-dark fw-bold" id="abono"
+                                                                    name="abono" required>
+                                                            </div>
                                                         </div>
-                                                        <div class="col-md-4">
-                                                            <label for="gran_total_restante"
-                                                                class="form-label fw-semibold text-muted">Total
-                                                                Restante</label>
-                                                            <input type="number" step="0.01"
-                                                                class="form-control bg-light rounded-3"
-                                                                id="gran_total_restante" name="gran_total_restante"
-                                                                readonly>
+                                                        <div class="col-4">
+                                                            <label class="small fw-bold text-muted mb-1"
+                                                                style="font-size: 0.7rem;">Saldo Pendiente</label>
+                                                            <div class="input-group input-group-sm">
+                                                                <span
+                                                                    class="input-group-text bg-light border-0">$</span>
+                                                                <input type="number"
+                                                                    class="form-control bg-light border-0 text-muted fw-semibold"
+                                                                    id="gran_total_restante" name="gran_total_restante"
+                                                                    readonly>
+                                                            </div>
                                                         </div>
                                                     </div>
 
-                                                    <div>
-                                                        <label class="form-label fw-semibold text-muted mb-2">Forma de
-                                                            pago</label>
-                                                        <div class="d-flex flex-wrap gap-3">
-                                                            <div class="form-check form-check-inline">
+                                                    <div class="border rounded p-2 bg-light">
+                                                        <p class="text-center small fw-bold text-uppercase text-muted mb-2"
+                                                            style="font-size: 0.65rem;">Forma de Pago</p>
+                                                        <div class="d-flex justify-content-around">
+                                                            <div class="form-check">
                                                                 <input class="form-check-input" type="radio"
                                                                     name="abono_pago" id="abono_efectivo"
                                                                     value="efectivo" required>
-                                                                <label class="form-check-label text-dark"
+                                                                <label class="form-check-label small"
                                                                     for="abono_efectivo">Efectivo</label>
                                                             </div>
-                                                            <div class="form-check form-check-inline">
+                                                            <div class="form-check">
                                                                 <input class="form-check-input" type="radio"
                                                                     name="abono_pago" id="abono_tarjeta"
                                                                     value="tarjeta">
-                                                                <label class="form-check-label text-dark"
+                                                                <label class="form-check-label small"
                                                                     for="abono_tarjeta">Tarjeta</label>
                                                             </div>
-                                                            <div class="form-check form-check-inline">
+                                                            <div class="form-check">
                                                                 <input class="form-check-input" type="radio"
                                                                     name="abono_pago" id="abono_transferencia"
                                                                     value="transferencia">
-                                                                <label class="form-check-label text-dark"
-                                                                    for="abono_transferencia">Transferencia</label>
+                                                                <label class="form-check-label small"
+                                                                    for="abono_transferencia">Transf.</label>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                <div class="modal-footer p-4 bg-light rounded-bottom-4">
+                                                <div class="modal-footer bg-light py-2 border-0">
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-link text-decoration-none text-secondary fw-bold"
+                                                        data-bs-dismiss="modal">CANCELAR</button>
                                                     <button type="submit" id="registrarAbonoBtn"
-                                                        class="btn btn-primary w-100 fw-bold rounded-pill py-2">
-                                                        <i class="bi bi-receipt me-2"></i> Registrar Abono
+                                                        class="btn btn-sm btn-dark px-4 rounded-1 fw-bold">
+                                                        Confirmar Abono
                                                     </button>
                                                 </div>
                                             </form>
@@ -215,6 +240,7 @@
         </div>
     </div>
 
+    {% if priv == 1 or priv == 2 %}
     <div class="pt-4">
         <h3 class="pb-3" id="h3_2">Pedidos Entregados</h3>
         <table class="table table-striped table-bordered text-center align-middle" id="pedidos_ent">
@@ -256,6 +282,7 @@
         <!-- Botón "Cargar más" para pedidos entregados -->
         <button id="cargarMasPedidosEntregados" class="btn btn-secondary d-none">Cargar más entregados</button>
     </div>
+    {% endif %}
 </div>
 
 <!-- Modal para detalles del pedido seleccionado -->

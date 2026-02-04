@@ -2,265 +2,436 @@
 {% load static %}
 
 {% block items %}
-<title>Punto de Venta - Palaxtli</title>
-<link rel="stylesheet" href="{% static 'styles/punto_venta.css' %}">
+<title>POS - Palaxtli</title>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-<script src="{% static 'javascript/anadir_producto.js' %}"></script>
 
+<style>
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Columna Izquierda */
+    .product-panel {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+        height: 100%;
+    }
+
+    .table-custom thead th {
+        background-color: #1c1c1c;
+        border-bottom: 2px solid #e9ecef;
+        color: #ffffff;
+        font-weight: 600;
+    }
+
+    .table-custom td {
+        vertical-align: middle;
+    }
+
+    /* Columna Derecha (Sticky) */
+    .sidebar-panel {
+        position: sticky;
+        top: 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        padding: 25px;
+    }
+
+    /* Inputs y Botones */
+    .form-control-lg {
+        font-size: 1.1rem;
+    }
+
+    .btn-circle {
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Totales */
+    .total-display-container {
+        background-color: #212529;
+        color: #fff;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 20px;
+        text-align: right;
+    }
+
+    .label-total {
+        font-size: 0.9rem;
+        color: #adb5bd;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .amount-total {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2ecc71;
+        line-height: 1;
+    }
+
+    .amount-subtotal {
+        font-size: 1rem;
+        color: #adb5bd;
+    }
+
+    /* Descuentos */
+    .discount-badge {
+        background-color: #ffeaa7;
+        color: #d35400;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 0.8rem;
+        display: none;
+    }
+
+    /* Tabs de Pago */
+    .payment-option {
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+    }
+
+    .payment-option:hover {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+    }
+
+    .payment-option input {
+        display: none;
+    }
+
+    .payment-option.selected {
+        border-color: #0d6efd;
+        background-color: #e7f1ff;
+        color: #0d6efd;
+        font-weight: bold;
+    }
+
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 2000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="container py-4 shadow bg-white mt-1">
-    <div class="bg-white p-4 card-style">
-        <div class="text-center mb-4">
-            <h3 class="fw-bold text-black mb-0">Palaxtli</h3>
-            <h5 class="fw-light text-muted">Repostería</h5>
-            <p class="text-secondary mb-0">{{ direccion_sucursal }}</p>
-        </div>
+<script>
+    // Usamos comillas simples y escapejs para que el editor lo vea como un string válido
+    // y luego JS lo convierte a objeto real.
+    const TARJETAS_DB = JSON.parse('{{ tarjetas_json|escapejs }}');
+</script>
 
-        <hr>
+<form id="venta_form" method="post" action="{% url 'registrar_venta' %}">
+    {% csrf_token %}
 
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <label class="form-label small text-black fw-semibold">Fecha</label>
-                <input type="date" class="form-control form-control-sm  w-25" id="fecha_registro"
-                    value="{{ today_date }}" readonly>
-            </div>
-            <div class="col-md-6 text-md-end">
-                <label class="form-label small text-black fw-semibold">No. Venta</label>
-                <input type="number" class="form-control form-control-sm fw-bold text-danger d-inline-block w-25"
-                    value="{{ numero_venta }}" id="numero_venta" readonly>
-            </div>
-        </div>
+    <div class="container-fluid py-3">
+        <div class="row g-4">
 
-        <div class="mb-4">
-            <label class="form-label">Atiende:</label>
-            <div class="row g-0">
-                <div class="col-auto">
-                    <input type="number" class="form-control form-control-sm w-50" id="at_nom_emp" value="{{ no_emp }}"
-                        readonly>
-                </div>
-                <div class="col">
-                    <input type="text" class="form-control form-control-sm w-25" id="at_no_emp" value="{{ empleado }}"
-                        readonly>
-                </div>
-            </div>
-        </div>
-
-        <hr>
-
-        <h5 class="text-primary mb-3">Selección de Producto</h5>
-        <form class="row justify-content-center align-items-end g-3 mb-4" id="venta_form" method="post" action="{% url 'registrar_venta' %}">
-            {% csrf_token %}
-            <div class="col-md-4">
-                <label class="form-label"> <i class="bi bi-bag-heart-fill"></i> Producto</label>
-                <select class="form-select " name="producto_id" id="producto-select">
-                    <option selected disabled>Seleccione un producto</option>
-                    {% for producto in productos %}
-                        {% if producto.estado %}
-                            <option value="{{ producto.id }}" data-precio="{{ producto.precio }}" data-cant="{{producto.existencias}}">{{ producto.nombre }}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label class="form-label"> <i class="bi bi-stack"></i> Cantidad</label>
-                <input type="number" class="form-control" min="1" name="cantidad" id="cantidad">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label"> <i class="bi bi-currency-exchange"></i> Precio Unitario</label>
-                <input type="number" class="form-control" name="precio-unitario" id="precio-unitario" readonly>
-            </div>
-            <div class="col-md-2">
-                <label class="form-label"> <i class="bi bi-wallet-fill"></i> Total</label>
-                <input type="number" class="form-control" name="total-tab" id="total-tab" readonly>
-            </div>
-            <div class="col-md-1 d-flex justify-content-center">
-                <button type="button" class="btn btn-outline-primary px-3" id="btnAnadir">
-                    <i class="bi bi-arrow-down-circle fs-5"></i>
-                </button>
-            </div>
-
-
-            <hr>
-
-            <h5 class="text-center text-success mb-3">Resumen de la Venta</h5>
-            <div class="table-responsive mb-4">
-                <table class="table table-bordered" id="resumenTabla">
-                    <thead class="table-success text-center">
-                        <tr>
-                            <th>Producto</th>
-                            <th>Cantidad</th>
-                            <th>Precio Unitario <i class="bi bi-currency-dollar"></i></th>
-                            <th>Subtotal <i class="bi bi-currency-dollar"></i></th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-center">
-                        <!-- Aquí van las filas dinámicas -->
-
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="bg-dark text-white py-3 px-4 rounded mb-4 text-end">
-                <h4 class="m-0">TOTAL: $<span id="total">0.00</span></h4>
-            </div>
-
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <h5 class="mb-3">Método de Pago</h5>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="metodo_pago" id="metodo_efectivo"
-                            value="efectivo" required>
-                        <label class="form-check-label" for="metodo_efectivo"> <i class="bi bi-cash-coin"></i>
-                            Efectivo</label>
+            <div class="col-lg-7">
+                <div class="product-panel">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                        <div>
+                            <h4 class="fw-bold m-0 text-dark">Palaxtli <span class="fw-light text-muted"></span></h4>
+                            <small class="text-muted"><i class="bi bi-shop"></i> {{ direccion_sucursal }} &nbsp;|&nbsp;
+                                <i class="bi bi-person"></i> {{ empleado }}</small>
+                        </div>
+                        <div class="text-end">
+                            <div class="badge bg-primary fs-6 mb-1">Venta #{{ numero_venta }}</div>
+                            <div class="text-muted small">{{ today_date }}</div>
+                        </div>
                     </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="metodo_pago" id="metodo_tarjeta"
-                            value="tarjeta">
-                        <label class="form-check-label" for="metodo_tarjeta"> <i class="bi bi-credit-card"></i>
-                            Tarjeta</label>
+
+                    <div class="row g-2 align-items-end mb-4 bg-light p-3 rounded">
+                        <div class="col-md-5">
+                            <label class="form-label small fw-bold">Producto</label>
+                            <select class="form-select" id="producto-select" style="width: 100%">
+                                <option></option>
+                                {% for producto in productos %}
+                                {% if producto.estado %}
+                                <option value="{{ producto.id }}" data-precio="{{ producto.precio }}"
+                                    data-cant="{{producto.existencias}}">{{ producto.nombre }}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small fw-bold">Cant.</label>
+                            <input type="number" class="form-control" id="cantidad" min="1" placeholder="1">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small fw-bold">Precio</label>
+                            <input type="number" class="form-control" id="precio-unitario" readonly>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small fw-bold">Total</label>
+                            <input type="number" class="form-control fw-bold text-primary" id="total-tab" readonly>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-success w-100" id="btnAnadir"><i
+                                    class="bi bi-plus-lg"></i></button>
+                        </div>
                     </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="metodo_pago" id="metodo_transferencia"
-                            value="transferencia">
-                        <label class="form-check-label" for="metodo_transferencia"> <i class="bi bi-send-dash"></i>
-                            Transferencia</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="metodo_pago" id="metodo_mixto"
-                            value="mixto">
-                        <label class="form-check-label" for="metodo_mixto"> <i class="bi bi-shuffle"></i>
-                            Mixto</label>
+
+                    <div class="table-responsive">
+                        <table class="table table-custom table-hover bg-black" id="resumenTabla">
+                            <thead>
+                                <tr>
+                                    <th>Descripción</th>
+                                    <th class="text-center">Cant.</th>
+                                    <th class="text-end">Precio</th>
+                                    <th class="text-end">Importe</th>
+                                    <th class="text-center">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+            </div>
 
-                <div class="col-md-6">
-                    <div class="row g-3 justify-content-end">
-                        <div id="efectivo-fields" class="col-md-5 d-none">
-                            <label class="form-label text-end">Recibido</label>
-                            <input type="number" id="recibido" class="form-control text-end fw-bold fs-6">
-                            <label class="form-label mt-2 text-end">Cambio</label>
-                            <input type="number" id="cambio" class="form-control text-end fw-bold fs-6" readonly>
+            <div class="col-lg-5">
+                <div class="sidebar-panel">
+
+                    <div class="total-display-container">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-white-50 small">SUBTOTAL</span>
+                            <span class="amount-subtotal">$<span id="subtotal_display">0.00</span></span>
                         </div>
-                        <div id="operacion-fields" class="col-md-5 d-none">
-                            <label class="form-label">Número de Operación</label>
-                            <input type="text" id="operacion" class="form-control">
+
+                        <div id="row_descuento_display"
+                            class="d-flex justify-content-between align-items-center text-warning mt-1"
+                            style="display:none !important;">
+                            <span class="small">DESCUENTO (<span id="desc_label_display"></span>)</span>
+                            <span class="fw-bold">-$<span id="desc_monto_display">0.00</span></span>
                         </div>
-                        <div id="transferencia-fields" class="col-md-5 d-none">
-                            <label class="form-label">Número de Operación</label>
-                            <input type="text" id="operacion_transferencia" class="form-control">
+
+                        <hr class="border-secondary my-2">
+
+                        <div class="label-total">TOTAL A PAGAR</div>
+                        <div class="amount-total">$<span id="total">0.00</span></div>
+                    </div>
+
+                    <div class="card mb-4 border-0 shadow-sm bg-light">
+                        <div class="card-body p-3">
+                            <h6 class="fw-bold text-secondary mb-2"><i class="bi bi-tag-fill"></i> Aplicar Descuento
+                            </h6>
+
+                            <ul class="nav nav-pills nav-fill mb-3" id="pills-tab" role="tablist">
+                                <li class="nav-item">
+                                    <button class="nav-link active py-1 small" id="pills-none-tab" data-bs-toggle="pill"
+                                        data-bs-target="#pills-none" type="button">Ninguno</button>
+                                </li>
+                                <li class="nav-item">
+                                    <button class="nav-link py-1 small" id="pills-manual-tab" data-bs-toggle="pill"
+                                        data-bs-target="#pills-manual" type="button">Manual</button>
+                                </li>
+                                <li class="nav-item">
+                                    <button class="nav-link py-1 small" id="pills-card-tab" data-bs-toggle="pill"
+                                        data-bs-target="#pills-card" type="button">Tarjeta</button>
+                                </li>
+                            </ul>
+
+                            <div class="tab-content" id="pills-tabContent">
+                                <div class="tab-pane fade show active" id="pills-none">
+                                    <small class="text-muted">Precio normal de lista.</small>
+                                </div>
+
+                                <div class="tab-pane fade" id="pills-manual">
+                                    <div class="input-group input-group-sm">
+                                        <select class="form-select" id="manual_desc_type" style="max-width: 70px;">
+                                            <option value="%">%</option>
+                                            <option value="$">$</option>
+                                        </select>
+                                        <input type="number" class="form-control" id="manual_desc_val"
+                                            placeholder="Valor">
+                                        <button class="btn btn-outline-primary" type="button"
+                                            id="btnAplicarManual">Aplicar</button>
+                                    </div>
+                                </div>
+
+                                <div class="tab-pane fade" id="pills-card">
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" class="form-control" id="card_code_input"
+                                            placeholder="Escanear Referencia">
+                                        <button class="btn btn-outline-primary" type="button" id="btnBuscarTarjeta"><i
+                                                class="bi bi-search"></i></button>
+                                    </div>
+                                    <div id="card_msg" class="small mt-1 text-danger fw-bold"></div>
+                                </div>
+                            </div>
+
+                            <input type="hidden" name="total_venta_final" id="hidden_total_final">
+                            <input type="hidden" name="descuento_monto" id="hidden_desc_monto" value="0">
+                            <input type="hidden" name="info_descuento" id="hidden_desc_info" value="Ninguno">
+                            <input type="hidden" name="codigo_tarjeta_usada" id="hidden_card_code">
                         </div>
-                        <div id="mixto-fields" class="col-md-10 d-none">
-                            <div class="table-responsive">
-                                <table class="table table-borderless align-middle">
-                                    <tbody>
-                                        <tr>
-                                            <td class="text-end fw-bold">Efectivo $</td>
-                                            <td>
-                                                <input type="number" id="mix_ef" class="form-control text-end fw-bold fs-6">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-end fw-bold">Tarjeta $</td>
-                                            <td>
-                                                <input type="number" id="mix_tar" class="form-control text-end fw-bold fs-6 text-danger" readonly>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-end fw-bold">Número de Operación</td>
-                                            <td>
-                                                <input type="text" id="operacion_mixto" class="form-control text-end fw-bold fs-6 text-primary">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-end fw-bold">Recibido</td>
-                                            <td>
-                                                <input type="number" id="recibido_mixto" class="form-control text-end fw-bold fs-6">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-end fw-bold">Cambio</td>
-                                            <td>
-                                                <input type="number" id="cambio_mixto" class="form-control text-end fw-bold fs-6" readonly>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                    </div>
+
+                    <h6 class="fw-bold text-secondary mb-2">Método de Pago</h6>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-3">
+                            <label class="payment-option w-100 border p-2 rounded text-center" style="cursor:pointer">
+                                <input type="radio" name="metodo_pago" value="efectivo" class="d-none" required>
+                                <i class="bi bi-cash fs-4 d-block"></i> <span style="font-size:0.7rem">Efectivo</span>
+                            </label>
+                        </div>
+                        <div class="col-3">
+                            <label class="payment-option w-100 border p-2 rounded text-center" style="cursor:pointer">
+                                <input type="radio" name="metodo_pago" value="tarjeta" class="d-none">
+                                <i class="bi bi-credit-card fs-4 d-block"></i> <span
+                                    style="font-size:0.7rem">Tarjeta</span>
+                            </label>
+                        </div>
+                        <div class="col-3">
+                            <label class="payment-option w-100 border p-2 rounded text-center" style="cursor:pointer">
+                                <input type="radio" name="metodo_pago" value="transferencia" class="d-none">
+                                <i class="bi bi-phone fs-4 d-block"></i> <span style="font-size:0.7rem">Transfer</span>
+                            </label>
+                        </div>
+                        <div class="col-3">
+                            <label class="payment-option w-100 border p-2 rounded text-center" style="cursor:pointer">
+                                <input type="radio" name="metodo_pago" value="mixto" class="d-none">
+                                <i class="bi bi-layout-split fs-4 d-block"></i> <span
+                                    style="font-size:0.7rem">Mixto</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="payment-details" class="bg-white border rounded p-3 mb-3 shadow-sm">
+                        <p class="text-center text-muted small m-0 fst-italic" id="msg-select-payment">Seleccione un
+                            método para ingresar montos.</p>
+
+                        <div id="efectivo-fields" class="d-none">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="fw-bold">Recibido:</label>
+                                <input type="number" id="recibido" name="recibido" class="form-control text-end fw-bold"
+                                    style="width: 150px;">
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <label class="fw-bold text-success">Cambio:</label>
+                                <input type="text" id="cambio_visual"
+                                    class="form-control-plaintext text-end fw-bold fs-5 text-success" readonly
+                                    value="$0.00">
+                                <input type="hidden" id="cambio" name="cambio" value="0">
+                            </div>
+                        </div>
+
+                        <div id="operacion-fields" class="d-none">
+                            <label class="form-label small fw-bold">No. Operación / Referencia:</label>
+                            <input type="text" id="operacion" name="numero_operacion" class="form-control">
+                            <input type="hidden" id="operacion_transferencia">
+                        </div>
+
+                        <div id="mixto-fields" class="d-none">
+                            <div class="input-group mb-2">
+                                <span class="input-group-text bg-light"><i class="bi bi-cash"></i></span>
+                                <input type="number" id="mix_ef" name="mix_ef" class="form-control text-end"
+                                    placeholder="Monto Efectivo">
+                            </div>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text bg-light"><i class="bi bi-credit-card"></i></span>
+                                <input type="number" id="mix_tar" name="mix_tar" class="form-control text-end bg-light"
+                                    readonly placeholder="Restante Tarjeta">
+                            </div>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text bg-light">#</span>
+                                <input type="text" id="operacion_mixto" class="form-control text-end"
+                                    placeholder="No. Operación">
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small fw-bold">Recibido (Efectivo):</span>
+                                <input type="number" id="recibido_mixto"
+                                    class="form-control form-control-sm w-50 text-end">
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="small fw-bold">Cambio:</span>
+                                <span class="fw-bold text-success" id="cambio_mixto_txt">$0.00</span>
+                                <input type="hidden" id="cambio_mixto" value="0">
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <!-- <button type="submit" class="btn btn-success btn-lg px-2" id="registrarCompra"><i class="bi bi-cart-plus"></i> Registrar Venta</button>  -->
-            <!-- Botón que dispara el modal -->
-            <button type="button" class="btn btn-success btn-lg px-2" data-bs-toggle="modal" data-bs-target="#ticketModal">
-                <i class="bi bi-cart-plus"></i> Registrar Venta
-            </button>
 
-            <!-- Modal -->
-            <div class="modal fade" id="ticketModal" tabindex="-1" aria-labelledby="ticketModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content text-center p-4">
-                    <h5 class="modal-title mb-4" id="ticketModalLabel">Selecciona una opción:</h5>
-
-                    <!-- Botones principales -->
-                    <div class="d-grid gap-3 mb-4">
-                        <button id="btnImprimirTicket" class="btn btn-lg rounded-3 py-3" style="background-color: rgb(112, 147, 230); color: aliceblue;">Imprimir Ticket del Cliente</button>
-                        <button id="btnSinTicket" class="btn btn-lg rounded-3 py-3" style="background-color: rgb(243, 128, 128); color: aliceblue;">Continuar sin Ticket</button>
-                    </div>
-
-                    <!-- Botón cancelar -->
-                    <button id="btnCancelarModalTicket" type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">
-                        Cancelar
+                    <button type="button" id="btnCobrar" class="btn btn-dark w-100 py-3 fs-5 fw-bold shadow"
+                        data-bs-toggle="modal" data-bs-target="#ticketModal" disabled>
+                        <i class="bi bi-check-circle-fill"></i> COBRAR
                     </button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="modal fade" id="ticketModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header bg-dark text-white">
+                        <h5 class="modal-title">Confirmar Venta</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body text-center p-4">
+                        <h2 class="mb-4 fw-bold text-dark" id="modal_total_confirm">$0.00</h2>
+                        <div class="d-grid gap-3">
+                            <button id="btnImprimirTicket" class="btn btn-primary btn-lg"><i class="bi bi-printer"></i>
+                                Imprimir Ticket</button>
+                            <button id="btnSinTicket" class="btn btn-outline-secondary btn-lg">Solo Guardar</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
-</div>
+</form>
 
 <div id="overlay-loading" class="overlay d-none">
-    <div class="overlay-content">
-        <div class="spinner-border text-light" role="status"></div>
-        <p class="mt-3">Registrando Venta...</p>
+    <div class="text-center">
+        <div class="spinner-border text-light" style="width: 3rem; height: 3rem;" role="status"></div>
+        <h4 class="mt-3">Procesando Venta...</h4>
     </div>
 </div>
 
-<!-- Scripts -->
 <script>
+    // Configuración inicial
     $(document).ready(function () {
-        $('#producto-select').select2({
-            placeholder: "Buscar producto...",
-            allowClear: true
-        });
+        $('#producto-select').select2({ placeholder: "Buscar producto...", allowClear: true });
 
-        $('#producto-select').on('select2:select', function (e) {
-            const selectedOption = e.params.data.element;
-            const precio = selectedOption.getAttribute("data-precio");
-            const cantidad = selectedOption.getAttribute("data-cant");
-            console.log(cantidad + 'cantidad')
-            $('#precio-unitario').val(precio || '');
-            $('#cantidad').attr('placeholder', 'max: ' + (cantidad || ''));
-        });
-    });
-
-    const metodoRadios = document.querySelectorAll('input[name="metodo_pago"]');
-    metodoRadios.forEach(radio => {
-        radio.addEventListener('change', () => {
-            const metodo = radio.value;
-
-            document.getElementById('efectivo-fields').classList.toggle('d-none', metodo !== 'efectivo');
-            document.getElementById('operacion-fields').classList.toggle('d-none', metodo !== 'tarjeta');
-            document.getElementById('transferencia-fields').classList.toggle('d-none', metodo !== 'transferencia');
-            document.getElementById('mixto-fields').classList.toggle('d-none', metodo !== 'mixto');
+        // Asignar listeners visuales de pago
+        $('.payment-option').click(function () {
+            $('.payment-option').removeClass('selected');
+            $(this).addClass('selected');
+            $(this).find('input').prop('checked', true).trigger('change');
         });
     });
 </script>
 
+<script src="{% static 'javascript/anadir_producto.js' %}"></script>
 <script src="{% static 'javascript/registrar_venta.js' %}"></script>
 {% endblock %}

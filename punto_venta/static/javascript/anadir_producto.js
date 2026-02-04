@@ -1,242 +1,305 @@
-document.addEventListener("DOMContentLoaded", function() {
-    const cantidadInput = document.getElementById('cantidad');
-    const precioInput = document.getElementById('precio-unitario');
-    const totalInput = document.getElementById('total-tab');
+/* anadir_producto.js CORREGIDO */
 
-    function actualizarTotal() {
-        const cantidad = parseFloat(cantidadInput.value) || 0;
-        const precio = parseFloat(precioInput.value) || 0;
-        totalInput.value = (cantidad * precio).toFixed(2); // Calcula y muestra el total con 2 decimales
-    }
-
-    // Ejecutar actualización cada vez que cambien los valores
-    cantidadInput.addEventListener('input', actualizarTotal);
-    precioInput.addEventListener('input', actualizarTotal);
-});
-
-
+// Variables globales
+let subtotalGlobal = 0;
+let totalConDescuento = 0;
+let descuentoMonto = 0;
+let descuentoActivo = {
+    tipo: 'none',
+    valor: 0,
+    info: 'Ninguno',
+    codigo: null
+};
 
 document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById('btnAnadir').addEventListener('click', function(event) {
-        event.preventDefault();
 
-        const formData = new FormData(document.getElementById('venta_form'));
+    // --- 1. REFERENCIAS A ELEMENTOS (CON VALIDACIÓN) ---
+    const selectProducto = $('#producto-select');
+    const cantInput = document.getElementById('cantidad');
+    const precInput = document.getElementById('precio-unitario');
+    const totTabInput = document.getElementById('total-tab');
+    const btnAnadir = document.getElementById('btnAnadir');
 
-        // Productos
-        const productoId = formData.get('producto_id'); // ID del producto
-        const selectElement = document.getElementById('producto-select');
-        const productoNombre = selectElement.options[selectElement.selectedIndex].text; // Nombre del producto
+    // --- 2. LOGICA DE SELECT2 Y PRECIOS ---
+    if (selectProducto.length > 0) {
+        selectProducto.on('select2:select', function (e) {
+            const selected = e.params.data.element;
+            const precio = selected.getAttribute("data-precio");
+            const existencias = selected.getAttribute("data-cant");
 
-        // Cantidad
-        const cantidad = formData.get('cantidad') || 1; // Asegura un valor por defecto
-
-        // Precio unitario y total
-        const precio_unitario = parseFloat(formData.get('precio-unitario')) || 0;
-        const total_tab = parseFloat(formData.get('total-tab')) || 0;
-
-        // Tabla de productos
-        const tbody = document.querySelector('#resumenTabla tbody');
-        const newRow = tbody.insertRow();
-        newRow.innerHTML = `
-            <td data-id='${productoId}' >${productoNombre}</td>
-            <td>${cantidad}</td>
-            <td>${precio_unitario.toFixed(2)}</td>
-            <td>${total_tab.toFixed(2)}</td>
-            <td>
-                <button class="btn btn-sm btn-outline-warning btn-circle btn-editar editarBtn">
-                    <i class="bi bi-pencil"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger btn-circle btn-elim eliminarBtn">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </td>
-        `;
-
-
-        //AÑADIENDO ACCIONES A LOS BOTONES DE EDITAR Y ELIMINAR
-        newRow.querySelector('.editarBtn').addEventListener('click',function(event){
-            event.preventDefault();
-            editarFila(newRow);
-        })
-
-        newRow.querySelector(".btn-elim").addEventListener("click", function(event) {
-            event.preventDefault();
-            eliminarFila(newRow);
+            if (precInput) precInput.value = precio || 0;
+            if (cantInput) {
+                cantInput.setAttribute('placeholder', 'Max: ' + existencias);
+                cantInput.value = 1;
+                // Disparar evento input manualmente para calcular total inicial
+                const event = new Event('input');
+                cantInput.dispatchEvent(event);
+            }
         });
+    }
 
+    // Función de cálculo en los inputs (fila azul)
+    function calcRowInput() {
+        if (!cantInput || !precInput || !totTabInput) return;
+        const c = parseFloat(cantInput.value) || 0;
+        const p = parseFloat(precInput.value) || 0;
+        totTabInput.value = (c * p).toFixed(2);
+    }
 
-        //LIMPIANDO EL FORM
-        $('#producto-select').val(null).trigger('change');
-        document.getElementById('cantidad').value='';
-        document.getElementById('precio-unitario').value='';
-        document.getElementById('total-tab').value='';
-        document.getElementById('producto-select').value='';
+    if (cantInput) {
+        cantInput.addEventListener('input', calcRowInput);
+    }
 
+    // --- 3. AGREGAR A LA TABLA ---
+    if (btnAnadir) {
+        btnAnadir.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            if (selectProducto.val() === null || selectProducto.val() === "") {
+                alert("Selecciona un producto primero");
+                return;
+            }
 
-        actualizarTotalTabla();
+            const nombre = $('#producto-select option:selected').text();
+            const precio = parseFloat(precInput.value) || 0;
+            const cant = parseInt(cantInput.value) || 1;
+            const importe = precio * cant;
+            const prodId = selectProducto.val();
 
-        //actualizando el total
+            // Crear fila
+            const tbody = document.querySelector('#resumenTabla tbody');
+            if (tbody) {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td data-id="${prodId}">${nombre}</td>
+                    <td class="text-center">${cant}</td>
+                    <td class="text-end">$${precio.toFixed(2)}</td>
+                    <td class="text-end fw-bold">$${importe.toFixed(2)}</td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-outline-danger btn-circle btn-elim">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
 
-    });
+                // Botón eliminar
+                const btnElim = row.querySelector('.btn-elim');
+                if (btnElim) {
+                    btnElim.addEventListener('click', function() {
+                        row.remove();
+                        recalcularTodo();
+                    });
+                }
+            }
 
+            // Limpiar
+            selectProducto.val(null).trigger('change');
+            if (cantInput) cantInput.value = '';
+            if (precInput) precInput.value = '';
+            if (totTabInput) totTabInput.value = '';
+
+            recalcularTodo();
+        });
+    }
+
+    // --- 4. DESCUENTOS (MANUAL Y TARJETA) ---
+    
+    // Botón Manual
+    const btnManual = document.getElementById('btnAplicarManual');
+    if (btnManual) {
+        btnManual.addEventListener('click', function() {
+            const tipoElem = document.getElementById('manual_desc_type');
+            const valElem = document.getElementById('manual_desc_val');
+            
+            if (!tipoElem || !valElem) return;
+
+            const valorInput = parseFloat(valElem.value) || 0;
+            if (valorInput <= 0) {
+                alert("Ingrese un valor válido");
+                return;
+            }
+
+            descuentoActivo = {
+                tipo: tipoElem.value === '%' ? 'manual_percent' : 'manual_fixed',
+                valor: valorInput,
+                info: `Manual ${valorInput}${tipoElem.value}`,
+                codigo: null
+            };
+            recalcularTodo();
+            alert("Descuento aplicado.");
+        });
+    }
+
+    // Botón Tarjeta
+    const btnTarjeta = document.getElementById('btnBuscarTarjeta');
+    if (btnTarjeta) {
+        btnTarjeta.addEventListener('click', function() {
+            const codeElem = document.getElementById('card_code_input');
+            const msgDiv = document.getElementById('card_msg');
+            
+            if (!codeElem) return;
+            // Lo que el usuario escribe/escanea (La REFERENCIA)
+            const referenciaInput = codeElem.value.trim(); 
+
+            if (msgDiv) msgDiv.textContent = "";
+
+            let tarjetaEncontrada = null;
+            let keyInterna = null; // 'san_valentin'
+
+            // BUCLES PARA BUSCAR POR REFERENCIA
+            // TARJETAS_DB es un objeto: { 'san_valentin': {referencia: '...', ...}, 'otro': {...} }
+            if (typeof TARJETAS_DB !== 'undefined') {
+                for (const [key, data] of Object.entries(TARJETAS_DB)) {
+                    // Comparamos como string para evitar errores de tipos
+                    if (String(data.referencia) === String(referenciaInput)) {
+                        tarjetaEncontrada = data;
+                        keyInterna = key;
+                        break; // Ya la encontramos
+                    }
+                }
+            }
+
+            if (tarjetaEncontrada) {
+                // Validar activo y existencias
+                if (tarjetaEncontrada.activo === false || (tarjetaEncontrada.existencias !== undefined && tarjetaEncontrada.existencias <= 0)) {
+                    if (msgDiv) {
+                        msgDiv.className = 'small mt-1 fw-bold text-danger';
+                        msgDiv.textContent = "Tarjeta agotada o inactiva.";
+                    }
+                    return;
+                }
+
+                // Guardamos el descuento
+                descuentoActivo = {
+                    tipo: tarjetaEncontrada.tipo === '%' ? 'card_percent' : 'card_fixed',
+                    valor: parseFloat(tarjetaEncontrada.descuento),
+                    info: `Ref: ${referenciaInput} (${tarjetaEncontrada.descuento}${tarjetaEncontrada.tipo})`,
+                    codigo: keyInterna // GUARDAMOS 'san_valentin' PARA EL BACKEND
+                };
+
+                recalcularTodo();
+                
+                if (msgDiv) {
+                    msgDiv.className = 'small mt-1 fw-bold text-success';
+                    msgDiv.textContent = "Tarjeta válida.";
+                }
+
+                // Asignar al input oculto
+                const hiddenCode = document.getElementById('hidden_card_code');
+                if(hiddenCode) hiddenCode.value = keyInterna;
+
+            } else {
+                // No encontrada
+                descuentoActivo = { tipo: 'none', valor: 0, info: 'Ninguno', codigo: null };
+                recalcularTodo();
+                if (msgDiv) {
+                    msgDiv.className = 'small mt-1 fw-bold text-danger';
+                    msgDiv.textContent = "Referencia no encontrada.";
+                }
+                const hiddenCode = document.getElementById('hidden_card_code');
+                if(hiddenCode) hiddenCode.value = '';
+            }
+        });
+    }
+
+    // Reset al cambiar tabs
+    const tabs = document.querySelectorAll('button[data-bs-toggle="pill"]');
+    if (tabs) {
+        tabs.forEach(tab => {
+            tab.addEventListener('shown.bs.tab', function (event) {
+                if (event.target.id === 'pills-none-tab') {
+                    descuentoActivo = { tipo: 'none', valor: 0, info: 'Ninguno', codigo: null };
+                    recalcularTodo();
+                    
+                    const manualIn = document.getElementById('manual_desc_val');
+                    const cardIn = document.getElementById('card_code_input');
+                    const msgDiv = document.getElementById('card_msg');
+                    
+                    if (manualIn) manualIn.value = '';
+                    if (cardIn) cardIn.value = '';
+                    if (msgDiv) msgDiv.textContent = '';
+                }
+            });
+        });
+    }
 });
 
-//FUNCION DE EDITAR FILA
-function editarFila(row){
-
-    //obteniendo la id del total para restar directamente el subtotal del producto
-    const total =  document.getElementById('total');
-
-    const productoCell = row.cells[0];
-    const cantidadCell = row.cells[1];
-    const precio_unitarioCell = row.cells[2];
-    const subtotalCell = row.cells[3];
-
-    const productoId = productoCell.getAttribute('data-id');
-    const producto = productoCell.textContent;
-
-    const cantidad = parseInt(cantidadCell.textContent);
-
-    const prec_uni= parseInt(precio_unitarioCell.textContent);
-
-    const subtotal = parseInt(subtotalCell.textContent);
-
-    //tengo que restarle los cosos ajsajs
-
-
-    $('#producto-select').val(productoId).trigger('change');
-    document.getElementById('cantidad').value = cantidad;
-    document.getElementById('precio-unitario').value = prec_uni;
-    document.getElementById('total-tab').value = subtotal;
-
-    //restando subtotal del producto del total
-    const newTotal = parseInt(total.textContent) - subtotal;
-    total.textContent = newTotal;
-
-
-    eliminarFilaParaEditar(row);
-
-}
-
-//eliminar fila para su edicion
-function eliminarFilaParaEditar(row){
-    row.remove();
-}
-
-
-//eliminar fila 
-function eliminarFila(row){
+// --- FUNCION MAESTRA DE RECALCULO ---
+function recalcularTodo() {
+    let subtotal = 0;
+    const rows = document.querySelectorAll('#resumenTabla tbody tr');
     
-    const subtotalCell = row.cells[3];
-    const subtotal = parseInt(subtotalCell.textContent);
-    
-    const total =  document.getElementById('total');
-    const currentTotal = parseInt(total.textContent) || 0;
+    rows.forEach(r => {
+        // Asumiendo columna 3 es el importe
+        if (r.cells.length > 3) {
+            const txt = r.cells[3].textContent.replace('$','').trim();
+            subtotal += parseFloat(txt) || 0;
+        }
+    });
 
-    const newTotal = currentTotal - subtotal;
-    total.textContent = newTotal;
-    
-    row.remove();
-}
+    subtotalGlobal = subtotal;
 
+    // Calcular descuento
+    let descuento = 0;
+    if (descuentoActivo.tipo === 'manual_percent' || descuentoActivo.tipo === 'card_percent') {
+        descuento = subtotal * (descuentoActivo.valor / 100);
+    } else if (descuentoActivo.tipo === 'manual_fixed' || descuentoActivo.tipo === 'card_fixed') {
+        descuento = descuentoActivo.valor;
+    }
 
+    if (descuento > subtotal) descuento = subtotal;
 
-//CAMBIO DE ACUERDO A LO RECIBIDO
-document.addEventListener("DOMContentLoaded", function() {
-    const totalElement = document.getElementById('total'); // Captura el elemento donde está el total
-    const metodoEfectivo = document.getElementById('metodo_efectivo');
-    const recibidoInput = document.getElementById('recibido');
-    const cambioOutput = document.getElementById('cambio');
+    descuentoMonto = descuento;
+    totalConDescuento = subtotal - descuento;
 
-    function calcularCambio() {
-        const total = parseFloat(totalElement.textContent) || 0; // Convierte el total a número
-        const recibido = parseFloat(recibidoInput.value) || 0; // Convierte lo recibido a número
-        
-        if (metodoEfectivo.checked) { // Verifica si el método "Efectivo" está seleccionado
-            const cambio = recibido - total;
-            cambioOutput.value = cambio.toFixed(2); // Muestra el cambio con dos decimales
+    // Actualizar UI
+    const subElem = document.getElementById('subtotal_display');
+    const totElem = document.getElementById('total');
+    const modalTot = document.getElementById('modal_total_confirm');
+    const descRow = document.getElementById('row_descuento_display');
+    const descLabel = document.getElementById('desc_label_display');
+    const descMonto = document.getElementById('desc_monto_display');
+
+    if (subElem) subElem.textContent = subtotal.toFixed(2);
+    if (totElem) totElem.textContent = totalConDescuento.toFixed(2);
+    if (modalTot) modalTot.textContent = '$' + totalConDescuento.toFixed(2);
+
+    if (descRow && descLabel && descMonto) {
+        if (descuento > 0) {
+            descRow.style.setProperty('display', 'flex', 'important');
+            descLabel.textContent = descuentoActivo.info;
+            descMonto.textContent = descuento.toFixed(2);
         } else {
-            cambioOutput.value = 0.00; // Si otro método está seleccionado, el cambio es 0
-            recibidoInput.value = 0.00;
+            descRow.style.setProperty('display', 'none', 'important');
         }
     }
 
-
-    //OBSERVADOR PARA EL SPAN DEL TOTAL, PARA ACTUALIZAR EL CAMBIO DE ACUERDO A NUEVOS PRODUCTOS AÑADIDOS
-    const observer = new MutationObserver(() => {
-        calcularCambio(); // Llama tu función cuando cambie el contenido del span
-    });
-
+    // Actualizar Inputs Hidden
+    const hTotal = document.getElementById('hidden_total_final');
+    const hDescM = document.getElementById('hidden_desc_monto');
+    const hDescI = document.getElementById('hidden_desc_info');
     
-    // Actualiza el cambio cada vez que cambien el método de pago o el monto recibido
-    metodoEfectivo.addEventListener('change', calcularCambio);
-    recibidoInput.addEventListener('input', calcularCambio);
-    totalElement.addEventListener('change', calcularCambio)
-    
-    // Observar cambios en el contenido del span
-    observer.observe(totalElement, { childList: true, characterData: true, subtree: true });
-});
+    if (hTotal) hTotal.value = totalConDescuento.toFixed(2);
+    if (hDescM) hDescM.value = descuentoMonto.toFixed(2);
+    if (hDescI) hDescI.value = descuentoActivo.info;
 
-
-//metodo mixto
-document.addEventListener("DOMContentLoaded", function() {
-    const efectivoInput = document.getElementById('mix_ef'); // Captura el elemento donde está el total
-    const totalElement = document.getElementById('total');
-    const tarjetaInput = document.getElementById("mix_tar");
-    const metodoMixto = document.getElementById('metodo_mixto');
-    const recibidoInput = document.getElementById('recibido_mixto');
-    const cambioOutput = document.getElementById('cambio_mixto');
-
-    function calcularCambio() {
-        const efectivo = parseFloat(efectivoInput.value) || 0; // Convierte el total a número
-        const recibido = parseFloat(recibidoInput.value) || 0; // Convierte lo recibido a número
-        const total = parseFloat(totalElement.textContent) || 0;
-        
-        if (metodoMixto.checked) { // Verifica si el método "Mixto" está seleccionado
-            //1. del total restar lo que se va a dar en efectivo y el resto ponerlo en el de tarjeta
-            const tarjeta = total - efectivo;
-            tarjetaInput.value = tarjeta.toFixed(2);
-
-            //2.de acuerdo al efectivo a pagar sacar el cambio de lo recibido
-            const cambio = recibido - efectivo;
-            cambioOutput.value = cambio.toFixed(2); // Muestra el cambio con dos decimales
-        } else {
-            cambioOutput.value = 0.00; // Si otro método está seleccionado, el cambio es 0
-            recibidoInput.value = 0.00;
-
+    // Input hidden para tarjeta
+    let cardInput = document.getElementById('hidden_card_code');
+    if (!cardInput) {
+        const form = document.getElementById('venta_form');
+        if (form) {
+            cardInput = document.createElement('input');
+            cardInput.type = 'hidden';
+            cardInput.id = 'hidden_card_code';
+            cardInput.name = 'codigo_tarjeta_usada';
+            form.appendChild(cardInput);
         }
     }
+    if (cardInput) cardInput.value = descuentoActivo.codigo || '';
 
-
-    //OBSERVADOR PARA EL SPAN DEL TOTAL, PARA ACTUALIZAR EL CAMBIO DE ACUERDO A NUEVOS PRODUCTOS AÑADIDOS
-    const observer = new MutationObserver(() => {
-        calcularCambio(); // Llama tu función cuando cambie el contenido del span
-    });
-
-    
-    // Actualiza el cambio cada vez que cambien el método de pago o el monto recibido
-    metodoMixto.addEventListener('change', calcularCambio);
-    recibidoInput.addEventListener('input', calcularCambio);
-    efectivoInput.addEventListener('input', calcularCambio)
-    
-    // Observar cambios en el contenido del span
-    observer.observe(totalElement, { childList: true, characterData: true, subtree: true });
-});
-
-
-
-
-function actualizarTotalTabla() {
-    let total = 0;
-    const filas = document.querySelectorAll('#resumenTabla tr'); // Todas las filas de la tabla
-
-    filas.forEach(fila => {
-        const subtotalElemento = fila.querySelector('td:nth-child(4)'); // La columna del subtotal
-        if (subtotalElemento) {
-            const subtotal = parseFloat(subtotalElemento.textContent.replace('$', '')) || 0;
-            total += subtotal;
-        }
-    });
-
-    document.getElementById('total').textContent = total.toFixed(2); // Actualiza el total
+    // Notificar cambio
+    if (totElem) {
+        const evt = new Event('change');
+        totElem.dispatchEvent(evt);
+    }
 }

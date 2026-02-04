@@ -253,112 +253,143 @@
                                             <!-- Modal -->
                                             <div class="modal fade" id="abonoModal" tabindex="-1"
                                                 aria-labelledby="abonoModalLabel" aria-hidden="true">
-                                                <div class="modal-dialog modal-lg modal-dialog-centered">
-                                                    <div class="modal-content border-0 shadow-lg rounded-4">
+                                                <div class="modal-dialog modal-dialog-centered"
+                                                    style="max-width: 500px;">
+                                                    <div class="modal-content border-0 shadow-lg rounded-3">
+
                                                         <form method="POST" action="{% url 'abonar' %}">
                                                             {% csrf_token %}
+
                                                             <div
-                                                                class="modal-header bg-primary text-white rounded-top-4 py-3">
-                                                                <h5 class="modal-title fw-bold">Registrar Abono</h5>
+                                                                class="modal-header bg-dark text-white py-2 px-3 border-0">
+                                                                <h6 class="modal-title fw-bold text-uppercase small"
+                                                                    id="abonoModalLabel">
+                                                                    <i class="bi bi-cash-stack me-2"></i>Registrar Abono
+                                                                </h6>
                                                                 <button type="button" class="btn-close btn-close-white"
                                                                     data-bs-dismiss="modal"
                                                                     aria-label="Cerrar"></button>
                                                             </div>
 
-                                                            <div class="modal-body p-4">
-                                                                <div class="mb-4">
-                                                                    <label for="id"
-                                                                        class="form-label fw-semibold text-muted">ID del
-                                                                        Pedido</label>
-                                                                    <input type="text"
-                                                                        class="form-control form-control-lg text-center bg-light border-0 rounded-3"
-                                                                        id="id" name="id" readonly>
+                                                            <div class="modal-body p-3">
+                                                                <div
+                                                                    class="d-flex justify-content-between align-items-center bg-light p-2 mb-3 border-start border-4 border-dark rounded-end">
+                                                                    <div>
+                                                                        <label
+                                                                            class="d-block fw-bold text-muted text-uppercase"
+                                                                            style="font-size: 0.65rem; letter-spacing: 0.5px;">ID
+                                                                            Interno del Pedido</label>
+                                                                        <input type="text"
+                                                                            class="fw-bold border-0 bg-transparent p-0 m-0 text-dark"
+                                                                            id="id" name="id" readonly>
+                                                                    </div>
+                                                                    <i
+                                                                        class="bi bi-info-circle-fill text-secondary"></i>
                                                                 </div>
 
-                                                                <div class="row g-3 mb-4">
-                                                                    <div class="col-md-4">
+                                                                <div class="row g-2 mb-3">
+                                                                    <div class="col-6">
                                                                         <label for="folio"
-                                                                            class="form-label fw-semibold text-muted">Folio</label>
+                                                                            class="form-label small fw-bold text-secondary mb-1">Folio
+                                                                            de Referencia</label>
                                                                         <input type="number" step="0.01"
-                                                                            class="form-control rounded-3" id="folio"
-                                                                            name="folio" required>
+                                                                            class="form-control form-control-sm border-secondary shadow-sm"
+                                                                            id="folio" name="folio" required>
                                                                     </div>
-                                                                    <div class="col-md-8">
+                                                                    <div class="col-6">
                                                                         <label for="fecha"
-                                                                            class="form-label fw-semibold text-muted">Fecha
-                                                                            y hora
-                                                                            del Abono</label>
+                                                                            class="form-label small fw-bold text-secondary mb-1">Fecha
+                                                                            y Hora</label>
                                                                         <input type="datetime-local"
-                                                                            class="form-control rounded-3" id="fecha"
-                                                                            name="fecha" required>
+                                                                            class="form-control form-control-sm border-secondary shadow-sm"
+                                                                            id="fecha" name="fecha" required>
                                                                     </div>
                                                                 </div>
 
-                                                                <div class="row g-3 mb-4">
-                                                                    <div class="col-md-4">
-                                                                        <label for="gran_total"
-                                                                            class="form-label fw-semibold text-muted">Gran
-                                                                            Total</label>
-                                                                        <input type="number" step="0.01"
-                                                                            class="form-control bg-light rounded-3"
-                                                                            id="gran_total" name="gran_total" readonly>
+                                                                <div class="row g-2 mb-3">
+                                                                    <div class="col-4">
+                                                                        <label class="fw-bold text-muted mb-1"
+                                                                            style="font-size: 0.7rem;">Total
+                                                                            Pedido</label>
+                                                                        <div class="input-group input-group-sm">
+                                                                            <span
+                                                                                class="input-group-text bg-light border-0">$</span>
+                                                                            <input type="number"
+                                                                                class="form-control bg-light border-0 fw-semibold"
+                                                                                id="gran_total" name="gran_total"
+                                                                                readonly>
+                                                                        </div>
                                                                     </div>
-                                                                    <div class="col-md-4">
-                                                                        <label for="abono"
-                                                                            class="form-label fw-semibold text-muted">Monto
-                                                                            del
-                                                                            Abono</label>
-                                                                        <input type="number" step="0.01"
-                                                                            class="form-control rounded-3 border-primary"
-                                                                            id="abono" name="abono" required>
+                                                                    <div class="col-4">
+                                                                        <label class="fw-bold text-dark mb-1"
+                                                                            style="font-size: 0.7rem;">Monto a
+                                                                            Abonar</label>
+                                                                        <div class="input-group input-group-sm">
+                                                                            <span
+                                                                                class="input-group-text bg-dark text-white border-dark">$</span>
+                                                                            <input type="number" step="0.01"
+                                                                                class="form-control border-dark fw-bold"
+                                                                                id="abono" name="abono" required>
+                                                                        </div>
                                                                     </div>
-                                                                    <div class="col-md-4">
-                                                                        <label for="gran_total_restante"
-                                                                            class="form-label fw-semibold text-muted">Total
-                                                                            Restante</label>
-                                                                        <input type="number" step="0.01"
-                                                                            class="form-control bg-light rounded-3"
-                                                                            id="gran_total_restante"
-                                                                            name="gran_total_restante" readonly>
+                                                                    <div class="col-4">
+                                                                        <label class="fw-bold text-muted mb-1"
+                                                                            style="font-size: 0.7rem;">Saldo
+                                                                            Pendiente</label>
+                                                                        <div class="input-group input-group-sm">
+                                                                            <span
+                                                                                class="input-group-text bg-light border-0">$</span>
+                                                                            <input type="number"
+                                                                                class="form-control bg-light border-0 text-muted fw-semibold"
+                                                                                id="gran_total_restante"
+                                                                                name="gran_total_restante" readonly>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
 
-                                                                <div>
-                                                                    <label
-                                                                        class="form-label fw-semibold text-muted mb-2">Forma
-                                                                        de
-                                                                        pago</label>
-                                                                    <div class="d-flex flex-wrap gap-3">
-                                                                        <div class="form-check form-check-inline">
+                                                                <div class="border rounded p-2 bg-light">
+                                                                    <p class="text-center small fw-bold text-uppercase text-muted mb-2"
+                                                                        style="font-size: 0.65rem;">Forma de Pago</p>
+                                                                    <div class="d-flex justify-content-around">
+                                                                        <div class="form-check form-check-inline me-0">
                                                                             <input class="form-check-input" type="radio"
                                                                                 name="abono_pago" id="abono_efectivo"
                                                                                 value="efectivo" required>
-                                                                            <label class="form-check-label text-dark"
+                                                                            <label
+                                                                                class="form-check-label small fw-semibold"
                                                                                 for="abono_efectivo">Efectivo</label>
                                                                         </div>
-                                                                        <div class="form-check form-check-inline">
+                                                                        <div class="form-check form-check-inline me-0">
                                                                             <input class="form-check-input" type="radio"
                                                                                 name="abono_pago" id="abono_tarjeta"
                                                                                 value="tarjeta">
-                                                                            <label class="form-check-label text-dark"
+                                                                            <label
+                                                                                class="form-check-label small fw-semibold"
                                                                                 for="abono_tarjeta">Tarjeta</label>
                                                                         </div>
-                                                                        <div class="form-check form-check-inline">
+                                                                        <div class="form-check form-check-inline me-0">
                                                                             <input class="form-check-input" type="radio"
                                                                                 name="abono_pago"
                                                                                 id="abono_transferencia"
                                                                                 value="transferencia">
-                                                                            <label class="form-check-label text-dark"
-                                                                                for="abono_transferencia">Transferencia</label>
+                                                                            <label
+                                                                                class="form-check-label small fw-semibold"
+                                                                                for="abono_transferencia">Transf.</label>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
 
-                                                            <div class="modal-footer p-4 bg-light rounded-bottom-4">
+                                                            <div
+                                                                class="modal-footer bg-light py-2 px-3 border-0 d-flex justify-content-between">
+                                                                <button type="button"
+                                                                    class="btn btn-sm text-muted fw-bold text-uppercase border-0"
+                                                                    data-bs-dismiss="modal"
+                                                                    style="font-size: 0.75rem;">Cancelar</button>
                                                                 <button type="submit" id="registrarAbonoBtn"
-                                                                    class="btn btn-primary w-100 fw-bold rounded-pill py-2">
-                                                                    <i class="bi bi-receipt me-2"></i> Registrar Abono
+                                                                    class="btn btn-sm btn-dark px-4 rounded-1 fw-bold text-uppercase"
+                                                                    style="font-size: 0.75rem;">
+                                                                    <i class="bi bi-receipt me-1"></i> Registrar Abono
                                                                 </button>
                                                             </div>
                                                         </form>

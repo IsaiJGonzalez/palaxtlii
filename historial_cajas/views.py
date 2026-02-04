@@ -23,16 +23,15 @@ def historial_caja(request):
 
     return render(request,'historial_cajas.html',context)
 
-
 @login_required
 def ver_ventas(request,id):
     sucursal = request.session.get('usuario',{}).get('sucursal')
+    # Se asume que fs.consultar_venta_historica ya trae los campos nuevos de la BD
     raw_venta_historica = fs.consultar_venta_historica(id,sucursal)
     venta_historica = raw_venta_historica[::-1]
     context = {
         'v_h' : venta_historica,
         'corte_id' : id
-
     }
     return render(request, 'ver_ventas.html',context)
 
@@ -41,7 +40,7 @@ def imprimir_ticket(request):
 
     if request.method == 'POST':
         direccion_empleado = request.session.get('usuario',{}).get('sucursal',0)
-        print('DIRECCIÓN DEL EMPLEADO: ', direccion_empleado)
+        
         corte_id = request.POST.get('corte')
         venta = int(request.POST.get('venta') or 0)
         fecha = request.POST.get('fecha') or ''
@@ -50,22 +49,36 @@ def imprimir_ticket(request):
         empleado_numero = request.POST.get('empleado_numero') or ''
         ubicacion = request.POST.get('ubicacion') or ''
         operacion = request.POST.get('operacion') or ''
+        
         total = float( request.POST.get('total')  or 0.0 )
+        
+        # --- NUEVOS CAMPOS DE DESCUENTO ---
+        descuento_monto = float(request.POST.get('descuento_monto') or 0.0)
+        info_descuento = request.POST.get('info_descuento') or 'Ninguno'
+        # ----------------------------------
+
         mix_tarjeta = float(request.POST.get('mix_tarjeta')  or 0.0 )
         mix_efectivo = float(request.POST.get('mix_efectivo')  or 0.0)
         recibido = float(request.POST.get('recibido')  or 0.0)
         cambio = float(request.POST.get('cambio')  or 0.0) 
+        
         nombres = request.POST.getlist('productos_nombre[]')
         cantidades = request.POST.getlist('productos_cantidad[]')
         precios = request.POST.getlist('productos_precio_unitario[]')
         subtotales = request.POST.getlist('productos_subtotal[]')
+        
         resumen_data = []
         for i in range(len(nombres)):
             resumen_data.append({
-                'nombre': nombres[i],
+                'nombre': nombres[i], # Ojo: en ticket_venta a veces espera 'productoNombre' o lo busca por ID. 
+                # Si tu ticket usa ID, esto es solo visual si falla la busqueda.
+                # Pero para reimpresión simple suele bastar.
                 'cantidad': cantidades[i],
                 'precio_unitario': precios[i],
                 'subtotal': subtotales[i],
+                # Agregamos dummy ID si el ticket lo exige estrictamente, 
+                # o asegúrate que tu ticket_venta maneje falta de ID si solo imprimes texto.
+                'productoId': '0' 
             })
 
 
@@ -77,6 +90,12 @@ def imprimir_ticket(request):
                 "at_no_emp": empleado_numero,
                 "productos": resumen_data,
                 "total": total,
+                
+                # --- AGREGAMOS AL RESUMEN ---
+                "descuento_monto": descuento_monto,
+                "info_descuento": info_descuento,
+                # ----------------------------
+
                 "metodo_pago": metodo,
                 "recibido": recibido,
                 "cambio": cambio,
@@ -85,8 +104,10 @@ def imprimir_ticket(request):
                 "mix_ef" : mix_efectivo,
                 "mix_tar" : mix_tarjeta
             }
+        
+        # Importante: tr debe estar importado arriba como 'import ticket_venta as tr'
         tr.imprimir_venta(resumen)
 
         return redirect('ver_ventas', id=corte_id)
 
-    return redirect('ver_ventas', id='default')  # fallback
+    return redirect('ver_ventas', id='default')

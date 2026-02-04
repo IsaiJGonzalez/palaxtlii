@@ -13,6 +13,7 @@ def corte_caja(request):
         return redirect('apertura_caja')
     id_caja = fs.consultar_id_caja_emp(no_emp)
     id_corte = fs.consultar_id_corte_caja_emp(no_emp)
+    monto_apertura = fs.consultar_monto_apertura(no_emp,sucursal)
 
     if privilegio == 1:
         base = 'base_gerencial.html'
@@ -23,7 +24,8 @@ def corte_caja(request):
 
     context = {
         'base':base,
-        'id_caja':id_caja
+        'id_caja':id_caja,
+        'monto_apertura' : monto_apertura
     }
 
     if request.method == 'POST':
@@ -43,7 +45,7 @@ def corte_caja(request):
         fs.cerrar_cajas(sucursal,no_emp,id_caja,id_corte,fecha_corte,billetes,monedas,total_en_caja)
         #Consultar los datos del corte al cerrar para impresión del ticket
         data = fs.consultar_corte(sucursal,id_corte)
-        tk.imprimir_corte(data,nombre_emp,sucursal)
+        tk.imprimir_corte(data,nombre_emp,sucursal,monto_apertura)
 
         return redirect('apertura_caja')
 

@@ -5,7 +5,7 @@ from django.conf import settings
 from datetime import datetime, date
 import locale
 import firebase_service as fs
-import time  # <--- NECESARIO para la pausa
+import time 
 
 # Configuración de locale segura
 try:
@@ -29,7 +29,7 @@ def imprimir_venta(resumen):
         p.charcode('CP850')       # Configurar idioma Español
         # =======================================================
 
-        # Función interna para imprimir el cuerpo del ticket (Cliente o Negocio)
+        # Función interna para imprimir el cuerpo del ticket
         def imprimir_contenido(titulo_copia):
             # --- LOGO ---
             logo_path = os.path.join(settings.BASE_DIR, "static", "logo_ticket.bmp")
@@ -45,7 +45,7 @@ def imprimir_venta(resumen):
             ubicacion = resumen.get('ubicacion', '')
             p.text(f'{ubicacion}\n\n')
             p.text('TICKET VENTA\n')
-            p.text(f'{titulo_copia}\n') # Cliente o Negocio
+            p.text(f'{titulo_copia}\n') 
             
             p.set(align='left', bold=False, width=1, height=1)
             
@@ -99,8 +99,13 @@ def imprimir_venta(resumen):
 
             p.text('-' * 48 + '\n')
 
-            # --- TOTALES ---
-            total = float(resumen.get('total', 0.0))
+            # --- TOTALES Y DESCUENTOS ---
+            total_pagar = float(resumen.get('total', 0.0))
+            
+            # Recuperamos el descuento (puede venir como info_descuento o descuento_detalle según tu BD)
+            descuento_monto = float(resumen.get('descuento_monto', 0.0))
+            info_descuento = resumen.get('info_descuento') or resumen.get('descuento_detalle') or 'Ninguno'
+
             metodo_p = resumen.get('metodo_pago', '')
             mix_ef = float(resumen.get('mix_ef', 0.0))
             mix_tar = float(resumen.get('mix_tar', 0.0))
@@ -108,20 +113,38 @@ def imprimir_venta(resumen):
             cambio = float(resumen.get('cambio', 0.0))
             no_operacion = resumen.get('no_operacion', '')
 
+            # >>> SECCIÓN NUEVA: SI HAY DESCUENTO SE MUESTRA EL DESGLOSE <<<
+            if descuento_monto > 0:
+                # Calculamos el subtotal original para mostrarlo
+                subtotal_orig = total_pagar + descuento_monto
+                
+                p.text(f"{'Subtotal:':<20}${subtotal_orig:>8.2f}\n")
+                # El descuento se muestra restando
+                p.text(f"{'Descuento:':<20}-${descuento_monto:>8.2f}\n")
+                
+                # Mostramos la referencia (ej. Tarjeta: XXXXX o Manual)
+                if info_descuento and info_descuento != "Ninguno":
+                    p.set(align='right')
+                    p.text(f"({info_descuento})\n")
+                    p.set(align='left')
+                
+                p.text('-' * 48 + '\n')
+
             p.set(bold=False)
             p.text(f'Método de Pago: {metodo_p.upper()}\n\n')
             
             # Total en grande
             p.set(bold=True)
-            p.text(f"{'Total:':<20}${total:>8.2f}\n")
+            p.text(f"{'TOTAL:':<20}${total_pagar:>8.2f}\n")
             p.set(bold=False)
 
             if metodo_p == 'mixto':
                 p.text(f"{'Tarjeta:':<20}${mix_tar:>8.2f}\n")
                 if no_operacion:
-                    p.text(f'No. Operación: {no_operacion}\n')
+                    p.text(f'Op. Tarjeta: {no_operacion}\n')
                 p.text(f"{'Efectivo:':<20}${mix_ef:>8.2f}\n")
-                p.text(f"{'Recibido:':<20}${recibido:>8.2f}\n")
+                # Cambio sobre la parte de efectivo
+                p.text(f"{'Recibido (Ef):':<20}${recibido:>8.2f}\n")
                 p.text(f"{'Cambio:':<20}${cambio:>8.2f}\n\n")
             
             elif metodo_p == 'efectivo':
@@ -130,7 +153,7 @@ def imprimir_venta(resumen):
             
             elif metodo_p in ['tarjeta', 'transferencia']:
                 if no_operacion:
-                    p.text(f'Número de Operación: {no_operacion}\n\n')
+                    p.text(f'Ref/Operación: {no_operacion}\n\n')
 
             # --- PIE DE PÁGINA ---
             p.set(align='center')
@@ -148,8 +171,7 @@ def imprimir_venta(resumen):
         imprimir_contenido("Cliente")
         p.cut()
 
-        # 2. IMPRIMIR COPIA NEGOCIO (Descomentado y funcional)
-        # Si no quieres copia negocio, comenta las siguientes 2 líneas:
+        # 2. IMPRIMIR COPIA NEGOCIO
         imprimir_contenido("Negocio")
         p.cut()
 

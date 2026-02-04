@@ -53,7 +53,8 @@ INSTALLED_APPS = [
     'apertura_caja',
     'corte_caja',
     'retiros',
-    'historial_cajas'
+    'historial_cajas',
+    'tarjetas_descuento'
 ]
 
 MIDDLEWARE = [

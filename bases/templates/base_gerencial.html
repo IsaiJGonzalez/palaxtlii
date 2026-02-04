@@ -21,66 +21,71 @@
 
 <body>
     <header>
-        <nav class="navbar navbar-custom border-bottom shadow-sm navbar-expand-lg">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm py-2">
             <div class="container-fluid">
-                <a class="navbar-brand">
-                    <img src="{% static '/logo.png' %}" alt="Palaxtli" width="70" height="65" class="d-inline-block">
-                    <strong> {{nombre_empleado}} </strong>
+                <a class="navbar-brand d-flex align-items-center" href="#">
+                    <img src="{% static '/logo.png' %}" alt="Palaxtli" width="65" height="60" class="d-inline-block">
+                    <span class="ms-2 fw-bold text-dark">{{nombre_empleado}}</span>
                 </a>
-                <ul class="navbar-nav d-flex flex-row gap-4">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'menu_gerencial' %}"><strong>Inicio</strong></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'pedidos' %}"><strong>Historial de Pedidos</strong></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'punto_venta' %}"><strong>Punto de Venta</strong></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'registro_pedidos' %}"><strong>Registrar Pedido</strong></a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            <strong>Configuración</strong>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{% url 'codigos' %}">Códigos / Categorías</a></li>
-                            <li>
-                                <a class="dropdown-item" href="{% url 'apertura_caja' %}">Apertura Caja</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{% url 'corte_caja' %}">Corte Caja</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{% url 'empleados' %}">Empleados</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{% url 'historial_cajas'%}">Historial Cajas</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{% url 'productos' %}">Productos</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{% url 'retiros' %}">Retirar Efectivo</a>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <button class="dropdown-item text-warning-emphasis" id="cambiar_loc" name="cambiar_loc"
-                                    data-bs-toggle="modal" data-bs-target="#modalCambiarLoc"> <strong>Cambiar Locación</strong> </button>
-                            </li>
-                            <li>
-                                <form action="{% url 'bases' %}" method="post">
-                                    {% csrf_token %}
-                                    <button type="submit" class="dropdown-item text-danger"> <strong>Cerrar sesión</strong> </button>
-                                </form>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarPalaxtli">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarPalaxtli">
+                    <ul class="navbar-nav ms-auto align-items-center gap-2">
+                        <li class="nav-item">
+                            <a class="nav-link px-3 fw-bold" href="{% url 'menu_gerencial' %}">Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link px-3 fw-bold" href="{% url 'pedidos' %}">Historial de Pedidos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link px-3 fw-bold" href="{% url 'punto_venta' %}">Punto de Venta</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link px-3 fw-bold" href="{% url 'registro_pedidos' %}">Registrar Pedido</a>
+                        </li>
+
+                        <li class="nav-item dropdown ms-lg-3">
+                            <a class="nav-link dropdown-toggle btn btn-light border px-4 rounded-pill fw-bold" href="#"
+                                id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Configuración
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2"
+                                aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item py-2" href="{% url 'codigos' %}">Códigos / Categorías</a>
+                                </li>
+                                <li><a class="dropdown-item py-2" href="{% url 'apertura_caja' %}">Apertura Caja</a>
+                                </li>
+                                <li><a class="dropdown-item py-2" href="{% url 'corte_caja' %}">Corte Caja</a></li>
+                                <li><a class="dropdown-item py-2" href="{% url 'empleados' %}">Empleados</a></li>
+                                <li><a class="dropdown-item py-2" href="{% url 'historial_cajas'%}">Historial Cajas</a>
+                                </li>
+                                <li><a class="dropdown-item py-2" href="{% url 'productos' %}">Productos</a></li>
+                                <li><a class="dropdown-item py-2" href="{% url 'retiros' %}">Retirar Efectivo</a></li>
+                                <li><a class="dropdown-item py-2" href="{% url 'registro_tarjetas' %}">Tarjetas de Desc.</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <button class="dropdown-item text-warning fw-bold py-2" id="cambiar_loc"
+                                        data-bs-toggle="modal" data-bs-target="#modalCambiarLoc">
+                                        Cambiar Locación
+                                    </button>
+                                </li>
+                                <li>
+                                    <form action="{% url 'bases' %}" method="post" class="m-0">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item text-danger fw-bold py-2">
+                                            Cerrar sesión
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </nav>
     </header>
@@ -92,7 +97,8 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title text-danger"> <i class="bi bi-exclamation-triangle-fill"></i> Deberá volver a iniciar sesión
+                    <h5 class="modal-title text-danger"> <i class="bi bi-exclamation-triangle-fill"></i> Deberá volver a
+                        iniciar sesión
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
@@ -126,8 +132,8 @@
                                 <option value="2">Moctezuma</option>
                             </select>
                         </div>
-                        
-                        
+
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>

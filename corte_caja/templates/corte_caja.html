@@ -14,9 +14,14 @@
         <div class="encabezado">
             <div class="usuario-fecha">
                 <div>
-                    <label for="id_caja">ID Caja asignada:</label>
-                    <input type="text" class="form-control" id="id_caja" name="id_caja"
-                        placeholder="ID Caja" value="{{id_caja}}" readonly>
+                    <label for="id_caja">ID:</label>
+                    <input type="text" class="form-control" id="id_caja" name="id_caja" placeholder="ID Caja"
+                        value="{{id_caja}}" readonly>
+                </div>
+                <div>
+                    <label for="id_caja">Fondo asignado:</label>
+                    <input type="text" class="form-control" id="id_caja" name="id_caja" placeholder="ID Caja"
+                        value="{{monto_apertura}}" readonly>
                 </div>
                 <div>
                     <label for="id_fecha_corte">Fecha de terminación:</label>
@@ -25,12 +30,13 @@
             </div>
         </div>
         <div class="text-center mt-2 mb-5">
-            <h5 class="text-danger"> <i class="bi bi-exclamation-triangle-fill"></i> Cuenta cuidadosamente <strong>la cantidad</strong> de billetes y monedas en tu caja</h5>
+            <h5 class="text-danger"> <i class="bi bi-exclamation-triangle-fill"></i> Cuenta cuidadosamente <strong>la
+                    cantidad</strong> de billetes y monedas en tu caja</h5>
         </div>
         <div class="billetes-monedas mt-3">
             <div>
                 <label for="id_mil">Billetes 1000:</label>
-                <input type="number" class="form-control" id="id_mil" name="billetes_1000" min="0" value="0"> 
+                <input type="number" class="form-control" id="id_mil" name="billetes_1000" min="0" value="0">
             </div>
             <div>
                 <label for="id_quinientos">Billetes 500:</label>
@@ -59,8 +65,8 @@
             </div>
             <div>
                 <label for="fondo_caja">Fondo de Caja:</label>
-                <input type="number" class="form-control bg-black text-white" id="fondo_caja" name="fondo_caja" step="0.01" min="0"
-                    value="0.00" readonly>
+                <input type="number" class="form-control bg-black text-white" id="fondo_caja" name="fondo_caja"
+                    step="0.01" min="0" value="0.00" readonly>
             </div>
         </div>
         <div class="form-bottom mt-4">
@@ -69,9 +75,9 @@
     </form>
 
     <!-- Overlay -->
-                                                    <div id="overlay" style="display:none;">
-                                                        <div class="spinner"></div>
-                                                    </div>
+    <div id="overlay" style="display:none;">
+        <div class="spinner"></div>
+    </div>
 
     {% if form.errors %}
     <div class="alert alert-danger mt-3">

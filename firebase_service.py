@@ -138,6 +138,8 @@ def registrar_venta_vh(
     no_operacion=None,
     mix_ef = None,
     mix_tar = None,
+    descuento_aplicado = 0, # Dinero descontado
+    info_descuento = "Ninguno" # Texto (ej: "10% Manual", "Tarjeta CUPON1")
     ):
 
     venta_data = {
@@ -147,13 +149,16 @@ def registrar_venta_vh(
         'at_nom_emp':at_nom_emp,
         'at_no_emp':at_no_emp,
         'productos':productos,
-        'total':total,
+        'total':total, #total con descuento
         'metodo_pago':metodo_pago,
         'recibido':recibido,
         'cambio':cambio,
         'no_operacion':no_operacion,
         'mix_ef':mix_ef,
-        'mix_tar':mix_tar
+        'mix_tar':mix_tar,
+        # GUARDAMOS INFO DEL DESCUENTO
+        'descuento_monto': descuento_aplicado,
+        'descuento_detalle': info_descuento
     }
     venta_data = {i: j for i, j in venta_data.items() if j is not None}
     fecha_str = fecha_venta if isinstance(fecha_venta, str) else fecha_venta.strftime('%Y-%m-%d')
@@ -279,7 +284,9 @@ def registrar_venta_mc(
     cambio=None,
     no_operacion=None,
     mix_ef = None,
-    mix_tar = None
+    mix_tar = None,
+    descuento_aplicado = 0, # Dinero descontado
+    info_descuento = "Ninguno" # Texto (ej: "10% Manual", "Tarjeta CUPON1")
     ):
 
     venta_data = {
@@ -295,7 +302,10 @@ def registrar_venta_mc(
         'cambio':cambio,
         'no_operacion':no_operacion,
         'mix_ef':mix_ef,
-        'mix_tar':mix_tar
+        'mix_tar':mix_tar,
+        # GUARDAMOS INFO DEL DESCUENTO
+        'descuento_monto': descuento_aplicado,
+        'descuento_detalle': info_descuento
     }
     venta_data = {i: j for i, j in venta_data.items() if j is not None}
     fecha_str = fecha_venta if isinstance(fecha_venta, str) else fecha_venta.strftime('%Y-%m-%d')
@@ -490,6 +500,17 @@ def consultar_caja_activa(id):
 def consultar_id_caja_emp(id):
     ref = db.reference(f'empleados/{id}').get()
     return ref.get('id_caja')
+
+def consultar_monto_apertura(id, suc):
+    id_caja = consultar_id_caja_emp(id)
+    sucursal = 'vistahermosa' if suc == 1 else 'moctezuma'
+    data = db.reference(f'{sucursal}/apertura_caja/{id_caja}').get()
+    
+    # Si data es una tupla (dict, key)
+    if isinstance(data, tuple):
+        data = data[0]
+    
+    return data.get('fondo_caja') if data else None
 
 def consultar_id_corte_caja_emp(id):
     ref = db.reference(f'empleados/{id}').get()
@@ -804,6 +825,22 @@ def registrar_en_corte_mc(corte_id,tipo,metodo_pago,ingreso,resumen=None):
                 ref.child('esperado_en_caja').set(suma_e)
             print('Ingreso de la venta registrada')
 
+        # Extraemos el descuento del resumen (si existe)
+        descuento_monto = float(resumen.get('descuento_monto', 0))
+        
+        if descuento_monto > 0:
+            # 1. Acumular el monto total descontado en el día
+            path_desc_monto = 'ventas/total_descontado_dinero'
+            val_desc_monto = ref.child(path_desc_monto).get() or 0
+            ref.child(path_desc_monto).set(val_desc_monto + descuento_monto)
+
+            # 2. Contar cuántos descuentos se hicieron
+            path_desc_count = 'ventas/cantidad_descuentos_aplicados'
+            val_desc_count = ref.child(path_desc_count).get() or 0
+            ref.child(path_desc_count).set(val_desc_count + 1)
+
+        print('Ingreso de la venta y descuento registrado')
+
         #ingresando la venta al corte
         venta_historica = ref.child('venta_historica')
         #verificamos las ventas que hay
@@ -886,6 +923,23 @@ def registrar_en_corte_vh(corte_id,tipo,metodo_pago,ingreso,resumen=None):
                 ref.child('esperado_en_caja').set(suma_e)
             print('Ingreso de la venta registrada')
         
+        # Extraemos el descuento del resumen (si existe)
+        descuento_monto = float(resumen.get('descuento_monto', 0))
+        
+        if descuento_monto > 0:
+            # 1. Acumular el monto total descontado en el día
+            path_desc_monto = 'ventas/total_descontado_dinero'
+            val_desc_monto = ref.child(path_desc_monto).get() or 0
+            ref.child(path_desc_monto).set(val_desc_monto + descuento_monto)
+
+            # 2. Contar cuántos descuentos se hicieron
+            path_desc_count = 'ventas/cantidad_descuentos_aplicados'
+            val_desc_count = ref.child(path_desc_count).get() or 0
+            ref.child(path_desc_count).set(val_desc_count + 1)
+
+        print('Ingreso de la venta y descuento registrado')
+
+
         #ingresando la venta al corte
         venta_historica = ref.child('venta_historica')
         #verificamos las ventas que hay
@@ -897,6 +951,48 @@ def registrar_en_corte_vh(corte_id,tipo,metodo_pago,ingreso,resumen=None):
 
     return
 
+def obtener_tarjetas_descuento():
+    """
+    Consulta todas las tarjetas disponibles en la raíz.
+    Retorna un diccionario: {'san_valentin': {...}, 'otro_codigo': {...}}
+    """
+    ref = db.reference('tarjetas_descuento')
+    return ref.get() or {}
+
+def crear_tarjeta_descuento(codigo, descuento, tipo, existencias,activo=True):
+    """
+    Crea o sobrescribe una tarjeta de descuento.
+    codigo: str (Ej: 'san_valentin')
+    descuento: float/int (Ej: 15)
+    tipo: str (Ej: '%' o '$')
+    existencias: int (Ej: 100)
+    """
+    ref = db.reference(f'tarjetas_descuento/{codigo}')
+    data = {
+        'referencia' : int(codigo),
+        'descuento': descuento,
+        'tipo': tipo,
+        'existencias': existencias,
+        'activo': activo
+    }
+    ref.set(data)
+    return True
+
+def restar_uso_tarjeta(codigo):
+    """
+    Resta 1 a las existencias de la tarjeta usada.
+    Si llega a 0, podrías optar por desactivarla (opcional).
+    """
+    ref = db.reference(f'tarjetas_descuento/{codigo}')
+    tarjeta = ref.get()
+    
+    if tarjeta and tarjeta.get('existencias', 0) > 0:
+        nuevas_existencias = tarjeta['existencias'] - 1
+        ref.update({'existencias': nuevas_existencias})
+        
+        # Opcional: Desactivar si llega a 0
+        if nuevas_existencias <= 0:
+            ref.update({'activo': False})
 
 ###REGISTRAR ABONOS
 

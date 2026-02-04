@@ -15,49 +15,63 @@
 
 <body>
     <header>
-        <nav class="navbar navbar-custom border-bottom shadow-sm navbar-expand-lg">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm py-2">
             <div class="container-fluid">
-                <a class="navbar-brand">
-                    <img src="{% static '/logo.png' %}" alt="Palaxtli" width="90" height="85" class="d-inline-block">
-                    Palaxtli
+                <a class="navbar-brand d-flex align-items-center" href="#">
+                    <img src="{% static '/logo.png' %}" alt="Palaxtli" width="85" height="80" class="d-inline-block">
+                    <span class="ms-2 fw-bold text-dark">Palaxtli</span>
                 </a>
-                <ul class="navbar-nav d-flex flex-row gap-4">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'menu_cajero' %}">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'punto_venta' %}">Punto de Venta</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'registro_pedidos' %}">Registrar Pedido</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            Configuración
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item" href="{% url 'apertura_caja' %}">Apertura Caja</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{% url 'corte_caja' %}">Corte Caja</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{% url 'retiros' %}">Retirar Efectivo</a>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <form action="{% url 'bases' %}" method="post">
-                                    {% csrf_token %}
-                                    <button type="submit" class="dropdown-item text-danger">Cerrar sesión</button>
-                                </form>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCajero">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarCajero">
+                    <ul class="navbar-nav ms-auto align-items-center gap-2">
+                        <li class="nav-item">
+                            <a class="nav-link px-3 fw-bold" href="{% url 'menu_cajero' %}">Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link px-3 fw-bold" href="{% url 'punto_venta' %}">Punto de Venta</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link px-3 fw-bold" href="{% url 'pedidos' %}">Abonar Pedido</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link px-3 fw-bold" href="{% url 'registro_pedidos' %}">Registrar Pedido</a>
+                        </li>
+
+                        <li class="nav-item dropdown ms-lg-3">
+                            <a class="nav-link dropdown-toggle btn btn-light border px-4 rounded-pill fw-bold" href="#"
+                                id="dropCajero" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Configuración
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2"
+                                aria-labelledby="dropCajero">
+                                <li>
+                                    <a class="dropdown-item py-2" href="{% url 'apertura_caja' %}">Apertura Caja</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-2" href="{% url 'corte_caja' %}">Corte Caja</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item py-2" href="{% url 'retiros' %}">Retirar Efectivo</a>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <form action="{% url 'bases' %}" method="post" class="m-0">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item text-danger fw-bold py-2">
+                                            Cerrar sesión
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </nav>
     </header>

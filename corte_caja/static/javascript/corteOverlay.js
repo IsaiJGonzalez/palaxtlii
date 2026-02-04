@@ -49,4 +49,3 @@ document.addEventListener("DOMContentLoaded", function () {
         input.addEventListener("input", calcularFondoCaja);
     }
 });
-
