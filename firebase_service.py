@@ -1,6 +1,189 @@
 from firebase_admin import db
 import firebase_config
 from datetime import date
+
+
+
+#*** FUNCIONES GLOBALES
+
+from firebase_admin import db
+from datetime import datetime, date
+
+
+# ==============================
+# Helpers
+# ==============================
+
+def to_float(v):
+    try:
+        return float(v)
+    except:
+        return 0.0
+
+
+# ==============================
+# 1️⃣ Obtener pedidos activos (solo folio)
+# ==============================
+
+def obtener_folios_activos():
+    ref = db.reference("pedidos")
+
+    pedidos = ref.order_by_child("estado").equal_to(0).get()
+
+    resultado = []
+
+    if pedidos:
+        for pid, p in pedidos.items():
+            resultado.append({
+                "id": pid,
+                "folio": p.get("folio")
+            })
+
+    return resultado
+
+
+# ==============================
+# 2️⃣ Obtener pedido completo por ID
+# ==============================
+
+def obtener_pedido_por_id(pedido_id):
+    ref = db.reference(f"pedidos/{pedido_id}")
+    return ref.get()
+
+
+# ==============================
+# EDITAR PEDIDO (VERSIÓN CORREGIDA)
+# ==============================
+def editar_pedido(pedido_id, data, nombre_emp):
+
+    ref = db.reference("pedidos").child(pedido_id)
+    pedido = ref.get()
+
+    if not pedido:
+        return {"ok": False, "error": "Pedido no existe"}
+
+    # =============================
+    # NO EDITAR ENTREGADOS
+    # =============================
+    if pedido.get("estado") == 1:
+        return {"ok": False, "error": "Pedido ya entregado"}
+
+    # =============================
+    # VALIDACIONES
+    # =============================
+
+    telefono = data.get("telefono", "").strip()
+    if not telefono:
+        return {"ok": False, "error": "Teléfono obligatorio"}
+
+    fecha_entrega = data.get("fecha_entrega")
+    if fecha_entrega:
+        f = datetime.strptime(fecha_entrega, "%Y-%m-%d").date()
+        if f < date.today():
+            return {"ok": False, "error": "Fecha inválida"}
+    else:
+        fecha_entrega = pedido.get("fecha_entrega")
+
+    forma_entrega = data.get("forma_entrega", "tienda")
+
+    # =============================
+    # COSTO ENVÍO
+    # =============================
+
+    costo_envio_nuevo = int(data.get("costo_envio") or 0)
+
+    # Si es tienda → envío en 0 SIEMPRE
+    if forma_entrega == "tienda":
+        costo_envio_nuevo = 0
+
+    # =============================
+    # PRODUCTOS
+    # =============================
+
+    productos_front = data.get("productos", [])
+
+    if not productos_front:
+        return {"ok": False, "error": "Debe haber al menos 1 producto"}
+
+    productos_bd = pedido.get("productos", {})
+
+    # convertir lista a dict
+    if isinstance(productos_bd, list):
+        productos_bd = {str(i): p for i, p in enumerate(productos_bd)}
+
+    max_index = -1
+    if productos_bd:
+        max_index = max(int(i) for i in productos_bd.keys())
+
+    suma_productos = 0
+
+    for prod in productos_front:
+
+        cantidad = int(prod.get("cantidad", 0))
+        precio = int(prod.get("precio_unitario", 0))
+
+        if cantidad <= 0 or precio <= 0:
+            return {"ok": False, "error": "Cantidad/precio inválidos"}
+
+        importe = cantidad * precio
+        suma_productos += importe
+
+        idx = prod.get("index")
+
+        prod_obj = {
+            "cantidad": cantidad,
+            "descripcion": prod.get("descripcion", ""),
+            "precio_unitario": precio,
+            "importe": importe
+        }
+
+        # editar existente
+        if idx is not None and str(idx) in productos_bd:
+            productos_bd[str(idx)] = prod_obj
+        else:
+            # nuevo producto
+            max_index += 1
+            productos_bd[str(max_index)] = prod_obj
+
+    # =============================
+    # RECALCULAR TOTALES DESDE CERO
+    # =============================
+
+    total_final = suma_productos + costo_envio_nuevo
+
+    anticipo = int(float(pedido.get("anticipo") or 0))
+
+    gran_total_final = total_final - anticipo
+    if gran_total_final < 0:
+        gran_total_final = 0
+
+    # =============================
+    # UPDATE
+    # =============================
+
+    update_data = {
+        "telefono": telefono,
+        "cel": data.get("cel", ""),
+        "direccion": data.get("direccion", ""),
+        "referencias": data.get("referencias", ""),
+        "forma_entrega": forma_entrega,
+        "costo_envio": costo_envio_nuevo,
+        "sucursal": data.get("sucursal", "") if forma_entrega == "tienda" else "",
+        "fecha_entrega": fecha_entrega,
+        "hora_entrega": data.get("hora_entrega", ""),
+        "especificaciones": data.get("especificaciones", ""),
+        "productos": productos_bd,
+        "total": total_final,
+        "gran_total": gran_total_final,
+        "editado_por": nombre_emp,
+        "fecha_edicion": datetime.now().strftime("%Y-%m-%d %H:%M")
+    }
+
+    ref.update(update_data)
+
+    return {"ok": True}
+
+
 # *** Funciones Vista Hermosa
 
 #Funciones add 

@@ -33,5 +33,6 @@ urlpatterns = [
     path('corte_caja/',include('corte_caja.urls')),
     path('retiros/',include('retiros.urls')),
     path('historial_caja/',include('historial_cajas.urls')),
-    path('registro_tarjetas/',include('tarjetas_descuento.urls'))
+    path('registro_tarjetas/',include('tarjetas_descuento.urls')),
+    path('editar_pedidos/', include('editar_pedidos.urls')),
 ]

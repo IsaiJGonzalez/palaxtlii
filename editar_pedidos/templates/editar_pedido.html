@@ -1,0 +1,300 @@
+{% extends 'base_gerencial.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container py-4">
+
+    <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
+
+    <div class="row">
+
+        <!-- ===================== FOLIOS ===================== -->
+        <div class="col-lg-4">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">
+                    Pedidos Activos
+                </div>
+
+                <ul class="list-group list-group-flush" id="listaFolios">
+                    <li class="list-group-item">Cargando...</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ===================== FORM ===================== -->
+        <div class="col-lg-8">
+
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    Editar Pedido
+                </div>
+
+                <div class="card-body">
+
+                    <div id="alertBox"></div>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label>Teléfono</label>
+                            <input id="telefono" class="form-control">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Celular</label>
+                            <input id="cel" class="form-control">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Dirección</label>
+                            <input id="direccion" class="form-control">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Referencias</label>
+                            <input id="referencias" class="form-control">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Forma entrega</label>
+                            <select id="forma_entrega" class="form-select">
+                                <option value="tienda">Tienda</option>
+                                <option value="envio">Envío</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Costo envío</label>
+                            <input id="costo_envio" type="number" class="form-control">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Sucursal</label>
+                            <select id="sucursal" class="form-select">
+                                <option value="1">Vista Hermosa</option>
+                                <option value="2">Moctezuma</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Fecha entrega</label>
+                            <input id="fecha_entrega" type="date" class="form-control">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Hora entrega</label>
+                            <input id="hora_entrega" type="time" class="form-control">
+                        </div>
+
+                        <div class="col-12">
+                            <label>Especificaciones</label>
+                            <textarea id="especificaciones" class="form-control"></textarea>
+                        </div>
+
+                    </div>
+
+                    <hr>
+
+                    <!-- ===================== PRODUCTOS ===================== -->
+
+                    <h5>Productos</h5>
+
+                    <table class="table table-bordered" id="tablaProductos">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Descripción</th>
+                                <th width="120">Cantidad</th>
+                                <th width="150">Precio Unit.</th>
+                                <th width="120">Importe</th>
+                                <th width="80"></th>
+                            </tr>
+                        </thead>
+
+                        <tbody></tbody>
+                    </table>
+
+                    <button class="btn btn-sm btn-secondary" onclick="agregarFilaProducto()">
+                        + Agregar producto
+                    </button>
+
+                    <hr>
+
+                    <button class="btn btn-success w-100" onclick="guardar()">
+                        Guardar Cambios
+                    </button>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+    let pedidoIdActual = null;
+
+    // ================= ALERTAS =================
+    function alerta(msg, t = "success") {
+        alertBox.innerHTML = `<div class="alert alert-${t} alert-dismissible fade show">
+${msg}<button class="btn-close" data-bs-dismiss="alert"></button></div>`;
+    }
+
+    // ================= FOLIOS =================
+    fetch("/editar_pedidos/api/folios/")
+        .then(r => r.json())
+        .then(data => {
+            listaFolios.innerHTML = "";
+            data.folios.forEach(p => {
+                let li = document.createElement("li");
+                li.className = "list-group-item list-group-item-action";
+                li.innerText = "Folio " + p.folio;
+                li.onclick = () => cargarPedido(p.id);
+                listaFolios.appendChild(li);
+            });
+        });
+
+    // ================= CARGAR PEDIDO =================
+    function cargarPedido(id) {
+        pedidoIdActual = id;
+
+        fetch(`/editar_pedidos/api/pedido/${id}/`)
+            .then(r => r.json())
+            .then(res => {
+                let p = res.pedido;
+
+                telefono.value = p.telefono || "";
+                cel.value = p.cel || "";
+                direccion.value = p.direccion || "";
+                referencias.value = p.referencias || "";
+                forma_entrega.value = p.forma_entrega || "tienda";
+                costo_envio.value = p.costo_envio || 0;
+                sucursal.value = p.sucursal || 1;
+                fecha_entrega.value = p.fecha_entrega;
+                hora_entrega.value = p.hora_entrega;
+                especificaciones.value = p.especificaciones || "";
+
+                toggleEntrega();
+
+                cargarProductos(p.productos || {});
+            });
+    }
+
+    // ================= PRODUCTOS =================
+    function cargarProductos(productos) {
+
+        let tbody = document.querySelector("#tablaProductos tbody");
+        tbody.innerHTML = "";
+
+        Object.entries(productos).forEach(([idx, p]) => {
+            agregarFilaProducto(idx, p.descripcion, p.cantidad, p.precio_unitario);
+        });
+    }
+
+    function agregarFilaProducto(idx = null, desc = "", cant = 1, precio = 0) {
+
+        let tr = document.createElement("tr");
+        tr.dataset.index = idx;
+
+        tr.innerHTML = `
+<td><input class="form-control desc" value="${desc}"></td>
+<td><input type="number" class="form-control cant" value="${cant}"></td>
+<td><input type="number" class="form-control precio" value="${precio}"></td>
+<td class="importe">0</td>
+<td><button class="btn btn-danger btn-sm">X</button></td>
+`;
+
+        tr.querySelector("button").onclick = () => tr.remove();
+
+        tr.querySelectorAll("input").forEach(inp => {
+            inp.oninput = () => calcImporte(tr);
+        });
+
+        document.querySelector("#tablaProductos tbody").appendChild(tr);
+        calcImporte(tr);
+    }
+
+    function calcImporte(tr) {
+        let c = Number(tr.querySelector(".cant").value);
+        let p = Number(tr.querySelector(".precio").value);
+        tr.querySelector(".importe").innerText = c * p;
+    }
+
+    // ================= ENTREGA =================
+    function toggleEntrega() {
+        if (forma_entrega.value == "tienda") {
+            cel.disabled = true;
+            direccion.disabled = true;
+            referencias.disabled = true;
+            costo_envio.disabled = true;
+            sucursal.disabled = false;
+        } else {
+            cel.disabled = false;
+            direccion.disabled = false;
+            referencias.disabled = false;
+            costo_envio.disabled = false;
+            sucursal.disabled = true;
+        }
+    }
+    forma_entrega.onchange = toggleEntrega;
+
+    // ================= GUARDAR =================
+    function guardar() {
+
+        if (!pedidoIdActual) {
+            alerta("Selecciona un pedido", "danger");
+            return;
+        }
+
+        let csrf = document.getElementById("csrf_token").value;
+
+        let productos = [];
+
+        document.querySelectorAll("#tablaProductos tbody tr")
+            .forEach(tr => {
+                productos.push({
+                    index: tr.dataset.index,
+                    descripcion: tr.querySelector(".desc").value,
+                    cantidad: Number(tr.querySelector(".cant").value),
+                    precio_unitario: Number(tr.querySelector(".precio").value)
+                });
+            });
+
+        let data = {
+            telefono: telefono.value,
+            cel: cel.value,
+            direccion: direccion.value,
+            referencias: referencias.value,
+            forma_entrega: forma_entrega.value,
+            costo_envio: costo_envio.value,
+            sucursal: sucursal.value,
+            fecha_entrega: fecha_entrega.value,
+            hora_entrega: hora_entrega.value,
+            especificaciones: especificaciones.value,
+            productos: productos
+        };
+
+        console.log("Enviando:", data);
+
+        fetch(`/editar_pedidos/api/editar/${pedidoIdActual}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrf
+            },
+            body: JSON.stringify(data)
+        })
+            .then(r => r.json())
+            .then(res => {
+                console.log(res);
+                if (res.ok) {
+                    alerta("Pedido actualizado");
+                } else {
+                    alerta(res.error || "Error", "danger");
+                }
+            });
+    }
+
+</script>
+
+{% endblock %}
