@@ -20,7 +20,7 @@ def imprimir_venta(resumen):
         time.sleep(0.1)           # Pequeña pausa para que procese
         p.charcode('CP850')       # Configurar idioma Español
         # =======================================================
-
+        print(resumen)
         # --- LOGO ---
         logo_path = os.path.join(settings.BASE_DIR, "static", "logo_ticket.bmp")
         if os.path.exists(logo_path):
@@ -70,11 +70,12 @@ def imprimir_venta(resumen):
 
             # Si tienes IDs y funciones de nombre por ubicación
             producto_id = producto.get('productoId')
-            if producto_id:
+
+            if producto_id and producto_id != '0':
                 if loc_emp == 1:
-                    nombre = fs.obtener_producto_vh(producto_id)
+                    nombre = fs.obtener_producto_vh(producto_id) or nombre
                 elif loc_emp == 2:
-                    nombre = fs.obtener_producto_mc(producto_id)
+                    nombre = fs.obtener_producto_mc(producto_id) or nombre
 
             # Dividir nombre en líneas de 24 caracteres para que no rompa la tabla
             lineas_nombre = [nombre[i:i+24] for i in range(0, len(nombre), 24)]

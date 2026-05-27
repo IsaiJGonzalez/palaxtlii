@@ -35,4 +35,5 @@ urlpatterns = [
     path('historial_caja/',include('historial_cajas.urls')),
     path('registro_tarjetas/',include('tarjetas_descuento.urls')),
     path('editar_pedidos/', include('editar_pedidos.urls')),
+    path('visor_ventas/', include('visor_de_ventas.urls'))
 ]

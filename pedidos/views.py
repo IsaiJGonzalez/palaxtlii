@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from django.http import JsonResponse
 import json
 import ticket_abono as tka
+import ticket_utils as tk
 from core.decorators import gerente_required, ventas_required, cajero_required, gerente_ventas_required, login_required
 
 
@@ -135,7 +136,22 @@ def act_pedido_estado(request):
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 
-
+def reimprimir_pedido(request):
+    locacion = int(request.session.get('usuario',{}).get('sucursal',0))
+    privilegio = request.session.get('usuario',{}).get('privilegio',0)
+    
+    if request.method == 'POST':
+        folio = str(request.POST.get('data-objectPrinted'))
+        pedido = fs.obtener_pedido_por_folio(folio)
+        if pedido:
+            tk.imprimir_ticket(pedido, locacion)
+        else:
+            print("❌ No se encontró el pedido con ese folio")
+        #verificando el privilegio para la redirección
+    if privilegio == 1 or privilegio == 2:
+        return redirect('pedidos')
+    elif privilegio == 3:
+        return redirect('menu_cajero')
 
 def abonar(request):
     

@@ -1,6 +1,7 @@
 from firebase_admin import db
 import firebase_config
 from datetime import date
+import json
 
 
 
@@ -20,6 +21,33 @@ def to_float(v):
     except:
         return 0.0
 
+
+
+def obtener_ventas_por_rango(fecha_inicio, fecha_fin, sucursal):
+
+    ref = db.reference(f'{sucursal}/ventas')
+
+    ventas_snapshot = ref.get()
+
+    ventas_resultado = []
+
+    if not ventas_snapshot:
+        return ventas_resultado
+
+    # Recorremos fechas
+    for fecha, ventas_dia in ventas_snapshot.items():
+
+        # Filtrar por rango
+        if fecha_inicio <= fecha <= fecha_fin:
+
+            # Recorremos ventas de ese día
+            for venta_id, venta_data in ventas_dia.items():
+
+                venta_data['firebase_id'] = venta_id
+
+                ventas_resultado.append(venta_data)
+
+    return ventas_resultado
 
 # ==============================
 # 1️⃣ Obtener pedidos activos (solo folio)
@@ -49,6 +77,20 @@ def obtener_folios_activos():
 def obtener_pedido_por_id(pedido_id):
     ref = db.reference(f"pedidos/{pedido_id}")
     return ref.get()
+
+import json
+
+def obtener_pedido_por_folio(folio):
+    ref = db.reference('pedidos')
+    snapshot = ref.order_by_child('folio').equal_to(folio).get()
+    
+    # snapshot es algo como {"-OtaKa7af4Hjht264vo2": { ...pedido... }}
+    if snapshot:
+        # Tomamos el primer valor (el pedido en sí)
+        pedido = list(snapshot.values())[0]
+        return pedido
+    return None
+
 
 
 # ==============================

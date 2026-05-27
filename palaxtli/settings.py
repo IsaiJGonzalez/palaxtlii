@@ -55,7 +55,8 @@ INSTALLED_APPS = [
     'retiros',
     'historial_cajas',
     'tarjetas_descuento',
-    'editar_pedidos'
+    'editar_pedidos',
+    'visor_de_ventas'
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Visor de Ventas</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #0f1115;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        .filtros {
+            background: #1b1f27;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+
+            display: flex;
+            gap: 20px;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+
+        .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        input,
+        select {
+            background: #2a303c;
+            border: 1px solid #444;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            min-width: 180px;
+        }
+
+        button {
+            background: #007bff;
+            border: none;
+            color: white;
+            padding: 11px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .tabla-container {
+            overflow-x: auto;
+            background: #1b1f27;
+            border-radius: 12px;
+            padding: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+
+        th {
+            background: #007bff;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #2e3440;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #262c38;
+        }
+
+        .loading {
+            margin-top: 15px;
+            color: #aaa;
+        }
+
+        .total-box {
+            margin-top: 20px;
+            background: #1b1f27;
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Visor de Ventas</h2>
+
+    <div class="filtros">
+
+        <div class="campo">
+            <label>Fecha inicio</label>
+            <input type="date" id="fechaInicio">
+        </div>
+
+        <div class="campo">
+            <label>Fecha fin</label>
+            <input type="date" id="fechaFin">
+        </div>
+
+        <div class="campo">
+            <label>Sucursal</label>
+
+            <select id="sucursal">
+                <option value="">Seleccione...</option>
+                <option value="vistahermosa">Vista Hermosa</option>
+                <option value="moctezuma">Moctezuma</option>
+            </select>
+        </div>
+
+        <button onclick="visualizarVentas()">
+            Visualizar
+        </button>
+
+    </div>
+
+    <div class="tabla-container">
+
+        <table id="tablaVentas">
+
+            <thead>
+                <tr>
+                    <th>No Venta</th>
+                    <th>Fecha</th>
+                    <th>Empleado</th>
+                    <th>Productos</th>
+                    <th>No Productos</th>
+                    <th>-</th>
+                    <th>-</th>
+                    <th>Total Venta</th>
+                    <th>Método Pago</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <div class="total-box">
+        Total Ventas: $
+        <span id="totalVentas">0.00</span>
+    </div>
+
+    <script>
+
+        async function visualizarVentas() {
+
+            const fechaInicio = document.getElementById('fechaInicio').value;
+            const fechaFin = document.getElementById('fechaFin').value;
+            const sucursal = document.getElementById('sucursal').value;
+
+            if (!fechaInicio || !fechaFin || !sucursal) {
+                alert('Completa todos los campos');
+                return;
+            }
+
+            const formData = new FormData();
+
+            formData.append('fechaInicio', fechaInicio);
+            formData.append('fechaFin', fechaFin);
+            formData.append('sucursal', sucursal);
+
+            const response = await fetch('', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            });
+
+            const data = await response.json();
+
+            console.log(data);
+
+            const tbody = document.querySelector('#tablaVentas tbody');
+
+            tbody.innerHTML = '';
+
+            let totalGeneral = 0;
+
+            /*
+                AGRUPAR POR NO. VENTA
+            */
+            const ventasAgrupadas = {};
+
+            data.ventas.forEach(v => {
+
+                if (!ventasAgrupadas[v.no_venta]) {
+
+                    ventasAgrupadas[v.no_venta] = {
+                        fecha_venta: v.fecha_venta,
+                        at_nom_emp: v.at_nom_emp,
+                        metodo_pago: v.metodo_pago,
+                        total: parseFloat(v.total),
+                        productos: []
+                    };
+
+                    totalGeneral += parseFloat(v.total);
+                }
+
+                ventasAgrupadas[v.no_venta].productos.push({
+                    productoNombre: v.productoNombre,
+                    cantidad: v.cantidad,
+                    precio_unitario: v.precio_unitario,
+                    subtotal: v.subtotal
+                });
+
+            });
+
+
+            /*
+                CREAR FILAS
+            */
+            Object.entries(ventasAgrupadas).forEach(([noVenta, venta]) => {
+
+                let productosHTML = '';
+
+                venta.productos.forEach(p => {
+
+                    productosHTML += `
+            <div style="margin-bottom:8px;">
+                <strong>${p.productoNombre}</strong><br>
+
+                Cantidad: ${p.cantidad}
+                |
+                P.U: $${parseFloat(p.precio_unitario).toFixed(2)}
+                |
+                Subtotal: $${parseFloat(p.subtotal).toFixed(2)}
+            </div>
+        `;
+                });
+
+                const fila = `
+        <tr>
+            <td>${noVenta}</td>
+            <td>${venta.fecha_venta}</td>
+            <td>${venta.at_nom_emp}</td>
+
+            <td>
+                ${productosHTML}
+            </td>
+
+            <td>
+                ${venta.productos.length}
+            </td>
+
+            <td>-</td>
+
+            <td>-</td>
+
+            <td>
+                $${venta.total.toFixed(2)}
+            </td>
+
+            <td>
+                ${venta.metodo_pago}
+            </td>
+        </tr>
+    `;
+
+                tbody.insertAdjacentHTML(
+                    'beforeend',
+                    fila
+                );
+
+            });
+
+
+            document.getElementById(
+                'totalVentas'
+            ).innerText = totalGeneral.toFixed(2);
+
+            document.getElementById('totalVentas').innerText =
+                totalGeneral.toFixed(2);
+        }
+
+
+        function getCookie(name) {
+
+            let cookieValue = null;
+
+            if (document.cookie && document.cookie !== '') {
+
+                const cookies = document.cookie.split(';');
+
+                for (let i = 0; i < cookies.length; i++) {
+
+                    const cookie = cookies[i].trim();
+
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+
+                        cookieValue = decodeURIComponent(
+                            cookie.substring(name.length + 1)
+                        );
+
+                        break;
+                    }
+                }
+            }
+
+            return cookieValue;
+        }
+
+    </script>
+
+</body>
+
+</html>
