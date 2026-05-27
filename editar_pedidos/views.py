@@ -10,7 +10,16 @@ import firebase_service as fs
 # ==============================
 
 def editar_pedido_page(request):
-    return render(request, "editar_pedido.html")
+    #<-Obtener la plantilla correspondiente al nivel del usuario
+    privilegio = request.session.get('usuario',{}).get('privilegio',0)
+    if privilegio == 1 :
+        base = 'base_gerencial.html'
+    elif privilegio == 2:
+        base = 'base_ventas.html'
+    elif privilegio == 3:
+        base = 'base_cajero.html'
+    #<----
+    return render(request, "editar_pedido.html",{'base' : base})
 
 
 # ==============================
